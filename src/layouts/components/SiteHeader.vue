@@ -7,7 +7,7 @@
                 @click="router.push('/')"
             >
                 <img :src="Logo" class="h-[calc(100%-6px)]" />
-                <h1 text="white h5" hover="text-[#eee]">PhageScope</h1>
+                <h1 text="white h5" hover="text-[#eee]">mRNA vaccine design</h1>
             </div>
             <n-menu
                 v-model:value="activeKey"
@@ -35,7 +35,7 @@ import {
 import { useRouter, RouterLink } from 'vue-router'
 import { NConfigProvider, GlobalThemeOverrides, NIcon, NEllipsis } from 'naive-ui'
 // eslint-disable-next-line import/extensions
-import Logo from '@/assets/img/p5.png'
+import Logo from '@/assets/img/mRNA.png'
 </script>
 
 <script setup lang="ts">
@@ -299,6 +299,7 @@ const changeMenu = (_: string, option: MenuOption) => {
 .c-main-menu {
     @apply flex justify-between items-center;
     @apply text-base;
+
     .n-menu-item {
         @apply flex flex-grow;
     }

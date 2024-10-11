@@ -36,7 +36,9 @@
             <div class="w-full flex flex-col justify-start h-700 bg-[#f8f9fa]">
                 <div class="h-220 flex flex-col">
                     <div class="flex flex-row border-b-1 border-[#34498E] ml-13 w-290 pb-6">
-                        <div class="text-5xl font-700 mt-20 text-[#3e5294]">PhageScope</div>
+                        <div class="text-5xl font-700 mt-20 text-[#3e5294]">
+                            mRNA vaccine design
+                        </div>
                         <el-button
                             round
                             color="#34498E"
@@ -398,11 +400,13 @@ const confirmcookie = () => {
 :deep(.el-carousel__arrow) {
     background-color: rgb(31 45 61 / 59%);
 }
+
 :deep(.el-carousel__indicators--outside button) {
     height: 10px;
     width: 60px;
     background-color: #070708;
 }
+
 // :deep(.el-carousel__indicators--outside) {
 //     z-index: 500 !important;
 //     position: absolute;
