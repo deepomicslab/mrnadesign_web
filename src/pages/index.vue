@@ -307,10 +307,8 @@
                         </div>
                         <div class="flex flex-col">
                             <a class="text-xl mb-3" href="/database">Database</a>
-                            <p><a href="/database/phage">Phage List</a></p>
-                            <p><a href="/database/host">Host List</a></p>
-                            <p><a href="/database/cluster">Cluster List</a></p>
-                            <p><a href="/database/protein">Annotated Protein List</a></p>
+                            <p><a href="/database/antigen">Antigen List</a></p>
+                            <p><a href="/database/tantigen_db">Tantigen List</a></p>
                             <p><a href="/database/filter">Sequence Filter</a></p>
                         </div>
 

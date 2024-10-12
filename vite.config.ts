@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
         // 开发服务器选项
         server: {
             host: env.VITE_HOST ?? 'localhost',
-            port: env.VITE_PORT ?? '8328',
+            port: env.VITE_PORT ?? '8368',
             proxy: {
                 // 配置 api 代理解决跨域问题
                 '/api': {
