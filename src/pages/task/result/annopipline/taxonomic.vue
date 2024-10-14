@@ -135,7 +135,6 @@ import { CloudDownloadOutline as downicon } from '@vicons/ionicons5'
 import log from '../../log.vue'
 import { decrypt } from '@/utils/crypto'
 
-
 const dialogVisible = ref(false)
 const route = useRoute()
 const router = useRouter()
