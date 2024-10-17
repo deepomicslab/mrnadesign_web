@@ -33,7 +33,7 @@
                 :columns="columns"
                 :data="AntigenList"
                 :row-key="rowKey"
-                :scroll-x="1900"
+                :scroll-x="2600"
                 :max-height="1000"
                 @update:checked-row-keys="handleCheck"
                 @update:sorter="handleSorterChange"
@@ -105,25 +105,25 @@ const renderTooltip = (trigger: any, content: any) => {
 const sorter_dict = ref('')
 
 type RowData = {
-    ID: number
-    Antigen_Name: string
-    Antigen_Sequence: string
-    Sequence: string
-    Antigen_Type: string
-    Model_Structure: string
+    id: number
+    antigen_name: string
+    db_info: string
+    sequence: string
+    antigen_type: string
+    model_structure: string
     href2: string
-    Surface_Access: string
+    surface_access: string
     href3: string
-    Protein_Class: string
-    Database_Reference1: string
+    protein_class: string
+    database_reference1: string
     href4: string
-    Database_Reference2: string
+    database_reference2: string
     href5: string
-    Database_Reference3: string
+    database_reference3: string
     href6: string
-    Source_Organism: string
+    source_organism: string
     href7: string
-    Literature_Reference: string
+    literature_reference: string
     href8: string
 }
 
@@ -256,6 +256,7 @@ const resetsearch = () => {
 const columnWidth = {
     id: 100,
     antigen_name: 300,
+    db_info: 200,
     sequence: 200,
     antigen_type: 150,
     model_structure: 120,
@@ -296,6 +297,20 @@ const createColumns = (): DataTableColumns<RowData> => [
         },
         width: columnWidth.antigen_name,
         sorter: true,
+    },
+    {
+        title() {
+            return renderTooltip(
+                h('div', null, { default: () => 'DB Information' }),
+                'DB Information'
+            )
+        },
+        key: 'db_info',
+        align: 'center',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: columnWidth.db_info,
     },
     {
         title() {

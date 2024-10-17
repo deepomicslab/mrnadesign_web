@@ -3,7 +3,7 @@
         <el-scrollbar class="w-full" ref="scrollbarRef" v-load="loading">
             <div class="flex flex-col h-400">
                 <div class="font-600 ml-20 mt-16 flex flex-row border-b-2 w-9/10 pb-5">
-                    <div class="text-4xl text-[#253959]">Completeness Assessment</div>
+                    <div class="text-4xl text-[#253959]">Linear Design</div>
                     <el-button
                         round
                         size="large"
@@ -64,7 +64,7 @@
                     <div class="ml-5">
                         <n-radio-group v-model:value="inputtype">
                             <n-radio-button value="upload">UPLOAD FILE</n-radio-button>
-                            <n-radio-button value="enter">ENTER Phage ID</n-radio-button>
+                            <n-radio-button value="enter">ENTER ANTIGEN/TANTIGEN ID</n-radio-button>
                             <n-radio-button value="paste">PASTE SEQUENCE</n-radio-button>
                         </n-radio-group>
                     </div>
@@ -112,60 +112,57 @@
                     </div>
 
                     <div
-                        class="rounded w-200 h-80 mt-5 rounded-2xl flex-col flex justify-center items-center"
+                        class="rounded w-200 h-60 mt-5 rounded-2xl flex-col flex justify-center items-center"
                         style="box-shadow: 0 0 64px #cfd5db"
                         v-if="inputtype === 'enter'"
                     >
-                        <div class="text-lg flex flex-row mb-2">
+                        <div class="text-lg flex flex-row mt-20">
                             Enter the
-                            <p class="text-red-400 mx-2">Phage IDs</p>
+                            <p class="text-red-400 mx-2">Antigen/Tantigen IDs</p>
                             that already exist in the database, separated by
                             <p class="text-red-400 mx-2 font-900">' ; '</p>
                         </div>
-
-                        <div class="w-130 mt-4 flex flex-row">
-                            <n-form
-                                ref="formRef"
-                                :model="inputformValue"
-                                class="w-130"
-                                label-placement="left"
-                                size="large"
-                            >
-                                <n-form-item
-                                    label="Phage IDs"
-                                    path="phage"
-                                    :validation-status="validationstatus"
-                                    :show-require-mark="true"
-                                >
-                                    <n-input-group>
-                                        <n-input
-                                            size="large"
-                                            round
-                                            placeholder="Phage ID"
-                                            clearable
-                                            v-model:value="inputformValue.phage"
-                                        ></n-input>
-                                        <n-button
-                                            size="large"
-                                            round
-                                            ghost
-                                            @click="confirmids"
-                                            :type="validationstatus"
-                                        >
-                                            Confirm
-                                        </n-button>
-                                    </n-input-group>
-                                </n-form-item>
-                            </n-form>
-                        </div>
-                        <div class="flex flex-row">
-                            <p class="text-red-400 mx-2">Example:</p>
-                            M14428.1;MGV-GENOME-0091953;AJ969242.1
-                        </div>
-                        <div v-show="inputfeedback.length !== 0" class="mt-5">
-                            <n-alert :type="validationstatus">
-                                {{ inputfeedback }}
-                            </n-alert>
+                        <div class="flex flex-row justify-center">
+                            <div class="rounded w-200 h-40 mt-10 rounded-xl">
+                                <el-form status-icon label-width="auto" label-position="right">
+                                    <el-row justify="space-evenly">
+                                        <el-col :span="16">
+                                            <el-form-item label="ID" class="is-required">
+                                                <n-input
+                                                    v-model:value="inputformValue.phage"
+                                                    placeholder="Example: 1;27;56"
+                                                    type="textarea"
+                                                    :autosize="{
+                                                        minRows: 1,
+                                                        maxRows: 2,
+                                                    }"
+                                                />
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row justify="space-evenly">
+                                        <el-col :span="16">
+                                            <el-form-item
+                                                label="Select Data Table"
+                                                class="is-required"
+                                            >
+                                                <n-radio-group
+                                                    v-model:value="inputformValue.datatable"
+                                                    name="datatable"
+                                                    size="large"
+                                                >
+                                                    <n-radio-button value="antigen">
+                                                        Antigen
+                                                    </n-radio-button>
+                                                    <n-radio-button value="tantigen">
+                                                        Tantigen
+                                                    </n-radio-button>
+                                                </n-radio-group>
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-row>
+                                </el-form>
+                            </div>
                         </div>
                     </div>
                     <div
@@ -187,13 +184,6 @@
                             ></n-input>
                         </div>
                         <div class="mt-4">
-                            <!-- <el-switch
-                                active-text="Use Example"
-                                size="large"
-                                class="mr-7"
-                                v-model="exampleSwicth"
-                                @change="examplechange"
-                            /> -->
                             <n-button-group>
                                 <n-button
                                     round
@@ -278,7 +268,6 @@
 import type { UploadFileInfo } from 'naive-ui'
 import { InfoFilled } from '@element-plus/icons-vue'
 import axios from 'axios'
-import { FormInst } from 'naive-ui'
 import { useUserIdGenerator } from '@/utils/userIdGenerator'
 import { encrypt } from '@/utils/crypto'
 import { codonUsageOptions } from '@/utils/taskoptions'
@@ -291,53 +280,17 @@ const pastefile = ref('')
 const userid = ref('')
 const loading = ref(false)
 
-// input phage ids
-const inputformValue = ref({ phage: '' })
+const inputformValue = ref({
+    phage: '',
+    datatable: '',
+})
 const idlist = ref([])
-const formRef = ref<FormInst | null>(null)
 const inputfeedback = ref('')
 const validationstatus = ref()
-const isconfirmed = ref(false)
-const confirmids = async () => {
-    console.log(idlist.value)
-    const checkdata = new FormData()
-    if (inputformValue.value.phage.length === 0) {
-        inputfeedback.value = 'Please input phage id'
-        validationstatus.value = 'error'
-    } else {
-        checkdata.append('phageids', inputformValue.value.phage)
-        const response = await axios.post(`/analyze/inputcheck/`, checkdata, {
-            baseURL: '/api',
-            timeout: 10000,
-        })
-        const res = response.data
-        idlist.value = res.idlist
-        validationstatus.value = res.status
-        inputfeedback.value = res.message
-        isconfirmed.value = true
-    }
-}
-// const exampleSwicth = ref(false)
 
 const fillSequence = (seq: string) => {
     pastefile.value = seq
 }
-
-// const examplechange = async () => {
-//     console.log(exampleSwicth.value)
-//     if (exampleSwicth.value) {
-//         const fileURL = new URL(
-//             '../../../../../public/dataExample/data_demo/sequence.fasta',
-//             import.meta.url
-//         )
-//         const response = await fetch(fileURL)
-//         const content = await response.text()
-//         console.log(content)
-//         pastefile.value = content
-//     } else {
-//         pastefile.value = ''
-//     }
-// }
 
 /* eslint-disable */
 const handleFileListChange = (data: UploadFileInfo[]) => {
@@ -404,7 +357,7 @@ const submit = async () => {
     const submitdata = new FormData()
     submitdata.append('rundemo', 'false')
     const precheck = ref(false)
-    // check empty
+
     if (inputtype.value === 'upload') {
         if (typeof submitfile.value === 'undefined') {
             window.$message.error('Please upload file', {
@@ -426,25 +379,40 @@ const submit = async () => {
             })
             precheck.value = false
         }
-    } else {
-        if (isconfirmed.value) {
-            if (idlist.value.length > 0) {
-                submitdata.append('phageid', JSON.stringify(idlist.value))
-                precheck.value = true
-            } else {
-                window.$message.error('The number of Phage IDs you entered is 0.', {
-                    closable: true,
-                    duration: 5000,
-                })
-                precheck.value = false
-            }
-        }
-        else {
-            window.$message.error('Please click the confirm button first to check if the IDs you entered are correct.', {
+    } else { // enter
+        if (inputformValue.value.phage.length === 0) {
+            window.$message.error('Please input Antigen/TAntigen IDs', {
                 closable: true,
                 duration: 5000,
             })
             precheck.value = false
+        } else if (inputformValue.value.datatable === '') {
+            window.$message.error('Please select the data table that the IDs come from', {
+                closable: true,
+                duration: 5000,
+            })
+        } else {
+            const checkdata = new FormData()
+            checkdata.append('antigen_tantigen_ids', inputformValue.value.phage)
+            checkdata.append('datatable', inputformValue.value.datatable)
+            const response = await axios.post(`/analyze/linear_design_inputcheck/`, checkdata, {
+                baseURL: '/api',
+                timeout: 10000,
+            })
+            const res = response.data
+            idlist.value = res.idlist
+            validationstatus.value = res.status
+            inputfeedback.value = res.message
+            if (validationstatus.value == 'failed') {
+                window.$message.error(inputfeedback.value, {
+                    closable: true,
+                    duration: 5000,
+                })
+            } else if (validationstatus.value == 'success') {
+                submitdata.append('datatable', inputformValue.value.datatable)
+                submitdata.append('queryids', JSON.stringify(idlist.value))
+                precheck.value = true
+            }
         }
     }
 
@@ -454,7 +422,7 @@ const submit = async () => {
         submitdata.append('inputtype', inputtype.value)
         submitdata.append('submitfile', submitfile.value as File)
         submitdata.append('codonusage', paramform.value.codonusage as string)
-        submitdata.append('lambda', paramform.value.lambda)
+        submitdata.append('lambda', paramform.value.lambda.toString() as string)
         const response = await axios.post(`/analyze/linear_design/`, submitdata, {
             baseURL: '/api',
             timeout: 10000,
@@ -486,7 +454,6 @@ const submitdemo = async () => {
     if (precheck.value) {
         submitdata.append('analysistype', 'Completeness Assessment')
         submitdata.append('userid', userid.value)
-        //submitdata.append('user', 'demo')
         submitdata.append('inputtype', inputtype.value)
         const response = await axios.post(`/analyze/pipline/`, submitdata, {
             baseURL: '/api',
