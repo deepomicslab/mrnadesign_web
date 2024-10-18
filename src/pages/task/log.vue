@@ -130,13 +130,6 @@ const taskmoduledetail = ref({
 })
 const loading = ref(false)
 const consoleloading = ref(false)
-// const logStyle = computed(
-//     () => {
-//         console.log('log style')
-//         return 'h-96 bg-dark p-4 text-light' ? props.enableTable : 'h-150 bg-dark p-4 text-light'
-//     }
-//     // 'h-96 bg-dark p-4 text-light' ? props.enableTable : 'h-150 bg-dark p-4 text-light'
-// )
 const logStyle = ref('h-150 bg-dark p-4 text-light')
 
 const fetchData = async () => {
