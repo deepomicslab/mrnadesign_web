@@ -1,3 +1,4 @@
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
 <template>
     <div class="h-320 flex flex-col py-10 px-30">
         <div class="text-4xl ml-1 font-600">Linear Design Result Display</div>
@@ -26,12 +27,20 @@
                             />
                         </div>
                         <div v-loading="loading" class="mb-2">
-                            <iframe
-                                :src="url"
-                                scrolling="auto"
-                                frameborder="no"
-                                class="w-full h-106"
-                            />
+                            <div v-if="activeTab === 'primary'">
+                                <seqdemoD3 />
+                            </div>
+                            <div v-else-if="activeTab === 'second'">
+                                <forna :structure="forna_structure" :sequence="forna_sequence" />
+                            </div>
+                            <div v-else-if="activeTab === 'protein'">
+                                <iframe
+                                    :src="url"
+                                    scrolling="auto"
+                                    frameborder="no"
+                                    class="w-full h-106"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -39,19 +48,26 @@
         </div>
     </div>
 </template>
+
 <script setup lang="ts">
 /* eslint-disable camelcase */
 
-import { watchEffect } from 'vue'
+import { watchEffect, ref } from 'vue'
 import axios from 'axios'
 import type { DataTableColumns } from 'naive-ui'
 import { NButton, NTooltip } from 'naive-ui'
+import { CloudDownloadOutline as downicon } from '@vicons/ionicons5'
 import _ from 'lodash'
 import { decrypt } from '@/utils/crypto'
+import seqdemoD3 from './seqdemoD3.vue'
+import forna from './forna.vue'
 
 const url = ref('')
 const sorter_dict = ref('')
-const activeTab = ref('protein')
+const activeTab = ref('second')
+
+const forna_structure = ref('')
+const forna_sequence = ref('')
 
 const route = useRoute()
 const taskid = computed(() => {
@@ -75,17 +91,26 @@ const rowKey = (row: RowData) => {
     return row.id
 }
 
+const openPrimaryStructure = (row: any) => {
+    activeTab.value = 'primary'
+    console.log(row)
+}
+
 const openSecondaryStructure = (row: any) => {
-    watchEffect(() => {
-        // console.log(row)
-        url.value = `http://nibiru.tbi.univie.ac.at/forna/forna.html?id=url/name&structure=${row.structure}&sequence=${row.sequence}`
-        // url.value = `http://nibiru.tbi.univie.ac.at/forna/forna.html?id=url/name&structure=.().&sequence=ACCA`
-    })
+    activeTab.value = 'second'
+    forna_structure.value = row.structure
+    forna_sequence.value = row.sequence
+    // watchEffect(() => {
+    //     // url.value = `http://nibiru.tbi.univie.ac.at/forna/forna.html?id=url/name&structure=${row.structure}&sequence=${row.sequence}`
+    //     url.value = `https://mrnadesign.deepomics.org/vis?id=url/name&structure=${row.structure}&sequence=${row.sequence}`
+    //     // url.value = `http://nibiru.tbi.univie.ac.at/forna/forna.html?id=url/name&structure=.().&sequence=ACCA`
+    // })
 }
 
 const openProteinStructure = (row: any) => {
+    activeTab.value = 'protein'
+    console.log(row)
     watchEffect(() => {
-        console.log(row)
         // url.value = `https://www.ncbi.nlm.nih.gov/Structure/icn3d/?type=${mrnaStore.proteinstructureList.type}&url=${mrnaStore.proteinstructureList.fileurl}`
         url.value = `https://www.ncbi.nlm.nih.gov/Structure/icn3d/?mmdbid=1HHO&bu=1`
     })
@@ -103,7 +128,9 @@ onBeforeMount(async () => {
     const { data } = response
     rnadata.value = data
 
-    if (activeTab.value === 'second') {
+    if (activeTab.value === 'primary') {
+        openPrimaryStructure(rnadata.value.results[0])
+    } else if (activeTab.value === 'second') {
         openSecondaryStructure(rnadata.value.results[0])
     } else if (activeTab.value === 'protein') {
         openProteinStructure(rnadata.value.results[0])
@@ -152,7 +179,7 @@ const columnWidth = {
     structure: 150,
     folding_free_energy: 100,
     cai: 100,
-    actions: 200,
+    actions: 150,
 }
 const createColumns = (): DataTableColumns<RowData> => [
     {
@@ -240,7 +267,7 @@ const createColumns = (): DataTableColumns<RowData> => [
         sorter: true,
     },
     {
-        title: 'Action',
+        title: 'Structure Visualization',
         key: 'actions',
         align: 'center',
         width: columnWidth.actions,
@@ -250,7 +277,7 @@ const createColumns = (): DataTableColumns<RowData> => [
                 'div',
                 {
                     style: {
-                        display: 'center',
+                        display: 'flex',
                         justifyContent: 'space-between',
                     },
                 },
@@ -261,20 +288,30 @@ const createColumns = (): DataTableColumns<RowData> => [
                             strong: true,
                             size: 'small',
                             type: 'info',
-                            onClick: () => openSecondaryStructure(row),
+                            onClick: () => openPrimaryStructure(row),
                         },
-                        { default: () => 'Secondary Structure' }
+                        { default: () => 'Primary' }
                     ),
                     h(
                         NButton,
                         {
                             strong: true,
                             size: 'small',
-                            type: 'primary',
+                            type: 'info',
+                            onClick: () => openSecondaryStructure(row),
+                        },
+                        { default: () => 'Secondary' }
+                    ),
+                    h(
+                        NButton,
+                        {
+                            strong: true,
+                            size: 'small',
+                            type: 'info',
                             onClick: () => openProteinStructure(row),
                         },
                         {
-                            default: () => 'Protein Structure',
+                            default: () => 'Protein',
                         }
                     ),
                 ]
