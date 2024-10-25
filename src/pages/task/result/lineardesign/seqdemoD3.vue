@@ -3,7 +3,7 @@
         <el-row>
             <el-col :span="5">
                 <el-form :model="form">
-                    <el-form-item label="mRNA Sequence">
+                    <el-form-item label="">
                         <el-select v-model="form.component_type" placeholder="please select type">
                             <el-option
                                 label="main regions"
@@ -29,7 +29,9 @@
                             :class="{ textHover: isActiveR1 }"
                             @mouseenter="hoverTextR1"
                             @mouseleave="leaveTextR1"
-                        ></el-text>
+                        >
+                            CUAAUGCCAUGAUCCAGGUGACAUGUAGAAGCUUGGAUCAGAUGCUGCACUUUGCGUUCGAUGUGGGAGCGUGCUUUCCACGACGGUGA
+                        </el-text>
 
                         <el-text
                             class="CDS"
@@ -38,7 +40,9 @@
                             :class="{ textHover: isActiveR2 }"
                             @mouseenter="hoverTextR2"
                             @mouseleave="leaveTextR2"
-                        ></el-text>
+                        >
+                            CACGCUUCCCUGGAUUGGCAGCCAGACUGCCUUCCGGGUCACUGCCAUGCCCAUG
+                        </el-text>
 
                         <el-text
                             class="UTR3"
@@ -46,7 +50,9 @@
                             :class="{ textHover: isActiveR3 }"
                             @mouseenter="hoverTextR3"
                             @mouseleave="leaveTextR3"
-                        ></el-text>
+                        >
+                            CCCAUCGGCAGCAAGGAGAGGCCCACCUUCUUCGAGAUCUUCAAGACCAGGUGCAACAAGGCCGACCUGGGCCCCAUCAGCCUGAACUGA
+                        </el-text>
                         <svg></svg>
                     </div>
 
@@ -1930,7 +1936,7 @@ const form = reactive({
     component_type: '',
 })
 
-const showregion = ref(false)
+const showregion = ref(true)
 const showuorf = ref(false)
 const showresSites = ref(false)
 
@@ -2146,6 +2152,7 @@ function leaveText5() {
     margin-top: 20px;
     margin-left: 20px;
 }
+
 .line {
     position: absolute;
     margin-top: 4px;
