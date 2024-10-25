@@ -1,50 +1,76 @@
-<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+<!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" /> -->
 <template>
-    <div class="h-320 flex flex-col py-10 px-30">
-        <div class="text-4xl ml-1 font-600">Linear Design Result Display</div>
-        <div class="mt-7 flex flex-row justify-start items-center ml-5">
-            <el-button @click="downloadresult">
-                <template #icon>
-                    <n-icon>
-                        <downicon />
-                    </n-icon>
-                </template>
-                DownLoad Analysis Result
-            </el-button>
+    <div class="flex flex-col mx-1/20 justify-start">
+        <div class="w-300 mt-18 ml-10">
+            <div class="flex flex-row w-350 border-b-2 border-gray-300">
+                <div class="text-4xl font-500 mb-8">Linear Design Result Display</div>
+                <div class="mt-1.5 ml-10">
+                    <el-button class="ml-5" @click="downloadresult">
+                        <template #icon>
+                            <n-icon>
+                                <downicon />
+                            </n-icon>
+                        </template>
+                        Download Analysis Result
+                    </el-button>
+                </div>
+            </div>
+
+            <div class="flex flex-row justify-between mt-6 ml-8 w-350">
+                <div v-loading="loading" class="mb-20">
+                    <n-data-table
+                        :columns="columns"
+                        :data="rnadataList"
+                        :row-key="rowKey"
+                        :scroll-x="1000"
+                        :max-height="200"
+                        @update:sorter="handleSorterChange"
+                    />
+                </div>
+            </div>
         </div>
-        <div class="mt-0 flex flex-row justify-start items-center ml-5">
-            <el-tabs v-model="activeTab" type="card">
-                <div v-loading="loading">
-                    <div>
-                        <div v-loading="loading" class="mb-20">
-                            <n-data-table
-                                :columns="columns"
-                                :data="rnadataList"
-                                :row-key="rowKey"
-                                :scroll-x="1000"
-                                :max-height="200"
-                                @update:sorter="handleSorterChange"
-                            />
-                        </div>
-                        <div v-loading="loading" class="mb-2">
-                            <div v-if="activeTab === 'primary'">
-                                <seqdemoD3 />
-                            </div>
-                            <div v-else-if="activeTab === 'second'">
-                                <forna :structure="forna_structure" :sequence="forna_sequence" />
-                            </div>
-                            <div v-else-if="activeTab === 'protein'">
-                                <iframe
-                                    :src="url"
-                                    scrolling="auto"
-                                    frameborder="no"
-                                    class="w-full h-106"
-                                />
-                            </div>
-                        </div>
+        <div class="mt-5 ml-15">
+            <div class="flex flex-row w-200">
+                <div class="text-2xl font-500 mb-5">Annotation</div>
+            </div>
+            <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
+                <mrnaAnnotation />
+            </div>
+            <div class="flex flex-row w-300">
+                <div class="text-2xl font-500 mb-5">Structure Visualization</div>
+                <div class="text-2xl font-500 mb-5 ml-10">
+                    <n-space align="center">
+                        <n-radio-group v-model:value="activeTab">
+                            <n-radio-button value="primary">Primary Structure</n-radio-button>
+                            <n-radio-button value="second">Secondary Structure</n-radio-button>
+                            <n-radio-button value="protein">Protein Structure</n-radio-button>
+                        </n-radio-group>
+                    </n-space>
+                </div>
+            </div>
+
+            <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
+                <div class="mb-2">
+                    <div v-if="activeTab === 'primary'">
+                        <seqdemoD3 />
+                    </div>
+                    <div v-else-if="activeTab === 'second'">
+                        <forna
+                            :structure="forna_structure"
+                            :sequence="forna_sequence"
+                            :cur_time="cur_time"
+                        />
+                    </div>
+                    <div v-else-if="activeTab === 'protein'">
+                        <iframe
+                            :src="protein_url"
+                            scrolling="auto"
+                            frameborder="no"
+                            class="w-full h-130"
+                        />
                     </div>
                 </div>
-            </el-tabs>
+            </div>
         </div>
     </div>
 </template>
@@ -52,7 +78,7 @@
 <script setup lang="ts">
 /* eslint-disable camelcase */
 
-import { watchEffect, ref } from 'vue'
+import { ref } from 'vue'
 import axios from 'axios'
 import type { DataTableColumns } from 'naive-ui'
 import { NButton, NTooltip } from 'naive-ui'
@@ -61,13 +87,22 @@ import _ from 'lodash'
 import { decrypt } from '@/utils/crypto'
 import seqdemoD3 from './seqdemoD3.vue'
 import forna from './forna.vue'
+import mrnaAnnotation from './mrna_annotation.vue'
 
-const url = ref('')
+// url.value = `https://www.ncbi.nlm.nih.gov/Structure/icn3d/?type=${mrnaStore.proteinstructureList.type}&url=${mrnaStore.proteinstructureList.fileurl}`
+const protein_url = ref('https://www.ncbi.nlm.nih.gov/Structure/icn3d/?mmdbid=1HHO&bu=1')
 const sorter_dict = ref('')
 const activeTab = ref('second')
 
 const forna_structure = ref('')
 const forna_sequence = ref('')
+
+const cur_time = ref('')
+
+watch(activeTab, async () => {
+    const today = new Date()
+    cur_time.value = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
+})
 
 const route = useRoute()
 const taskid = computed(() => {
@@ -91,29 +126,9 @@ const rowKey = (row: RowData) => {
     return row.id
 }
 
-const openPrimaryStructure = (row: any) => {
-    activeTab.value = 'primary'
-    console.log(row)
-}
-
-const openSecondaryStructure = (row: any) => {
-    activeTab.value = 'second'
+const openView = (row: any) => {
     forna_structure.value = row.structure
     forna_sequence.value = row.sequence
-    // watchEffect(() => {
-    //     // url.value = `http://nibiru.tbi.univie.ac.at/forna/forna.html?id=url/name&structure=${row.structure}&sequence=${row.sequence}`
-    //     url.value = `https://mrnadesign.deepomics.org/vis?id=url/name&structure=${row.structure}&sequence=${row.sequence}`
-    //     // url.value = `http://nibiru.tbi.univie.ac.at/forna/forna.html?id=url/name&structure=.().&sequence=ACCA`
-    // })
-}
-
-const openProteinStructure = (row: any) => {
-    activeTab.value = 'protein'
-    console.log(row)
-    watchEffect(() => {
-        // url.value = `https://www.ncbi.nlm.nih.gov/Structure/icn3d/?type=${mrnaStore.proteinstructureList.type}&url=${mrnaStore.proteinstructureList.fileurl}`
-        url.value = `https://www.ncbi.nlm.nih.gov/Structure/icn3d/?mmdbid=1HHO&bu=1`
-    })
 }
 
 onBeforeMount(async () => {
@@ -128,13 +143,8 @@ onBeforeMount(async () => {
     const { data } = response
     rnadata.value = data
 
-    if (activeTab.value === 'primary') {
-        openPrimaryStructure(rnadata.value.results[0])
-    } else if (activeTab.value === 'second') {
-        openSecondaryStructure(rnadata.value.results[0])
-    } else if (activeTab.value === 'protein') {
-        openProteinStructure(rnadata.value.results[0])
-    }
+    forna_structure.value = rnadata.value.results[0].structure
+    forna_sequence.value = rnadata.value.results[0].sequence
 
     loading.value = false
 })
@@ -179,7 +189,7 @@ const columnWidth = {
     structure: 150,
     folding_free_energy: 100,
     cai: 100,
-    actions: 150,
+    actions: 100,
 }
 const createColumns = (): DataTableColumns<RowData> => [
     {
@@ -277,7 +287,7 @@ const createColumns = (): DataTableColumns<RowData> => [
                 'div',
                 {
                     style: {
-                        display: 'flex',
+                        display: 'center', // flex
                         justifyContent: 'space-between',
                     },
                 },
@@ -288,31 +298,9 @@ const createColumns = (): DataTableColumns<RowData> => [
                             strong: true,
                             size: 'small',
                             type: 'info',
-                            onClick: () => openPrimaryStructure(row),
+                            onClick: () => openView(row),
                         },
-                        { default: () => 'Primary' }
-                    ),
-                    h(
-                        NButton,
-                        {
-                            strong: true,
-                            size: 'small',
-                            type: 'info',
-                            onClick: () => openSecondaryStructure(row),
-                        },
-                        { default: () => 'Secondary' }
-                    ),
-                    h(
-                        NButton,
-                        {
-                            strong: true,
-                            size: 'small',
-                            type: 'info',
-                            onClick: () => openProteinStructure(row),
-                        },
-                        {
-                            default: () => 'Protein',
-                        }
+                        { default: () => 'view' }
                     ),
                 ]
             )

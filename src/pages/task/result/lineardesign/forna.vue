@@ -1,8 +1,8 @@
 <template>
-    <div>
-        <!-- <link rel="stylesheet" type="text/css" href="/forna/css/fornac.css" media="screen" /> -->
-        <div id="rna_ss"></div>
-    </div>
+    <!-- <div> -->
+    <!-- <link rel="stylesheet" type="text/css" href="/forna/css/fornac.css" media="screen" /> -->
+    <div id="rna_ss" class="h-130"></div>
+    <!-- </div> -->
 </template>
 
 <script setup lang="ts">
@@ -11,9 +11,10 @@
 const props = defineProps<{
     structure: string
     sequence: string
+    cur_time: string
 }>()
 
-const { structure, sequence } = toRefs(props)
+const { structure, sequence, cur_time } = toRefs(props)
 
 const loadScript = (src: string) => {
     return new Promise((resolve, reject) => {
@@ -66,9 +67,12 @@ const preprocess_forna = () => {
         })
 }
 
-watch(structure, () => {
+// to give a starting point to run the preprocess_forna()
+const today = new Date()
+const ccur_time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
+if (cur_time.value !== ccur_time.value) {
     preprocess_forna()
-})
+}
 </script>
 
 <style scoped></style>
