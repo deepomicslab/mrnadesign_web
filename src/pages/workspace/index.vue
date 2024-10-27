@@ -63,7 +63,7 @@
         </div>
     </div>
     <el-dialog v-model="dialogVisible" title="Task Log" width="75%">
-        <log v-model:taskid="taskid" :moduleName="''" :enableTab="true" :enableTable="true" />
+        <log v-model:taskid="taskid" :enableTab="true" :enableTable="true" />
     </el-dialog>
 </template>
 
