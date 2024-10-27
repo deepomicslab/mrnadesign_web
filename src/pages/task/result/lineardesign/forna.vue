@@ -15,6 +15,12 @@ const props = defineProps<{
 }>()
 
 const { structure, sequence, cur_time } = toRefs(props)
+console.log(
+    '========================================',
+    structure.value,
+    sequence.value,
+    cur_time.value
+)
 
 const loadScript = (src: string) => {
     return new Promise((resolve, reject) => {
@@ -73,6 +79,10 @@ const ccur_time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds(
 if (cur_time.value !== ccur_time.value) {
     preprocess_forna()
 }
+
+watch(structure, async () => {
+    preprocess_forna()
+})
 </script>
 
 <style scoped></style>
