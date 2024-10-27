@@ -308,14 +308,14 @@
                         <div class="flex flex-col">
                             <a class="text-xl mb-3" href="/database">Database</a>
                             <p><a href="/database/antigen">Antigen List</a></p>
-                            <p><a href="/database/tantigen_db">Tantigen List</a></p>
-                            <p><a href="/database/filter">Sequence Filter</a></p>
+                            <p><a href="/database/tantigen">Tantigen List</a></p>
+                            <p><a href="/database/three_utr">3'UTR List</a></p>
+                            <!-- <p><a href="/database/filter">Sequence Filter</a></p> -->
                         </div>
 
                         <div class="flex flex-col">
                             <p class="text-xl mb-3">Analysis</p>
-                            <p><a href="/analysis/annopipline">Genome Annotation</a></p>
-                            <p><a href="/analysis/comparison">Genome Comparison</a></p>
+                            <p><a href="/analysis/linear_design">Linear Design</a></p>
                         </div>
                         <div class="flex flex-col mb-3">
                             <p class="text-xl mb-10"><a href="/workspace">Workspace</a></p>

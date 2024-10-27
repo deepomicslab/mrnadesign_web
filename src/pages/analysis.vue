@@ -111,7 +111,6 @@
 <script setup lang="ts">
 import type { MenuOption, GlobalThemeOverrides } from 'naive-ui'
 import { RouterLink } from 'vue-router'
-import { NEllipsis } from 'naive-ui'
 
 const themeOverrides: GlobalThemeOverrides = {
     Menu: {
@@ -136,164 +135,18 @@ const defaultExpandedKeys = [
     '/analysis/annopipline/structural',
 ]
 const menuOptions: MenuOption[] = [
-    // {
-    //     label: 'Analysis Helper',
-    //     key: '/analysis/helper',
-    // },
     {
         label: () =>
             h(
                 RouterLink,
                 {
                     to: {
-                        path: '/analysis/annopipline',
+                        path: '/analysis/linear_design',
                     },
                 },
-                { default: () => 'Genome Annotation' }
+                { default: () => 'Linear Design' }
             ),
-        key: '/analysis/annopipline',
-        children: [
-            {
-                label: 'Completeness Assessment',
-                key: '/analysis/annopipline/quality',
-            },
-            {
-                label: () =>
-                    h(
-                        RouterLink,
-                        {
-                            to: {
-                                path: '/analysis/annopipline/phenotype',
-                            },
-                        },
-                        { default: () => 'Phenotype Annotation' }
-                    ),
-                key: '/analysis/annopipline/phenotype',
-                children: [
-                    {
-                        label: 'Host Assignment',
-                        key: '/analysis/annopipline/phenotype/host',
-                    },
-                    {
-                        label: 'Lifestyle Prediction',
-                        key: '/analysis/annopipline/phenotype/lifestyle',
-                    },
-                ],
-            },
-            {
-                label: () =>
-                    h(
-                        RouterLink,
-                        {
-                            to: {
-                                path: '/analysis/annopipline/structural',
-                            },
-                        },
-                        { default: () => 'Structural Annotation' }
-                    ),
-                key: '/analysis/annopipline/structural',
-                children: [
-                    {
-                        label: () =>
-                            h(NEllipsis, null, {
-                                default: () => 'ORF prediction & Protein Classification',
-                            }),
-                        key: '/analysis/annopipline/structural/annotation',
-                    },
-                    {
-                        label: () =>
-                            h(NEllipsis, null, {
-                                default: () => 'Transcription Terminator Annotation',
-                            }),
-                        key: '/analysis/annopipline/structural/terminators',
-                    },
-                ],
-            },
-            {
-                label: 'Taxonomic Annotation',
-                key: '/analysis/annopipline/taxonomic',
-            },
-            {
-                label: () =>
-                    h(
-                        RouterLink,
-                        {
-                            to: {
-                                path: '/analysis/annopipline/functional',
-                            },
-                        },
-                        { default: () => 'Functional Annotation' }
-                    ),
-                key: '/analysis/annopipline/functional',
-                children: [
-                    {
-                        label: () =>
-                            h(NEllipsis, null, {
-                                default: () => 'tRNA & tmRNA Gene Annotation',
-                            }),
-                        key: '/analysis/annopipline/functional/trna',
-                    },
-
-                    {
-                        label: () =>
-                            h(NEllipsis, null, {
-                                default: () => 'Anti-CRISPR Protein Annotation',
-                            }),
-                        key: '/analysis/annopipline/functional/anti',
-                    },
-                    {
-                        label: () =>
-                            h(NEllipsis, null, {
-                                default: () => 'CRISPR Array Annotation',
-                            }),
-                        key: '/analysis/annopipline/functional/crispr',
-                    },
-                    {
-                        label: () =>
-                            h(NEllipsis, null, {
-                                default: () =>
-                                    'Virulent Factor & Antimicrobial Resistance Gene Detection',
-                            }),
-                        key: '/analysis/annopipline/functional/arvf',
-                    },
-                    {
-                        label: () =>
-                            h(NEllipsis, null, {
-                                default: () => 'Transmembrane Protein Annotation',
-                            }),
-                        key: '/analysis/annopipline/functional/trans',
-                    },
-                ],
-            },
-        ],
-    },
-
-    {
-        label: () =>
-            h(
-                RouterLink,
-                {
-                    to: {
-                        path: '/analysis/comparison',
-                    },
-                },
-                { default: () => 'Genome Comparison' }
-            ),
-        key: '/analysis/comparison',
-        children: [
-            {
-                label: 'Sequence Clustering',
-                key: '/analysis/comparison/clustering',
-            },
-            {
-                label: 'Sequence Alignment',
-                key: '/analysis/comparison/alignment',
-            },
-            {
-                label: 'Comparative Tree Construction',
-                key: '/analysis/comparison/phylogenetic',
-            },
-        ],
+        key: '/analysis/linear_design',
     },
 ]
 const router = useRouter()
@@ -310,27 +163,6 @@ watch(
         activeKey.value = route.path
     }
 )
-// import { Fold } from '@element-plus/icons-vue'
-
-// const router = useRouter()
-
-// const routeGO = (method: any) => {
-//     router.push({
-//         path: `/analysis/${method}`,
-//     })
-// }
-// const menu = ref(true)
-
-// const showMenu = () => {
-//     menu.value = true
-// }
-// const closeMenu = () => {
-//     menu.value = false
-// }
-
-// const rou = computed(() => {
-//     return router.currentRoute.value.path
-// })
 </script>
 
 <style scoped>
