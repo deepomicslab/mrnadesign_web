@@ -1,3 +1,4 @@
+<meta http-equiv="Permissions-Policy" content="xr-spatial-tracking=(self)" />
 <!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" /> -->
 <template>
     <div class="flex flex-col mx-1/20 justify-start">

@@ -58,20 +58,17 @@
                     </div>
 
                     <div class="text-[22px] font-400 mt-13 ml-15 w-[84%] leading-9 text-gray-900">
-                        Welcome to PhageScope! PhageScope is an
+                        Welcome to the mRNA Vaccine Design Platform! Our mRNA Vaccine Design
+                        Platform is an
                         <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">
-                            online bacteriophage database
+                            intelligent online tool
                         </strong>
-                        that offers comprehensive annotations, including completeness assessment,
-                        phenotype annotation, taxonomic annotation, structural annotation,
-                        functional annotation, and genome comparison.
+                        designed to streamline the design processes of mRNA vaccines.It offers tools
+                        including an analysis pipeline for whole-genome tumor-specific antigens
+                        (wgTSAs), 5'UTR design tool and CDS design tool and related database.
                     </div>
                     <div class="text-[22px] font-400 mt-10 ml-15 w-[89%] leading-9 text-gray-900">
-                        PhageScope incorporates automatic analysis and interactive visualization for
-                        both curated and customized data.
-                    </div>
-                    <div class="text-[22px] font-400 mt-10 ml-15 w-[89%] leading-9 text-gray-900">
-                        Key features of PhageScope:
+                        Key Features of the mRNA Design Platform:
                     </div>
                     <div class="mt-8 ml-25 w-[81%] flex flex-row">
                         <div>
@@ -80,57 +77,35 @@
                             ></div>
                         </div>
                         <div class="text-[21px] font-400 leading-9 text-gray-900">
-                            Curated PhageScope
-                            <span
-                                herf="https://phagescope.deepomics.org/database"
-                                class="text-[21px] font-400"
-                            >
-                                database
-                            </span>
-                            includes
-                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">873,718</strong>
+                            Therapeutic mRNA design database includes
+                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">5,812</strong>
                             <strong class="text-[#ee7e7d] font-400 mx-1 text-[21px]">
-                                phage sequences,
+                                antigen sequences,
                             </strong>
-                            with 767,797 nonredundant sequences, from 4,723 host species, harboring
-                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">
-                                43,088,582
-                            </strong>
+                            with
+                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">505</strong>
                             <strong class="text-[#ee7e7d] font-400 ml-1 text-[21px]">
-                                annotated proteins,
+                                normal antigen sequences, from
                             </strong>
-                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">6,462,417</strong>
+                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">94</strong>
                             <strong class="text-[#ee7e7d] font-400 ml-1 text-[21px]">
-                                terminators,
+                                organisms,
                             </strong>
                             <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">691,091</strong>
                             <strong class="text-[#ee7e7d] font-400 ml-1 text-[21px]">
                                 tRNA genes,
                             </strong>
-                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">11,516</strong>
+                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">4,307</strong>
                             <strong class="text-[#ee7e7d] font-400 ml-1 text-[21px]">
-                                tmRNA genes,
+                                tumor antigens form
                             </strong>
-                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">307,329</strong>
+                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">384</strong>
                             <strong class="text-[#ee7e7d] font-400 ml-1 text-[21px]">
-                                anti-CRISPR proteins,
+                                gene cards, and
                             </strong>
-                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">56,652</strong>
+                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">4,884</strong>
                             <strong class="text-[#ee7e7d] font-400 ml-1 text-[21px]">
-                                CRISPR arrays,
-                            </strong>
-                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">41,609</strong>
-                            <strong class="text-[#ee7e7d] font-400 ml-1 text-[21px]">
-                                virulent factors,
-                            </strong>
-                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">2,602</strong>
-                            <strong class="text-[#ee7e7d] font-400 ml-1 text-[21px]">
-                                antimicrobial resistance genes,
-                            </strong>
-                            and
-                            <strong class="text-2xl font-600 text-[#ee7e7d] ml-1">4,020,770</strong>
-                            <strong class="text-[#ee7e7d] font-400 ml-1 text-[21px]">
-                                transmembrane proteins.
+                                3'UTRs.
                             </strong>
                         </div>
                     </div>
@@ -143,10 +118,9 @@
                                 class="h-[0.4em] w-[0.4em] rounded-full bg-gray-900 mx-5 mt-3.5"
                             ></div>
                         </div>
-                        Automatic phage annotation and analysis with state-of-the-art tools,
-                        including completeness scoring, host assignment, lifestyle prediction,
-                        taxonomic classification, ORF and terminator localization, functional gene
-                        annotation, genome clustering, and sequence comparison, etc.
+                        Intelligent design and analysis with state-of-the-art tools, including
+                        analysis pipeline for whole-genome tumor-specific antigens (wgTSAs), Smart
+                        5'UTR, linear design for CDS and mRNA sequence annotation.
                     </div>
                     <div
                         class="text-[21px] font-400 mt-8 ml-25 w-[80%] leading-9 text-gray-900 flex flex-row"
@@ -156,52 +130,53 @@
                                 class="h-[0.4em] w-[0.4em] rounded-full bg-gray-900 mx-5 mt-3.5"
                             ></div>
                         </div>
-                        Interactive visualization of completeness and phenotype distribution,
-                        structural and functional annotation, sequence alignment, comparative tree,
-                        etc.
+                        Interactive visualization of antigen source distribution, structural and
+                        functional annotation, etc.
                     </div>
                 </div>
-                <div class="h-240 flex flex-col items-center">
-                    <div class="mb-10 text-3xl font-600 text-[#3e5294] mt-25">Focus</div>
+                <div class="h-290 flex flex-col items-center">
+                    <div class="mb-10 text-3xl font-600 text-[#3e5294] mt-5">Focus</div>
                     <div
                         style="box-shadow: 0 0 64px #cfd5db"
-                        class="w-270 h-150 bg-white rounded-2xl"
+                        class="w-270 h-200 bg-white rounded-2xl"
                     >
                         <div>
                             <el-carousel
-                                height="600px"
+                                height="800px"
                                 width="1080px"
                                 arrow="always"
                                 indicator-position="outside"
                                 :autoplay="false"
                             >
                                 <el-carousel-item>
-                                    <div class="w-270 h-150">
+                                    <div
+                                        class="w-270 h-200 flex flex-row items-center justify-center"
+                                    >
                                         <el-image
-                                            src="/png/databasevis.png"
-                                            class="image w-270 h-150"
+                                            src="/png/homepage_database.png"
+                                            class="image w-270 h-200"
                                             z-index="100"
                                         />
                                     </div>
                                 </el-carousel-item>
                                 <el-carousel-item>
                                     <div
-                                        class="w-270 h-150 flex flex-row items-center justify-center"
+                                        class="w-270 h-200 flex flex-row items-center justify-center"
                                     >
                                         <el-image
-                                            src="/png/analysisvis.png"
-                                            class="image w-270 h-150"
+                                            src="/png/homepage_analysis.png"
+                                            class="image w-270 h-200"
                                             z-index="100"
                                         />
                                     </div>
                                 </el-carousel-item>
                                 <el-carousel-item>
                                     <div
-                                        class="w-270 h-150 flex flex-row items-center justify-center"
+                                        class="w-270 h-200 flex flex-row items-center justify-center"
                                     >
                                         <el-image
-                                            src="/png/visualization.png"
-                                            class="image w-270 h-150"
+                                            src="/png/homepage_visualization.png"
+                                            class="image w-270 h-200"
                                             z-index="100"
                                         />
                                     </div>
@@ -226,70 +201,18 @@
                                 <el-step :icon="Opportunity" status="process">
                                     <template #title>
                                         <div class="text-gray-700 font-600">
-                                            Notice (2023.11.07)
+                                            Version 1.0 (2024.10.28)
                                         </div>
                                     </template>
                                     <template #description>
                                         <div :class="descriptionClass">
-                                            We are in the process of updating some data on our
-                                            website, which may result in occasional issues or bugs.
-                                            We are addressing these and anticipate a resolution
-                                            within the next week.
-                                        </div>
-                                    </template>
-                                </el-step>
-                                <el-step :icon="Opportunity" status="process">
-                                    <template #title>
-                                        <div class="text-gray-700 font-600">
-                                            Version 1.1 (2023.10.10)
-                                        </div>
-                                    </template>
-                                    <template #description>
-                                        <div :class="descriptionClass">
-                                            Five additional phage datasets are incorporated into the
-                                            database.
-                                            <br />
-                                            Update the genome comparison modules to provide the
-                                            option to compare customized phage genomes with the
-                                            PhageScope database.
-                                        </div>
-                                    </template>
-                                </el-step>
-                                <el-step :icon="Opportunity" status="process">
-                                    <template #title>
-                                        <div class="text-gray-700 font-600">
-                                            Version 1.0 (2023.7.1)
-                                        </div>
-                                    </template>
-                                    <template #description>
-                                        <div :class="descriptionClass">
-                                            PhageScope has been released. Welcome to use!
+                                            mRNA Vaccine Design Platform (v1.0) has been released.
+                                            Welcome to use.
                                         </div>
                                     </template>
                                 </el-step>
                             </el-steps>
                         </el-scrollbar>
-                    </div>
-                </div>
-                <div class="flex flex-row w-full justify-center mb-10">
-                    <div style="box-shadow: 0 0 64px #cfd5db" class="w-320 h-50 mb-10 rounded-7px">
-                        <div class="text-[22px] px-9 py-2 leading-10 text-gray-700 bg-gray-300">
-                            If you want to use PhageScope,
-                            <strong class="text-[#ee7e7d] font-400 mx-1 text-[22px]">
-                                <a
-                                    href="https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gkad979/7334092"
-                                >
-                                    please cite our publication.
-                                </a>
-                            </strong>
-                        </div>
-                        <div class="text-[18px] px-9 py-2 leading-10 text-gray-700">
-                            Ruo Han Wang, Shuo Yang, Zhixuan Liu, Yuanzheng Zhang, Xueying Wang,
-                            Zixin Xu, Jianping Wang, Shuai Cheng Li, PhageScope: a well-annotated
-                            bacteriophage database with automatic analyses and visualizations,
-                            Nucleic Acids Research, 2023;, gkad979,
-                            https://doi.org/10.1093/nar/gkad979
-                        </div>
                     </div>
                 </div>
                 <el-footer
@@ -328,7 +251,7 @@
                         </div>
                     </div>
                     <el-divider />
-                    <div>2023 &copy; City University of Hong Kong. All rights reserved.</div>
+                    <div>2024 &copy; City University of Hong Kong. All rights reserved.</div>
                 </el-footer>
             </div>
         </el-scrollbar>
@@ -373,18 +296,9 @@ const goDocument = () => {
 
 const goAnalysis = () => {
     router.push({
-        path: '/analysis/annopipline',
+        path: '/analysis/linear_design',
     })
 }
-
-// onBeforeMount(async () => {
-//     const { isCookieExist } = useUserIdGenerator()
-//     const CookieExist = ref(isCookieExist())
-//     console.log(CookieExist.value)
-//     if (!CookieExist.value) {
-//         dialogVisible.value = true
-//     }
-// })
 
 const confirmcookie = () => {
     const { generateUserId, userId } = useUserIdGenerator()
@@ -404,10 +318,4 @@ const confirmcookie = () => {
     width: 60px;
     background-color: #070708;
 }
-
-// :deep(.el-carousel__indicators--outside) {
-//     z-index: 500 !important;
-//     position: absolute;
-//     margin-top: -500px;
-// }
 </style>

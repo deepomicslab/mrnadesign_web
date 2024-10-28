@@ -26,13 +26,7 @@
                         Submission Helper
                     </el-button>
                     <el-button round size="large" color="#34498E" class="ml-5">
-                        <a
-                            href="https://github.com/deepomicslab/PhageScope/issues"
-                            target="_blank"
-                            class="btn"
-                        >
-                            Report bug
-                        </a>
+                        <a href="#" target="_blank" class="btn">Report bug</a>
                     </el-button>
                 </div>
                 <div class="text-lg font-500 ml-20 mt-3 w-9/10 flex flex-row">
@@ -49,7 +43,7 @@
                     1. Input Sequence
                     <n-button
                         text
-                        href="https://phagescope.deepomics.org/dataExample/data_demo/sequence.fasta"
+                        href="https://mrnadesign.deepomics.org/dataExample/mrna/lineardesign/sequence.fasta"
                         tag="a"
                         target="_blank"
                         type="primary"
@@ -328,9 +322,10 @@ const router = useRouter()
 
 const godemo = () => {
     router.push({
-        path: '/task/result/annopipline/quality', query: {
+        path: '/task/result/lineardesign',
+        query: {
             taskid: encrypt(
-                '47', 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2')
+                '-99', 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2')
         }
     })
 }
@@ -452,15 +447,17 @@ const submitdemo = async () => {
     const precheck = ref(true)
 
     if (precheck.value) {
-        submitdata.append('analysistype', 'Completeness Assessment')
+        submitdata.append('analysistype', 'Linear Design')
         submitdata.append('userid', userid.value)
-        submitdata.append('inputtype', inputtype.value)
-        const response = await axios.post(`/analyze/pipline/`, submitdata, {
+        submitdata.append('inputtype', 'rundemo')
+        submitdata.append('codonusage', 'human')
+        submitdata.append('lambda', '0')
+        const response = await axios.post(`/analyze/linear_design/`, submitdata, {
             baseURL: '/api',
             timeout: 10000,
         })
         const { data } = response
-        if (data.status === 'Success') {
+        if (data.status === 'Create Success') {
             window.$message.success(data.message, {
                 closable: true,
                 duration: 5000,

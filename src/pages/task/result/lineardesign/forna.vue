@@ -15,12 +15,6 @@ const props = defineProps<{
 }>()
 
 const { structure, sequence, cur_time } = toRefs(props)
-console.log(
-    '========================================',
-    structure.value,
-    sequence.value,
-    cur_time.value
-)
 
 const loadScript = (src: string) => {
     return new Promise((resolve, reject) => {
