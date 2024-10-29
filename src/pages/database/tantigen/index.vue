@@ -329,7 +329,7 @@ const createColumns = (): DataTableColumns<RowData> => [
     },
     {
         title() {
-            return renderTooltip(h('div', null, { default: () => 'Uni Prot ID' }), 'Uni Prot ID')
+            return renderTooltip(h('div', null, { default: () => 'UniPort' }), 'Uni Port ID')
         },
         key: 'uniprot_id',
         align: 'center',
@@ -474,7 +474,7 @@ const createColumns = (): DataTableColumns<RowData> => [
     },
     {
         title() {
-            return renderTooltip(h('div', null, { default: () => 'seq_5' }), 'seq_5')
+            return renderTooltip(h('div', null, { default: () => "5'UTR" }), 'seq_5')
         },
         key: 'seq_5',
         align: 'center',
@@ -498,7 +498,7 @@ const createColumns = (): DataTableColumns<RowData> => [
     },
     {
         title() {
-            return renderTooltip(h('div', null, { default: () => 'seq_3' }), 'seq_3')
+            return renderTooltip(h('div', null, { default: () => "3'UTR" }), 'seq_3')
         },
         key: 'seq_3',
         align: 'center',
