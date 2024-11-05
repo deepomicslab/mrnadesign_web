@@ -41,7 +41,7 @@
                 <div class="text-2xl font-500 mb-5">Annotation</div>
             </div>
             <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
-                <mrnaAnnotation />
+                <!-- <mrnaAnnotation /> -->
             </div>
             <div class="flex flex-row w-300">
                 <div class="text-2xl font-500 mb-5">Structure Visualization</div>
@@ -61,11 +61,12 @@
                         <seqdemoD3 />
                     </div>
                     <div v-else-if="activeTab === 'second'">
-                        <forna
+                        <!-- <forna
                             :structure="forna_structure"
                             :sequence="forna_sequence"
                             :cur_time="cur_time"
-                        />
+                        /> -->
+                        <forna :taskid="taskid" :protein_subtask_name="protein_subtask_name" />
                     </div>
                     <div v-else-if="activeTab === 'protein'">
                         <protein :taskid="taskid" :protein_subtask_name="protein_subtask_name" />
@@ -89,14 +90,12 @@ import { decrypt } from '@/utils/crypto'
 import seqdemoD3 from './seqdemoD3.vue'
 import forna from './forna.vue'
 import protein from './protein.vue'
-import mrnaAnnotation from './mrna_annotation.vue'
+// import mrnaAnnotation from './mrna_annotation.vue'
 // import heatmap from './heatmap.vue'
 
 const sorter_dict = ref('')
-const activeTab = ref('protein')
+const activeTab = ref('second')
 
-const forna_structure = ref('')
-const forna_sequence = ref('')
 const protein_subtask_name = ref('')
 
 const cur_time = ref('')
@@ -129,9 +128,6 @@ const rowKey = (row: RowData) => {
 }
 
 const openView = (row: any) => {
-    // forna_structure.value = row.structure
-    // forna_sequence.value = row.sequence
-
     protein_subtask_name.value = row.task_name
 }
 
@@ -146,11 +142,7 @@ onBeforeMount(async () => {
     })
     const { data } = response
     rnadata.value = data
-    // forna_structure.value = rnadata.value.results[0].structure
-    // forna_sequence.value = rnadata.value.results[0].sequence
-
     protein_subtask_name.value = rnadata.value.results[0].task_name
-
     loading.value = false
 })
 

@@ -1,20 +1,19 @@
 <template>
-    <!-- <div> -->
     <!-- <link rel="stylesheet" type="text/css" href="/forna/css/fornac.css" media="screen" /> -->
-    <div id="rna_ss" class="h-130"></div>
-    <!-- </div> -->
+    <div id="rna_ss" class="h-130" v-loading="loading"></div>
 </template>
 
 <script setup lang="ts">
 /* eslint-disable camelcase */
+import axios from 'axios'
+
+const loading = ref(false)
 
 const props = defineProps<{
-    structure: string
-    sequence: string
-    cur_time: string
+    taskid: string
+    protein_subtask_name: string
 }>()
-
-const { structure, sequence, cur_time } = toRefs(props)
+const { taskid, protein_subtask_name } = toRefs(props)
 
 const loadScript = (src: string) => {
     return new Promise((resolve, reject) => {
@@ -39,12 +38,21 @@ const loadStyle = (src: string) => {
     })
 }
 
-const preprocess_forna = () => {
+const process_forna = async () => {
+    loading.value = true
+
+    const response = await axios.get(`/tasks/secondarystructure/`, {
+        baseURL: '/api',
+        timeout: 10000,
+        params: {
+            taskid: taskid.value,
+            protein_subtask_name: protein_subtask_name.value,
+        },
+    })
+    const { data } = response
+
     // Load scripts in order
     Promise.all([
-        // loadScript('../../../../../public/forna/js/jquery.js'),
-        // loadScript('../../../../../public/forna/js/d3.js'),
-        // loadScript('../../../../../public/forna/js/fornac.js'),
         loadScript('/forna/js/jquery.js'),
         loadScript('/forna/js/d3.js'),
         loadScript('/forna/js/fornac.js'),
@@ -54,10 +62,8 @@ const preprocess_forna = () => {
             // After loading scripts, initialize the RNA container
             const container = new FornaContainer('#rna_ss', { applyForce: true })
             const options = {
-                // structure: '((..((....)).(((....))).))',
-                // sequence: 'CGCUUCAUAUAAUCCUAAUGACCUAU',
-                structure: structure.value,
-                sequence: sequence.value,
+                structure: data.structure,
+                sequence: data.sequence,
             }
 
             container.addRNA(options.structure, options)
@@ -65,17 +71,19 @@ const preprocess_forna = () => {
         .catch(error => {
             console.error('Error loading scripts:', error)
         })
+
+    loading.value = false
 }
 
 // to give a starting point to run the preprocess_forna()
-const today = new Date()
-const ccur_time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
-if (cur_time.value !== ccur_time.value) {
-    preprocess_forna()
-}
+// const today = new Date()
+// const ccur_time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
+// if (cur_time.value !== ccur_time.value) {
+//     process_forna()
+// }
 
-watch(structure, async () => {
-    preprocess_forna()
+watch(protein_subtask_name, async () => {
+    process_forna()
 })
 </script>
 
