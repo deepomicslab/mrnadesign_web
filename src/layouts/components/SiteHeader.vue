@@ -104,6 +104,10 @@ const menuOptions: MenuOption[] = [
                 label: 'Linear Design',
                 key: '/analysis/linear_design',
             },
+            {
+                label: 'Prediction',
+                key: '/analysis/prediction',
+            },
 
             // {
             //     label: () =>

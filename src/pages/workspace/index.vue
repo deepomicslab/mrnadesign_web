@@ -141,6 +141,16 @@ const viewdetail = (row: any) => {
                     ),
                 },
             })
+        } else if (row.analysis_type === 'Prediction') {
+            router.push({
+                path: '/task/result/prediction',
+                query: {
+                    taskid: encrypt(
+                        row.id,
+                        'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2'
+                    ),
+                },
+            })
         }
     } else if (row.status === 'Failed') {
         window.$message.warning('Task is Failed, please view task detail ', {
@@ -213,7 +223,7 @@ const createColumns = (): DataTableColumns<RowData> => {
             title: 'Task ID',
             key: 'id',
             align: 'center',
-            sorter: 'default',
+            // sorter: 'default',
             defaultSortOrder: 'ascend',
             width: 80,
         },

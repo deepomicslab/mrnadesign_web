@@ -148,6 +148,19 @@ const menuOptions: MenuOption[] = [
             ),
         key: '/analysis/linear_design',
     },
+    {
+        label: () =>
+            h(
+                RouterLink,
+                {
+                    to: {
+                        path: '/analysis/prediction',
+                    },
+                },
+                { default: () => 'Prediction' }
+            ),
+        key: '/analysis/prediction',
+    },
 ]
 const router = useRouter()
 const changeMenu = (_: string, option: MenuOption) => {
