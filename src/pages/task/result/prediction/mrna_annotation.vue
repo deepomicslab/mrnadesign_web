@@ -77,6 +77,8 @@
     </el-scrollbar>
 </template>
 <script setup lang="ts">
+/* eslint-disable camelcase */
+
 // @ts-nocheck
 // import { CloudDownload as down, InformationCircle as info } from '@vicons/ionicons5'
 import { InformationCircle as info } from '@vicons/ionicons5'
@@ -85,6 +87,12 @@ import * as d3 from 'd3'
 import _ from 'lodash'
 import { NButton, NModal } from 'naive-ui'
 import axios from 'axios'
+
+const props = defineProps<{
+    taskid: string
+    protein_subtask_name: string
+}>()
+const { taskid, protein_subtask_name } = toRefs(props)
 
 // import { InformationCircle as info } from '@vicons/ionicons5'
 // import { TypeDict, proteinType, countGC } from '@/utils/annotation'
@@ -156,38 +164,33 @@ const chooseColor = (d: unknown) => {
 }
 const annotationData = ref(null)
 
-const getsequencemarker = async id => {
-    // loading.value = true
-
+const process_sequencemarker = async () => {
     const response = await axios.get('/task/result/sequencemarker/', {
         baseURL: '/api',
         timeout: 10000,
         params: {
-            taskid: id,
-            mrnaid: id,
+            taskid: taskid.value,
+            protein_subtask_name: protein_subtask_name.value,
         },
     })
     const { data: sequencemarker } = response
-    console.log(sequencemarker)
     annotationData.value = sequencemarker
 }
 
-const id = 1
-getsequencemarker(id)
+watch(protein_subtask_name, async () => {
+    process_sequencemarker()
+})
 
 watch(annotationData, () => {
     const start = 0
-    console.log(annotationData)
     const end = annotationData.value.sequence.length
     const splitAnnotationData = _.groupBy(annotationData.value.result, 'component_type')
-    console.log(splitAnnotationData)
-    // const rectHeight = lineHeight.value + 65
-    // const labelOffsetX = 10
 
     height.value = lineHeight.value + 250
-    const svg = d3.select('#mrnaAnnotation').attr('transform', `translate(${marginLeft.value}, 0)`)
+    const svg = d3.select('#mrnaAnnotation')
+    svg.selectAll('*').remove() // clear all and re-render when data is changed
+    svg.attr('transform', `translate(${marginLeft.value}, 0)`)
 
-    // const gcY = d3.scaleLinear().domain([20, 80]).range([40, 0])
     svg.append('rect')
         .attr('x', 0)
         .attr('y', 0)
@@ -219,11 +222,9 @@ watch(annotationData, () => {
         .call(xAxis)
 
     const mainRegionsData = splitAnnotationData.main_regions
-    // const miRNAData = splitAnnotationData.miRNAs_targets
     const uORFData = splitAnnotationData.uORF
     const iresData = splitAnnotationData.IRES
     const loopstructureData = splitAnnotationData['stem-loop_structure']
-    // const secondaryStructureData = splitAnnotationData.secondary_structure
     const restrictionSitesData = splitAnnotationData.restriction_sites
     const groupedData = [
         mainRegionsData,
@@ -290,16 +291,14 @@ watch(annotationData, () => {
         toolarea.style('opacity', 0).attr('x', 0).attr('y', 0)
     }
     const click = function (md, mv) {
-        // console.log(mv)
-        // bararea.selectAll('.geneline').style('stroke', '#818181').attr('stroke-width', '1px')
         isShowSelect.value = false
         selectData.value = mv
-        console.log(selectData.value)
-        console.log(selectData.value.start)
         d3.select(this).style('stroke', '#818181').attr('stroke-width', '2px').value = mv
     }
-    // console.log(groupedData)
     for (let j = 0; j < 5; j += 1) {
+        if (!groupedData[j]) {
+            j += 1
+        }
         svg.append('text')
             .attr('x', 0)
             .attr('y', lineHeight.value + 84 - 52 * j)
@@ -338,10 +337,6 @@ watch(annotationData, () => {
 
         // 更新比例尺
         scaleX.domain(newDomain).range(newRange)
-        // scaleX.domain(newDomain).range(1, 1000)
-        /* scaleX.range(
-            [barareaMarginLeft, width - barareaMarginLeft].map(d => event.transform.applyX(d))
-        ) */
         // 更新坐标轴
         svg.select('.x-axis').call(xAxis)
 
