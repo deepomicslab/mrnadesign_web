@@ -213,10 +213,10 @@
         </el-scrollbar>
     </div>
     <el-dialog v-model="dialogVisible" title="Please select the demo result to view" width="30%">
-        <el-checkbox-group v-model="demotask">
-            <el-checkbox label="task0001">Task 0001</el-checkbox>
-            <el-checkbox label="task0002">Task 0002</el-checkbox>
-            <el-checkbox label="task0003">Task 0003</el-checkbox>
+        <el-checkbox-group v-model="demotask" :max="1">
+            <el-checkbox label="Task 0001" />
+            <el-checkbox label="Task 0002" />
+            <el-checkbox label="Task 0003" />
         </el-checkbox-group>
         <template #footer>
             <span class="dialog-footer">
@@ -257,7 +257,7 @@ const inputfeedback = ref('')
 const validationstatus = ref()
 
 const dialogVisible = ref(false)
-const demotask = ref()
+const demotask = ref([] as any[])
 
 const fillSequence = (seq: string) => {
     pastefile.value = seq
@@ -306,13 +306,12 @@ const godemo = () => {
     dialogVisible.value = true
 }
 const opendemo = () => {
-    console.log('======================================demotask.value', demotask.value)
     let thistaskid = ''
-    if (demotask.value === 'task0001') {
+    if (demotask.value[0] === 'Task 0001') {
         thistaskid = '-95'
-    } else if (demotask.value === 'task0002') {
+    } else if (demotask.value[0] === 'Task 0002') {
         thistaskid = '-94'
-    } else if (demotask.value === 'task0003') {
+    } else if (demotask.value[0] === 'Task 0003') {
         thistaskid = '-93'
     }
     router.push({

@@ -68,12 +68,7 @@
                         />
                     </div>
                     <div v-else-if="activeTab === 'protein'">
-                        <iframe
-                            :src="protein_url"
-                            scrolling="auto"
-                            frameborder="no"
-                            class="w-full h-130"
-                        />
+                        <protein :taskid="taskid" :protein_subtask_name="protein_subtask_name" />
                     </div>
                 </div>
             </div>
@@ -93,16 +88,16 @@ import _ from 'lodash'
 import { decrypt } from '@/utils/crypto'
 import seqdemoD3 from './seqdemoD3.vue'
 import forna from './forna.vue'
+import protein from './protein.vue'
 import mrnaAnnotation from './mrna_annotation.vue'
 // import heatmap from './heatmap.vue'
 
-// url.value = `https://www.ncbi.nlm.nih.gov/Structure/icn3d/?type=${mrnaStore.proteinstructureList.type}&url=${mrnaStore.proteinstructureList.fileurl}`
-const protein_url = ref('https://www.ncbi.nlm.nih.gov/Structure/icn3d/?mmdbid=1HHO&bu=1')
 const sorter_dict = ref('')
 const activeTab = ref('protein')
 
 const forna_structure = ref('')
 const forna_sequence = ref('')
+const protein_subtask_name = ref('')
 
 const cur_time = ref('')
 
@@ -134,8 +129,10 @@ const rowKey = (row: RowData) => {
 }
 
 const openView = (row: any) => {
-    forna_structure.value = row.structure
-    forna_sequence.value = row.sequence
+    // forna_structure.value = row.structure
+    // forna_sequence.value = row.sequence
+
+    protein_subtask_name.value = row.task_name
 }
 
 onBeforeMount(async () => {
@@ -149,9 +146,10 @@ onBeforeMount(async () => {
     })
     const { data } = response
     rnadata.value = data
+    // forna_structure.value = rnadata.value.results[0].structure
+    // forna_sequence.value = rnadata.value.results[0].sequence
 
-    forna_structure.value = rnadata.value.results[0].structure
-    forna_sequence.value = rnadata.value.results[0].sequence
+    protein_subtask_name.value = rnadata.value.results[0].task_name
 
     loading.value = false
 })
@@ -192,11 +190,7 @@ const renderTooltip = (trigger: any, content: any) => {
 
 const columnWidth = {
     id: 70,
-    seq_name: 100,
-    sequence: 150,
-    structure: 150,
-    folding_free_energy: 100,
-    cai: 100,
+    task_name: 100,
     actions: 100,
 }
 const createColumns = (): DataTableColumns<RowData> => [
@@ -215,73 +209,15 @@ const createColumns = (): DataTableColumns<RowData> => [
     },
     {
         title() {
-            return renderTooltip(
-                h('div', null, { default: () => 'Sequence Name' }),
-                'Sequence Name'
-            )
+            return renderTooltip(h('div', null, { default: () => 'Subtask Name' }), 'Subtask Name')
         },
-        key: 'seq_name',
+        key: 'task_name',
         align: 'center',
         fixed: 'left',
         ellipsis: {
             tooltip: true,
         },
-        width: columnWidth.seq_name,
-        sorter: true,
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'Sequence' }), 'Sequence')
-        },
-        key: 'sequence',
-        align: 'center',
-        fixed: 'left',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.sequence,
-        sorter: true,
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'Structure' }), 'Structure')
-        },
-        key: 'structure',
-        align: 'center',
-        fixed: 'left',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.structure,
-        sorter: true,
-    },
-    {
-        title() {
-            return renderTooltip(
-                h('div', null, { default: () => 'mRNA Folding Free Energy' }),
-                'mRNA Folding Free Energy'
-            )
-        },
-        key: 'folding_free_energy',
-        align: 'center',
-        fixed: 'left',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.folding_free_energy,
-        sorter: true,
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'mRNA CAI' }), 'mRNA CAI')
-        },
-        key: 'cai',
-        align: 'center',
-        fixed: 'left',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.cai,
+        width: columnWidth.task_name,
         sorter: true,
     },
     {
