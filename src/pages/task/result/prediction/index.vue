@@ -31,12 +31,12 @@
             </div>
         </div>
         <div class="mt-5 ml-15">
-            <!-- <div class="flex flex-row w-200">
-                <div class="text-2xl font-500 mb-5">Scorign Heatmap</div>
+            <div class="flex flex-row w-200">
+                <div class="text-2xl font-500 mb-5">Scoring Heatmap</div>
             </div>
             <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
                 <heatmap />
-            </div> -->
+            </div>
             <div class="flex flex-row w-200">
                 <div class="text-2xl font-500 mb-5">Annotation</div>
             </div>
@@ -58,7 +58,7 @@
             <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
                 <div class="mb-2">
                     <div v-if="activeTab === 'primary'">
-                        <seqdemoD3 />
+                        <seqdemoD3 :taskid="taskid" :protein_subtask_name="protein_subtask_name" />
                     </div>
                     <div v-else-if="activeTab === 'second'">
                         <forna :taskid="taskid" :protein_subtask_name="protein_subtask_name" />
@@ -86,10 +86,10 @@ import seqdemoD3 from './seqdemoD3.vue'
 import forna from './forna.vue'
 import protein from './protein.vue'
 import mrnaAnnotation from './mrna_annotation.vue'
-// import heatmap from './heatmap.vue'
+import heatmap from './heatmap.vue'
 
 const sorter_dict = ref('')
-const activeTab = ref('second')
+const activeTab = ref('primary')
 
 const protein_subtask_name = ref('')
 
