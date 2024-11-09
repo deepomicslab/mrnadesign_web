@@ -453,6 +453,8 @@ onBeforeMount(() => {
     const { userId, getUserIdFromCookie } = useUserIdGenerator()
     getUserIdFromCookie()
     userid.value = userId.value as string
+
+    console.log('=========================userid.value', userid.value)
 })
 
 const gosubmithelper = () => {

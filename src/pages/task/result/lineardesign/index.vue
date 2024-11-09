@@ -40,9 +40,9 @@
             <div class="flex flex-row w-200">
                 <div class="text-2xl font-500 mb-5">Annotation</div>
             </div>
-            <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
+            <!-- <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
                 <mrnaAnnotation />
-            </div>
+            </div> -->
             <div class="flex flex-row w-300">
                 <div class="text-2xl font-500 mb-5">Structure Visualization</div>
                 <div class="text-2xl font-500 mb-5 ml-10">
@@ -58,7 +58,7 @@
             <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
                 <div class="mb-2">
                     <div v-if="activeTab === 'primary'">
-                        <seqdemoD3 />
+                        <!-- <seqdemoD3 /> -->
                     </div>
                     <div v-else-if="activeTab === 'second'">
                         <forna
@@ -68,12 +68,12 @@
                         />
                     </div>
                     <div v-else-if="activeTab === 'protein'">
-                        <iframe
+                        <!-- <iframe
                             :src="protein_url"
                             scrolling="auto"
                             frameborder="no"
                             class="w-full h-130"
-                        />
+                        /> -->
                     </div>
                 </div>
             </div>
@@ -91,15 +91,14 @@ import { NButton, NTooltip } from 'naive-ui'
 import { CloudDownloadOutline as downicon } from '@vicons/ionicons5'
 import _ from 'lodash'
 import { decrypt } from '@/utils/crypto'
-import seqdemoD3 from './seqdemoD3.vue'
+// import seqdemoD3 from './seqdemoD3.vue'
 import forna from './forna.vue'
-import mrnaAnnotation from './mrna_annotation.vue'
+// import mrnaAnnotation from './mrna_annotation.vue'
 // import heatmap from './heatmap.vue'
 
-// url.value = `https://www.ncbi.nlm.nih.gov/Structure/icn3d/?type=${mrnaStore.proteinstructureList.type}&url=${mrnaStore.proteinstructureList.fileurl}`
-const protein_url = ref('https://www.ncbi.nlm.nih.gov/Structure/icn3d/?mmdbid=1HHO&bu=1')
+// const protein_url = ref('https://www.ncbi.nlm.nih.gov/Structure/icn3d/?mmdbid=1HHO&bu=1')
 const sorter_dict = ref('')
-const activeTab = ref('protein')
+const activeTab = ref('second')
 
 const forna_structure = ref('')
 const forna_sequence = ref('')

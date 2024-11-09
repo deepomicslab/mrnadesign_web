@@ -34,6 +34,7 @@
             <div class="flex flex-row w-200">
                 <div class="text-2xl font-500 mb-5">Scoring Heatmap</div>
             </div>
+
             <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
                 <heatmap />
             </div>
@@ -55,10 +56,22 @@
                     </n-space>
                 </div>
             </div>
+            <el-select v-model="showtype" placeholder="Main Regions" class="w-100 ml-10">
+                <el-option
+                    v-for="item in showtype_list"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                ></el-option>
+            </el-select>
             <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
                 <div class="mb-2">
                     <div v-if="activeTab === 'primary'">
-                        <seqdemoD3 :taskid="taskid" :protein_subtask_name="protein_subtask_name" />
+                        <seqdemoD3
+                            :taskid="taskid"
+                            :protein_subtask_name="protein_subtask_name"
+                            :showtype="showtype"
+                        />
                     </div>
                     <div v-else-if="activeTab === 'second'">
                         <forna :taskid="taskid" :protein_subtask_name="protein_subtask_name" />
@@ -90,10 +103,16 @@ import heatmap from './heatmap.vue'
 
 const sorter_dict = ref('')
 const activeTab = ref('primary')
-
 const protein_subtask_name = ref('')
 
 const cur_time = ref('')
+
+const showtype = ref('Main Region') // primary structure type
+const showtype_list = [
+    { label: 'Main Regions', value: 'Main Regions' },
+    { label: 'uORF', value: 'uORF' },
+    { label: 'Restriction Sites', value: 'Restriction Sites' },
+]
 
 watch(activeTab, async () => {
     const today = new Date()
