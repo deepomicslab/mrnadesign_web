@@ -38,7 +38,7 @@
             <svg></svg>
         </div>
 
-        <div class="uorfArea" v-else-if="showtype === 'uORF' && render_info">
+        <div id="uorfArea" v-else-if="showtype === 'uORF' && render_info">
             <el-text v-for="(element, index) in render_info.uORF" :key="index">
                 <!-- 
                             element[0] is node
@@ -64,7 +64,7 @@
             </el-text>
         </div>
 
-        <div class="resSitesArea" v-else-if="showtype === 'Restriction Sites'">
+        <div id="resSitesArea" v-else-if="showtype === 'Restriction Sites'">
             <el-text v-for="(element, index) in render_info.restriction_sites" :key="index">
                 <el-tooltip placement="top" effect="light" :content="getResTipCont(element[2])">
                     <el-text
@@ -135,6 +135,7 @@ const process_svg = () => {
     }
 
     const regionSvg = d3.select('#regionArea')
+    // regionSvg.selectAll('*').remove()
     regionSvg
         .selectAll('svg')
         .data(regionList.value)
@@ -151,6 +152,12 @@ watch(protein_subtask_name, async () => {
 })
 watch(seqData, () => {
     process_svg()
+})
+
+watch(showtype, () => {
+    // const elTextCount = document.querySelectorAll('el-text').length
+    const element = document.getElementById('uorfArea')
+    console.log('Number of el-text labels:', element?.childElementCount)
 })
 
 const isActive = ref('')

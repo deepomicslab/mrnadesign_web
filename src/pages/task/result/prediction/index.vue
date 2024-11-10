@@ -109,7 +109,7 @@ const cur_time = ref('')
 
 const showtype = ref('Main Region') // primary structure type
 const showtype_list = [
-    { label: 'Main Regions', value: 'Main Regions' },
+    { label: 'Main Region', value: 'Main Region' },
     { label: 'uORF', value: 'uORF' },
     { label: 'Restriction Sites', value: 'Restriction Sites' },
 ]
