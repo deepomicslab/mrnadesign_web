@@ -36,7 +36,7 @@
             </div>
 
             <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
-                <heatmap />
+                <heatmap taskid="-93" />
             </div>
             <div class="flex flex-row w-200">
                 <div class="text-2xl font-500 mb-5">Annotation</div>

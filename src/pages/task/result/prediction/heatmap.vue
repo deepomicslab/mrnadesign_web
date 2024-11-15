@@ -8,12 +8,58 @@
 // @ts-nocheck
 /* eslint-disable */
 import * as d3 from 'd3'
+import axios from 'axios'
 
-//import _ from 'lodash'
-//import { TypeDict, proteinType } from '@/utils/annotation'
-//import { usePhageStore } from '@/store/phage'
+const props = defineProps<{
+    taskid: string
+}>()
+const { taskid } = toRefs(props)
 
-//const phageStore = usePhageStore()
+const colormap1 = [
+    '#45bf43',
+    '#5490F8',
+    '#29cbce',
+    '#DF3AD2',
+    '#9dc6e7',
+    '#0FF0BF',
+    '#9343f0',
+    '#ec364e',
+    '#90ed7d',
+    '#445d8f',
+]
+const colormap2 = [
+    '#45bf43',
+    '#5490F8',
+    '#29cbce',
+    '#DF3AD2',
+    '#9dc6e7',
+    '#0FF0BF',
+    '#9343f0',
+    '#ec364e',
+    '#90ed7d',
+    '#445d8f',
+]
+
+const scoring = ref()
+const demoheader = ref()
+const parameterclass = ref()
+const process_scoring = async () => {
+    const response = await axios.get('/task/result/scoringheatmap/', {
+        baseURL: '/api',
+        timeout: 10000,
+        params: {
+            taskid: taskid.value,
+        },
+    })
+    const { data } = response
+    scoring.value = data.result
+    parameterclass.value = scoring.value.seq_acc
+    demoheader.value = Object.keys(scoring.value).slice(1)
+}
+
+watch(scoring, () => {
+    process_svg()
+})
 
 const Width = ref(1800)
 const Height = ref(700)
@@ -25,102 +71,42 @@ const topMargin = ref(0)
 const bottomMargin = ref(500)
 const yoffset = ref(5)
 
-const demodata = [[1, 0.1, 0.4, 0.5, 0.3, 0.9, 0.4, 0.3, 0.2, 0.9, 0.3], [2, 0.3, 0.2, 0.1, 0.9, 0.5, 0.2, 0.4, 0.1, 0.5, 0.2], [3, 0.5, 0.3, 0.8, 0.9, 0.8, 0.5, 0.1, 0.8, 0.4, 0.7],
-[4, 0.4, 0.8, 0.4, 0.8, 0.1, 0.3, 0.7, 0.5, 0.3, 0.9], [5, 0.9, 0.7, 0.4, 0.7, 0.4, 0.9, 0.8, 0.3, 0.1, 0.2]]
-const demoheader = ['Translation on Initialization', 'Score 2', 'Score 3', 'Half Life', 'RNA Components']
-const parameterclass = [
-    "Translation Score",
-    "Half-Life",
-    "Protein Score",
-    "RNA  Secondary Structure Metrics",
-    "Autoimmune Score",
-    "Motif Risk",
-    "MHC Affinity",
-    "T-Cell Score",
-    "B-Cell Score",
-    "Enzyme Sites",
-]
-const parameterclass2 = [
-    'Header 2',
-    'Header 1',
-]
+const parameterclass2 = ['Header 2', 'Header 1']
+
+const apply_sorter = async (order, columnKey) => {
+    const sorter = {
+        order: order,
+        columnKey: columnKey,
+    }
+    const response = await axios.get('/task/result/scoringheatmap/', {
+        baseURL: '/api',
+        timeout: 10000,
+        params: {
+            taskid: taskid.value,
+            sorter: sorter,
+        },
+    })
+    const { data } = response
+    scoring.value = data.result
+    parameterclass.value = scoring.value.seq_acc
+    demoheader.value = Object.keys(scoring.value).slice(1)
+}
 
 // Different protein class has different color
 const chooseColor = (d: unknown, flag: number) => {
-    let color = '';
-    // when d is protein_class
+    let idx = 0
+    let color = ''
     if (flag == 1) {
-        switch (d) {
-            case 'Translation Score':
-                color = '#45bf43';
-                break;
-            case 'Half-Life':
-                color = '#5490F8';
-                break;
-            case 'Protein Score':
-                color = '#29cbce';
-                break;
-            case 'RNA  Secondary Structure Metrics':
-                color = '#DF3AD2';
-                break;
-            case 'Autoimmune Score':
-                color = '#9dc6e7';
-                break;
-            case 'Motif Risk':
-                color = '#0FF0BF';
-                break;
-            case 'MHC Affinity':
-                color = '#9343f0';
-                break;
-            case 'T-Cell Score':
-                color = '#ec364e';
-                break;
-            case 'B-Cell Score':
-                color = '#90ed7d';
-                break;
-            case 'Enzyme Sites':
-                color = '#445d8f';
-                break;
-            // additional cases for other indices if needed
-        }
-        return color;
+        // idx = parameterclass.value.indexOf(d.id)
+        idx = d.id - 1
+        color = colormap1[idx]
+        return color
     }
-    // when d is final
-    switch (d.class) {
-        case 'Translation Score':
-            color = '#45bf43';
-            break;
-        case 'Half-Life':
-            color = '#5490F8';
-            break;
-        case 'Protein Score':
-            color = '#29cbce';
-            break;
-        case 'RNA  Secondary Structure Metrics':
-            color = '#DF3AD2';
-            break;
-        case 'Autoimmune Score':
-            color = '#9dc6e7';
-            break;
-        case 'Motif Risk':
-            color = '#0FF0BF';
-            break;
-        case 'MHC Affinity':
-            color = '#9343f0';
-            break;
-        case 'T-Cell Score':
-            color = '#ec364e';
-            break;
-        case 'B-Cell Score':
-            color = '#90ed7d';
-            break;
-        case 'Enzyme Sites':
-            color = '#445d8f';
-            break;
-        // additional cases for other indices if needed
-    }
-    return color;
-};
+    // idx = parameterclass.value.indexOf(d.id)
+    idx = d.id - 1
+    color = colormap1[idx]
+    return color
+}
 
 // util function
 function wrap(text, width) {
@@ -131,35 +117,40 @@ function wrap(text, width) {
             line = [],
             lineNumber = 0,
             lineHeight = 1.1, // ems
-            x = text.attr("x"),
-            y = text.attr("y"),
+            x = text.attr('x'),
+            y = text.attr('y'),
             dy = 0, //parseFloat(text.attr("dy")),
-            tspan = text.text(null)
-                .append("tspan")
-                .attr("x", x)
-                .attr("y", y)
-                .attr("dy", dy + "em");
-        while (word = words.pop()) {
-            line.push(word);
-            tspan.text(line.join(" "));
+            tspan = text
+                .text(null)
+                .append('tspan')
+                .attr('x', x)
+                .attr('y', y)
+                .attr('dy', dy + 'em')
+        while ((word = words.pop())) {
+            line.push(word)
+            tspan.text(line.join(' '))
             if (tspan.node().getComputedTextLength() > width) {
-                line.pop();
-                tspan.text(line.join(" "));
-                line = [word];
-                tspan = text.append("tspan")
-                    .attr("x", x)
-                    .attr("y", y)
-                    .attr("dy", ++lineNumber * lineHeight + dy + "em")
-                    .text(word);
+                line.pop()
+                tspan.text(line.join(' '))
+                line = [word]
+                tspan = text
+                    .append('tspan')
+                    .attr('x', x)
+                    .attr('y', y)
+                    .attr('dy', ++lineNumber * lineHeight + dy + 'em')
+                    .text(word)
             }
         }
-    });
+    })
 }
 
 // Labels of columns
 // const protein_class = proteinType
 // append the svg object to the body of the page
-onMounted(() => {
+const process_svg = () => {
+    // }
+    // onMounted(() => {
+    d3.select('#Viz_area').selectAll('*').remove()
     const svg = d3
         .select('#Viz_area')
         .append('svg')
@@ -169,11 +160,13 @@ onMounted(() => {
         .attr('transform', `translate(${leftMargin.value},${topMargin.value})`)
 
     // Build X scales and axis:
-    const xdomain = [1, 2, 3, 4, 5]
+    // const xdomain = [1, 2, 3, 4, 5]
+    const xdomain = Array.from({ length: demoheader.value.length }, (_, index) => index + 1)
     const x = d3
         .scaleBand()
         .range([0, width.value - leftMargin.value])
         .domain(xdomain)
+        // .domain(demoheader.value)
         .padding(0.001)
     let xAix = svg
         .append('g')
@@ -191,35 +184,42 @@ onMounted(() => {
     const y = d3
         .scaleBand()
         .range([height.value / 2 - yoffset.value, 0])
-        .domain(parameterclass)
+        .domain(parameterclass.value)
         .padding(0.01)
 
     const y1 = d3
         .scaleBand()
         .range([height.value, height.value / 2 + yoffset.value])
-        .domain(parameterclass)
+        .domain(parameterclass.value)
         .padding(0.01)
 
     const y3 = d3
         .scaleBand()
-        .range([height.value / 2 - yoffset.value, height.value / 2 - yoffset.value - 4 * y1.bandwidth()])
+        .range([
+            height.value / 2 - yoffset.value,
+            height.value / 2 - yoffset.value - 4 * y1.bandwidth(),
+        ])
         .domain(parameterclass2)
         .padding(0.01)
 
     // Build the second Y scales and axis:
     let y1Aix = svg
         .append('g')
-        .attr('transform', 'translate(' + leftMargin.value + ',' + (height.value / 2 + yoffset.value) + ')')
+        .attr(
+            'transform',
+            'translate(' + leftMargin.value + ',' + (height.value / 2 + yoffset.value) + ')'
+        )
         .call(d3.axisLeft(y))
     y1Aix.select('.domain').remove()
     y1Aix.selectAll('.tick').selectAll('line').remove()
-    y1Aix.selectAll('text')
+    y1Aix
+        .selectAll('text')
         .attr('transform', 'translate(' + -y.bandwidth() + ',0)')
         .style('font-size', 20)
 
     y1Aix
         .selectAll('textRec')
-        .data(parameterclass)
+        .data(parameterclass.value)
         .enter()
         .append('rect')
         .attr('x', function (d) {
@@ -233,7 +233,7 @@ onMounted(() => {
         .style('fill', function (d) {
             return chooseColor(d, 1)
         })
-    const tooltip = svg.append('svg').attr('height', 100).attr('width', 210).style('opacity', 0)
+    const tooltip = svg.append('svg').attr('height', 100).attr('width', 230).style('opacity', 0)
     tooltip
         .append('rect')
         .attr('x', 0)
@@ -261,14 +261,17 @@ onMounted(() => {
         tooltip.style('opacity', 1)
         myCol.style('opacity', 1)
     }
-    const mousemove = function (md: { layerX: number; layerY: number; }, d: { value: any; perc: any; }) {
+    const mousemove = function (
+        md: { layerX: number; layerY: number },
+        d: { value: any; perc: any }
+    ) {
         svg.selectAll('.myRec').style('opacity', 0.2)
         d3.select(this).style('opacity', 1)
         myCol
             .attr(
                 'x',
                 Math.floor((md.layerX - 2.9 * leftMargin.value) / x.bandwidth()) * x.bandwidth() +
-                leftMargin.value
+                    leftMargin.value
             )
             .attr('y', height.value / 2 - yoffset.value)
 
@@ -277,13 +280,13 @@ onMounted(() => {
             .attr(
                 'x',
                 Math.floor((md.layerX - 2.9 * leftMargin.value) / x.bandwidth()) * x.bandwidth() +
-                leftMargin.value
+                    leftMargin.value
             )
             .attr('y', height.value / 2 - 30)
-        toolText1.text(function () {
-            return `The exact value : ${d.value}`
-        })
 
+        toolText1.text(function () {
+            return `${d.value}`
+        })
     }
     const mouseleave = function () {
         svg.selectAll('.myRec').style('opacity', 1)
@@ -292,12 +295,13 @@ onMounted(() => {
     }
 
     let final = []
-    for (let m = 0; m < demodata.length; m++) {
-        for (let n = 0; n < demodata[m].length - 1; n++) {
+    for (let m = 0; m < parameterclass.value.length; m++) {
+        for (let n = 0; n < demoheader.value.length; n++) {
             final.push({
-                id: demodata[m][0], // col
-                class: parameterclass[n], // row
-                value: demodata[m][n + 1],
+                id: n + 1, // col
+                class: parameterclass.value[m], // row
+                // value: demodata[m][n + 1],
+                value: scoring.value[demoheader.value[n]][m],
             })
         }
     }
@@ -305,10 +309,7 @@ onMounted(() => {
     // Build gradient color scale
     let recColor = function (d) {
         let color = chooseColor(d, 0)
-        return d3
-            .scaleLinear()
-            .range(['#F7F7F7', color])
-            .domain([0, 1])
+        return d3.scaleLinear().range(['#F7F7F7', color]).domain([0, 100])
     }
 
     // gradient color rect
@@ -318,7 +319,7 @@ onMounted(() => {
     const defs = label.append('defs') //append defs
     const linearGradient = defs
         .selectAll('graDef') //append <linearGradient> in defs
-        .data(parameterclass)
+        .data(parameterclass.value)
         .enter()
         .append('linearGradient')
         .attr('id', function (d) {
@@ -332,7 +333,6 @@ onMounted(() => {
             return chooseColor(d, 1)
         })
 
-    // console.log('[[[[[final]]]]]', final)
     // heatmap
     svg.selectAll('myRec')
         .data(final) //, function(d) { return d.class+':'+d.id;})
@@ -356,19 +356,13 @@ onMounted(() => {
 
     // header
     let header = []
-    for (let m = 0; m < demoheader.length; m++) {
+    for (let m = 0; m < demoheader.value.length; m++) {
         header.push({
             id: m + 1, // index starst from 1, according to demodata
             class: 'Header 2',
-            value: demoheader[m],
+            value: demoheader.value[m],
         })
-        // header.push({
-        //     id: m, // index starst from 1, according to demodata
-        //     class: 'Header 1',
-        //     value: demoheader[m],
-        // })
     }
-    // console.log('[[[[[header]]]]]', header)
     svg.selectAll('myHeader')
         .data(header)
         .enter()
@@ -389,18 +383,18 @@ onMounted(() => {
         .append('polygon') // Using polyline for the down arrow
         .attr('class', 'uparrow')
         .attr('points', function (d) {
-            const xPos = x(d.id) + leftMargin.value + x.bandwidth() / 2 + 20;
-            const yPos = y3(d.class) + (y.bandwidth() - 1) - 5; // Position below the rectangle
-            return `${xPos - 7},${yPos} ${xPos},${yPos - 7} ${xPos + 7},${yPos}`; // Down arrow points
+            const xPos = x(d.id) + leftMargin.value + x.bandwidth() / 2 + 20
+            const yPos = y3(d.class) + (y.bandwidth() - 1) - 5 // Position below the rectangle
+            return `${xPos - 7},${yPos} ${xPos},${yPos - 7} ${xPos + 7},${yPos}` // Down arrow points
         })
         .style('stroke', 'grey') // Colour the line
-        .style('stroke-width', 2)  // Line width
+        .style('stroke-width', 2) // Line width
         .style('fill', 'grey')
         .style('stroke-linejoin', 'round') // Shape the line join
         .style('cursor', 'pointer') // Change cursor to pointer for interactivity
         .on('click', function (event, d) {
-            console.log('down down down');
-        });
+            apply_sorter('descend', d.value)
+        })
 
     svg.selectAll('.arrow')
         .data(header)
@@ -408,18 +402,18 @@ onMounted(() => {
         .append('polygon') // Using polyline for the down arrow
         .attr('class', 'downarrow')
         .attr('points', function (d) {
-            const xPos = x(d.id) + leftMargin.value + x.bandwidth() / 2 + 20;
-            const yPos = y3(d.class) + (y.bandwidth() - 1) + 5; // Position below the rectangle
-            return `${xPos - 7},${yPos} ${xPos},${yPos + 7} ${xPos + 7},${yPos}`; // Down arrow points
+            const xPos = x(d.id) + leftMargin.value + x.bandwidth() / 2 + 20
+            const yPos = y3(d.class) + (y.bandwidth() - 1) + 5 // Position below the rectangle
+            return `${xPos - 7},${yPos} ${xPos},${yPos + 7} ${xPos + 7},${yPos}` // Down arrow points
         })
         .style('stroke', 'grey') // Colour the line
-        .style('stroke-width', 2)  // Line width
+        .style('stroke-width', 2) // Line width
         .style('fill', 'grey')
         .style('stroke-linejoin', 'round') // Shape the line join
         .style('cursor', 'pointer') // Change cursor to pointer for interactivity
         .on('click', function (event, d) {
-            console.log('down down down');
-        });
+            apply_sorter('ascend', d.value)
+        })
 
     svg.selectAll('.headerText')
         .data(header)
@@ -427,21 +421,21 @@ onMounted(() => {
         .append('text')
         .attr('class', 'headerText')
         .attr('x', function (d) {
-            return x(d.id) + leftMargin.value + x.bandwidth() / 2; // Center the text
+            return x(d.id) + leftMargin.value + x.bandwidth() / 2 // Center the text
         })
         .attr('y', function (d) {
-            return y3(d.class) + y3.bandwidth() / 3;// Position above the rectangle
+            return y3(d.class) + y3.bandwidth() / 3 // Position above the rectangle
         })
         .attr('text-anchor', 'middle') // Center the text
         .style('font-size', '14px')
         .style('fill', '#000') // Text color
         .text(function (d) {
-            return demoheader[d.id - 1]; // Display the 'id' from the header array
+            return demoheader.value[d.id - 1] // Display the 'id' from the header array
         })
         .call(wrap, x.bandwidth() - 10)
-})
+}
 
-
+process_scoring()
 </script>
 
 <style lang="scss" scoped>
