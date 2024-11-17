@@ -134,7 +134,6 @@ const process_svg = () => {
         regionList.value.push(componentsRegion.value[i].sequence)
     }
 
-    // d3.select('#regionArea').selectAll('*').remove()
     const regionSvg = d3.select('#regionArea')
     // regionSvg.selectAll('*').remove()
     regionSvg
