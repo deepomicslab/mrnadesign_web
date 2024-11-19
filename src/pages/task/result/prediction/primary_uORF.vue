@@ -35,8 +35,9 @@ import axios from 'axios'
 const props = defineProps<{
     taskid: string
     protein_subtask_name: string
+    cur_time: number | undefined
 }>()
-const { taskid, protein_subtask_name } = toRefs(props)
+const { taskid, protein_subtask_name, cur_time } = toRefs(props)
 
 const type_list = ['primary', 'danger', 'success', 'warning']
 
@@ -64,13 +65,14 @@ const process_primarystructure = async () => {
 
     componentsRender.value = seqData.value.render_info.uORF
     resList.value = toRaw(componentsRender.value)
-
-    console.log('componentsData', componentsData.value)
 }
 
 watch(protein_subtask_name, async () => {
     process_primarystructure()
 })
+if (protein_subtask_name.value !== '' && cur_time.value !== Date.now()) {
+    process_primarystructure()
+}
 
 const highlight_start = ref(-1)
 const highlight_end = ref(-1)

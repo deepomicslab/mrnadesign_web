@@ -6,16 +6,18 @@
                             element[1] is color
                             element[2] is belongings
                             element[3] is highlight_range -->
-            <el-tooltip placement="bottom" effect="light" :content="getResTipCont(element[2])">
+            <el-tooltip
+                placement="bottom"
+                effect="light"
+                :content="getResTipCont(element[0], element[2])"
+            >
                 <el-text
                     :class="{ textHover: isTextHoverd(index) }"
                     @mouseenter="hoverText1(element[3])"
                     @mouseleave="leaveText1()"
                 >
-                    <div v-if="element[1] !== 0" class="line"></div>
-                    <el-text>
-                        {{ element[0] }}
-                    </el-text>
+                    <el-text v-if="element[1] !== 0" class="styled-text">|</el-text>
+                    <el-text>{{ element[0] }}</el-text>
                 </el-text>
             </el-tooltip>
         </el-text>
@@ -31,8 +33,9 @@ import axios from 'axios'
 const props = defineProps<{
     taskid: string
     protein_subtask_name: string
+    cur_time: number | undefined
 }>()
-const { taskid, protein_subtask_name } = toRefs(props)
+const { taskid, protein_subtask_name, cur_time } = toRefs(props)
 
 const componentsData = ref()
 const componentsRender = ref()
@@ -63,12 +66,15 @@ const process_primarystructure = async () => {
 watch(protein_subtask_name, async () => {
     process_primarystructure()
 })
+if (protein_subtask_name.value !== '' && cur_time.value !== Date.now()) {
+    process_primarystructure()
+}
 
 const highlight_start = ref(-1)
 const highlight_end = ref(-1)
 const isTextHoverd = (_index: any) => {
     const index = parseInt(_index, 10)
-    return index >= highlight_start.value - 1 && index <= highlight_end.value - 1
+    return index >= highlight_start.value && index <= highlight_end.value
 }
 function hoverText1(range: any[]) {
     const [_highlight_start, _highlight_end] = range
@@ -80,7 +86,7 @@ function leaveText1() {
     highlight_end.value = -1
 }
 
-const getResTipCont = (belongings: any[]) => {
+const getResTipCont = (node: string, belongings: any[]) => {
     let resTipCont = ''
     if (belongings.length > 0) {
         for (let i = 0; i < belongings.length; i += 1) {
@@ -101,7 +107,7 @@ const getResTipCont = (belongings: any[]) => {
         }
         if (resTipCont.length >= 3) resTipCont = resTipCont.slice(0, -3)
     } else {
-        resTipCont = 'This node is not in a restriction site'
+        resTipCont = node
     }
     return resTipCont
 }
@@ -130,22 +136,12 @@ const getResTipCont = (belongings: any[]) => {
     transition: 0.3s;
     background-color: rgb(203, 200, 200);
 }
-</style>
-
-<style lang="scss">
-.el-row {
-    margin-top: 20px;
-    margin-left: 20px;
-}
-
-.line {
-    position: relative;
-    margin-top: 0px;
-    margin-right: 0px;
-    width: 3px;
+.styled-text {
+    margin-left: 7px;
+    margin-right: 2px;
     height: 20px;
+    line-height: 20px;
     background: red;
-    vertical-align: center;
-    display: inline-block;
+    color: red;
 }
 </style>

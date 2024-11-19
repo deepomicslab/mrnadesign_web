@@ -15,8 +15,9 @@ const loading = ref(false)
 const props = defineProps<{
     taskid: string
     protein_subtask_name: string
+    cur_time: number
 }>()
-const { taskid, protein_subtask_name } = toRefs(props)
+const { taskid, protein_subtask_name, cur_time } = toRefs(props)
 const url = ref('')
 
 const process_protein = async () => {
@@ -39,4 +40,8 @@ const process_protein = async () => {
 watch(protein_subtask_name, async () => {
     process_protein()
 })
+
+if (cur_time.value !== Date.now()) {
+    process_protein()
+}
 </script>

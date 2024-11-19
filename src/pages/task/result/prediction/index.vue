@@ -31,18 +31,6 @@
             </div>
         </div>
         <div class="mt-5 ml-15">
-            <!-- v-if="showtype === 'Main Region'" -->
-            <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-40 mt-5 ml-10 mb-20">
-                <primaryMainRegion :taskid="taskid" :protein_subtask_name="protein_subtask_name" />
-            </div>
-            <!-- v-if="showtype === 'uORF'" -->
-            <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-70 mt-5 ml-10 mb-20">
-                <primaryuORF :taskid="taskid" :protein_subtask_name="protein_subtask_name" />
-            </div>
-            <!-- v-if="showtype === 'Restriction Sites'" -->
-            <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-70 mt-5 ml-10 mb-20">
-                <primaryResSite :taskid="taskid" :protein_subtask_name="protein_subtask_name" />
-            </div>
             <div class="flex flex-row w-200">
                 <div class="text-2xl font-500 mb-5">Scoring Heatmap</div>
             </div>
@@ -68,28 +56,49 @@
                     </n-space>
                 </div>
             </div>
-            <!-- <el-select v-model="showtype" placeholder="Main Regions" class="w-100 ml-10">
+            <el-select v-model="showtype" placeholder="Main Regions" class="w-100 ml-10">
                 <el-option
                     v-for="item in showtype_list"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value"
                 ></el-option>
-            </el-select> -->
+            </el-select>
             <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
                 <div class="mb-2">
                     <div v-if="activeTab === 'primary'">
-                        <!-- <seqdemoD3
+                        <primaryMainRegion
+                            v-if="showtype === 'Main Region'"
                             :taskid="taskid"
                             :protein_subtask_name="protein_subtask_name"
-                            :showtype="showtype"
-                        /> -->
+                            :cur_time="cur_time"
+                        />
+                        <primaryuORF
+                            v-else-if="showtype === 'uORF'"
+                            :taskid="taskid"
+                            :protein_subtask_name="protein_subtask_name"
+                            :cur_time="cur_time"
+                        />
+                        <primaryResSite
+                            v-else-if="showtype === 'Restriction Sites'"
+                            :taskid="taskid"
+                            :protein_subtask_name="protein_subtask_name"
+                            :cur_time="cur_time"
+                        />
                     </div>
                     <div v-else-if="activeTab === 'second'">
-                        <forna :taskid="taskid" :protein_subtask_name="protein_subtask_name" />
+                        <forna
+                            :taskid="taskid"
+                            :protein_subtask_name="protein_subtask_name"
+                            :cur_time="cur_time"
+                        />
                     </div>
                     <div v-else-if="activeTab === 'protein'">
-                        <protein :taskid="taskid" :protein_subtask_name="protein_subtask_name" />
+                        <protein
+                            :taskid="taskid"
+                            :protein_subtask_name="protein_subtask_name"
+                            :cur_time="cur_time"
+                        />
                     </div>
                 </div>
             </div>
@@ -107,7 +116,6 @@ import { NButton, NTooltip } from 'naive-ui'
 import { CloudDownloadOutline as downicon } from '@vicons/ionicons5'
 import _ from 'lodash'
 import { decrypt } from '@/utils/crypto'
-// import seqdemoD3 from './seqdemoD3.vue'
 import forna from './forna.vue'
 import protein from './protein.vue'
 import mrnaAnnotation from './mrna_annotation.vue'
@@ -120,18 +128,17 @@ const sorter_dict = ref('')
 const activeTab = ref('primary')
 const protein_subtask_name = ref('')
 
-const cur_time = ref('')
+const cur_time = ref()
 
-// const showtype = ref('Main Region') // primary structure type
-// const showtype_list = [
-//     { label: 'Main Region', value: 'Main Region' },
-//     { label: 'uORF', value: 'uORF' },
-//     { label: 'Restriction Sites', value: 'Restriction Sites' },
-// ]
+const showtype = ref('Main Region') // primary structure type
+const showtype_list = [
+    { label: 'Main Region', value: 'Main Region' },
+    { label: 'uORF', value: 'uORF' },
+    { label: 'Restriction Sites', value: 'Restriction Sites' },
+]
 
 watch(activeTab, async () => {
-    const today = new Date()
-    cur_time.value = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
+    cur_time.value = Date.now()
 })
 
 const route = useRoute()

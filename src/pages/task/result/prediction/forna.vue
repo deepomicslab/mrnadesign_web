@@ -12,8 +12,9 @@ const loading = ref(false)
 const props = defineProps<{
     taskid: string
     protein_subtask_name: string
+    cur_time: number
 }>()
-const { taskid, protein_subtask_name } = toRefs(props)
+const { taskid, protein_subtask_name, cur_time } = toRefs(props)
 
 const loadScript = (src: string) => {
     return new Promise((resolve, reject) => {
@@ -76,11 +77,9 @@ const process_forna = async () => {
 }
 
 // to give a starting point to run the preprocess_forna()
-// const today = new Date()
-// const ccur_time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
-// if (cur_time.value !== ccur_time.value) {
-//     process_forna()
-// }
+if (cur_time.value !== Date.now()) {
+    process_forna()
+}
 
 watch(protein_subtask_name, async () => {
     process_forna()

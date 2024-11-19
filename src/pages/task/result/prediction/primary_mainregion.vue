@@ -44,8 +44,9 @@ import axios from 'axios'
 const props = defineProps<{
     taskid: string
     protein_subtask_name: string
+    cur_time: number | undefined
 }>()
-const { taskid, protein_subtask_name } = toRefs(props)
+const { taskid, protein_subtask_name, cur_time } = toRefs(props)
 
 const componentsRegion = ref() // main_regions
 
@@ -70,12 +71,13 @@ const process_primarystructure = async () => {
 
 const process_svg = () => {
     componentsRegion.value = splitSeqData.value.main_regions
+    regionList.value.length = 0
     for (let i = 0; i < componentsRegion.value.length; i += 1) {
         regionList.value.push(componentsRegion.value[i].sequence)
     }
 
     const regionSvg = d3.select('#regionArea')
-    // regionSvg.selectAll('*').remove()
+    regionSvg.selectAll('svg').selectAll('*').remove()
     regionSvg
         .selectAll('svg')
         .data(regionList.value)
@@ -88,6 +90,10 @@ const process_svg = () => {
 watch(protein_subtask_name, async () => {
     process_primarystructure()
 })
+if (protein_subtask_name.value !== '' && cur_time.value !== Date.now()) {
+    process_primarystructure()
+}
+
 watch(seqData, () => {
     process_svg()
 })
