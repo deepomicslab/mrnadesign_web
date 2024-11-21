@@ -56,7 +56,12 @@
                     </n-space>
                 </div>
             </div>
-            <el-select v-model="showtype" placeholder="Main Regions" class="w-100 ml-10">
+            <el-select
+                v-if="activeTab === 'primary'"
+                v-model="showtype"
+                placeholder="Main Regions"
+                class="w-100 ml-10"
+            >
                 <el-option
                     v-for="item in showtype_list"
                     :key="item.value"

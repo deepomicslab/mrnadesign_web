@@ -180,7 +180,7 @@
 
                         <div v-for="(inputGroup, index) in inputBlocks" :key="index" class="w-190">
                             <hr class="mb-5" />
-                            <el-form-item label="Name" label-width="100px">
+                            <el-form-item label="Name" label-width="100px" class="is-required">
                                 <n-input-group>
                                     <n-input
                                         round
@@ -195,7 +195,7 @@
                                     </n-input-group-label>
                                 </n-input-group>
                             </el-form-item>
-                            <el-form-item label="3'UTR" label-width="100px">
+                            <el-form-item label="3'UTR" label-width="100px" class="is-required">
                                 <n-input
                                     round
                                     placeholder="3'UTR"
@@ -208,7 +208,7 @@
                                     }"
                                 ></n-input>
                             </el-form-item>
-                            <el-form-item label="CDS" label-width="100px">
+                            <el-form-item label="CDS" label-width="100px" class="is-required">
                                 <n-input
                                     round
                                     placeholder="CDS"
@@ -221,7 +221,7 @@
                                     }"
                                 ></n-input>
                             </el-form-item>
-                            <el-form-item label="5'UTR" label-width="100px">
+                            <el-form-item label="5'UTR" label-width="100px" class="is-required">
                                 <n-input
                                     round
                                     placeholder="5'UTR"
@@ -239,11 +239,7 @@
                             <n-button size="large" class="w-50 mt-4" @click="addInputBlock">
                                 Add Input Block
                             </n-button>
-                            <n-button
-                                size="large"
-                                class="w-50 mt-4"
-                                @click="fillSequence('>seq1\nMPNTLACP\n>seq2\nMLDQVNKLKYPEVSLT*\n')"
-                            >
+                            <n-button size="large" class="w-50 mt-4" @click="fillSequence">
                                 Sample Input
                             </n-button>
                         </n-button-group>
@@ -291,6 +287,7 @@ import axios from 'axios'
 import parameter from './parameter.vue'
 import { useUserIdGenerator } from '@/utils/userIdGenerator'
 import { encrypt } from '@/utils/crypto'
+import { windowErrorMessage, windowSuccessMessage } from '@/utils/windowFunctions'
 // import { usePredictionParameterStore } from '@/store/mrna'
 const inputBlocks = ref([{ name: '', utr3: '', cds: '', utr5: '' }]) // Initialize with one input block
 
@@ -307,7 +304,6 @@ const paramform = ref([])
 const fileList = ref<UploadFileInfo[]>([])
 const submitfile = ref<File>()
 const inputtype = ref('paste')
-const pastefile = ref('')
 
 const userid = ref('')
 const loading = ref(false)
@@ -323,8 +319,20 @@ const validationstatus = ref()
 const dialogVisible = ref(false)
 const demotask = ref([] as any[])
 
-const fillSequence = (seq: string) => {
-    pastefile.value = seq
+const fillSequence = () => {
+    inputBlocks.value.length = 0
+    inputBlocks.value.push({
+        name: 'SEQ000000',
+        utr3: 'CUAAUGCCAUGAUCCAGGUGACAUGUAGAAGCUUGGAUCAGAUGCUGCACUUUGCGUUCGAUGUGGGAGCGUGCUUUCCACGACGGUGACACGCUUCCCUGGAUUGGCAGCCAGACUGCCUUCCGGGUCACUGCC',
+        cds: 'AUGCCCAUGCCCAUCGGCAGCAAGGAGAGGCCCACCUUCUUCGAGAUCUUCAAGACCAGGUGCAACAAGGCCGACCUGGGCCCCAUCAGCCUGAACUGA',
+        utr5: 'AUUGAUUUU',
+    })
+    inputBlocks.value.push({
+        name: 'SEQ000001',
+        utr3: 'CUAAUGCCAUGAUCCAACAUGUGGAAGCUUGGAUCAGAUGCUGCACCCUGGAUUGGCUGCC',
+        cds: 'AUGCCCAUGCCCAUCGGCAGCAAGGAGAGGCCCACCUUCUUCGAGAUCUUCAAGACCAGGUGCAACAAGGCCGACCUGGGCCCCAUCAGCCUGAACUGA',
+        utr5: 'AUUGAUUGGGGUAAUAAAGGGU',
+    })
 }
 
 /* eslint-disable */
@@ -335,25 +343,16 @@ const handleParamSubmitted = (value: any) => {
 
 const handleFileListChange = (data: UploadFileInfo[]) => {
     if (data[0].name.match(/(.tsv)$/g) === null) {
-        window.$message.error('Uploaded file must be in TSV format.', {
-            closable: true,
-            duration: 5000,
-        })
+        windowErrorMessage('Uploaded file must be in TSV format.')
         data.pop()
     } else if (data[0].file?.size === 0 || data[0].file?.size === undefined) {
-        window.$message.error('Uploaded file cannot be empty.', { closable: true, duration: 5000 })
+        windowErrorMessage('Uploaded file cannot be empty.')
         data.pop()
     } else if (data[0].file.size / 1024 / 1024 > 10) {
-        window.$message.error('Uploaded file cannot exceed 10MB.', {
-            closable: true,
-            duration: 5000,
-        })
+        windowErrorMessage('Uploaded file cannot exceed 10MB.')
         data.pop()
     } else if (data.length > 1) {
-        window.$message.error('Cannot upload more than one files.', {
-            closable: true,
-            duration: 5000,
-        })
+        windowErrorMessage('Cannot upload more than one files.')
         data.pop()
     } else if (data.length === 1) {
         submitfile.value = data[0].file
@@ -389,6 +388,41 @@ const opendemo = () => {
     })
 }
 
+const checkPasteInput = () => {
+    // error code: 0 for true, 1 for requiring input, 2 for requiring letters
+
+    const isOnlyLetters = (str: string) => {
+        const regex = /^[A-Za-z]+$/
+        return regex.test(str)
+    }
+    const isOnlyLettersAndDigits = (str: string) => {
+        const regex = /^[A-Za-z0-9]+$/
+        return regex.test(str)
+    }
+
+    if (inputBlocks.value.length === 0) {
+        return 1
+    }
+    for (let i = 0; i < inputBlocks.value.length; i++) {
+        let block = inputBlocks.value[i]
+        if (
+            block.name.length === 0 ||
+            block.utr3.length === 0 ||
+            block.cds.length === 0 ||
+            block.utr5.length === 0
+        ) {
+            return 1
+        }
+        if (!isOnlyLettersAndDigits(block.name)) {
+            return 2
+        }
+        if (!isOnlyLetters(block.utr3) && !isOnlyLetters(block.cds) && !isOnlyLetters(block.utr5)) {
+            return 2
+        }
+    }
+    return 0
+}
+
 const submit = async () => {
     loading.value = true
     const submitdata = new FormData()
@@ -397,38 +431,30 @@ const submit = async () => {
 
     if (inputtype.value === 'upload') {
         if (typeof submitfile.value === 'undefined') {
-            window.$message.error('Please upload file', {
-                closable: true,
-                duration: 5000,
-            })
+            windowErrorMessage('Please upload file')
             precheck.value = false
         } else {
             precheck.value = true
         }
     } else if (inputtype.value === 'paste') {
-        if (pastefile.value.length > 0) {
-            submitdata.append('file', pastefile.value)
+        const paster_input_code = checkPasteInput()
+        if (paster_input_code === 0) {
+            submitdata.append('seq', JSON.stringify(inputBlocks.value))
             precheck.value = true
-        } else {
-            window.$message.error('Please input sequence', {
-                closable: true,
-                duration: 5000,
-            })
+        } else if (paster_input_code === 1) {
+            windowErrorMessage('Please input sequence')
+            precheck.value = false
+        } else if (paster_input_code === 2) {
+            windowErrorMessage('Only letters and digits are allowed in the name; Only letters are allowed in the sequences')
             precheck.value = false
         }
     } else {
         // enter
         if (inputformValue.value.phage.length === 0) {
-            window.$message.error('Please input Antigen/TAntigen IDs', {
-                closable: true,
-                duration: 5000,
-            })
+            windowErrorMessage('Please input Antigen/TAntigen IDs')
             precheck.value = false
         } else if (inputformValue.value.datatable === '') {
-            window.$message.error('Please select the data table that the IDs come from', {
-                closable: true,
-                duration: 5000,
-            })
+            windowErrorMessage('Please select the data table that the IDs come from')
         } else {
             const checkdata = new FormData()
             checkdata.append('antigen_tantigen_ids', inputformValue.value.phage)
@@ -442,10 +468,7 @@ const submit = async () => {
             validationstatus.value = res.status
             inputfeedback.value = res.message
             if (validationstatus.value == 'failed') {
-                window.$message.error(inputfeedback.value, {
-                    closable: true,
-                    duration: 5000,
-                })
+                windowErrorMessage(inputfeedback.value)
             } else if (validationstatus.value == 'success') {
                 submitdata.append('datatable', inputformValue.value.datatable)
                 submitdata.append('queryids', JSON.stringify(idlist.value))
@@ -466,18 +489,12 @@ const submit = async () => {
         })
         const { data } = response
         if (data.status === 'Create Success') {
-            window.$message.success(data.message, {
-                closable: true,
-                duration: 5000,
-            })
+            windowSuccessMessage(data.message)
             router.push({
                 path: '/workspace/',
             })
         } else {
-            window.$message.error(data.message, {
-                closable: true,
-                duration: 5000,
-            })
+            windowErrorMessage(data.message)
         }
     }
     loading.value = false
@@ -500,18 +517,12 @@ const submitdemo = async () => {
         })
         const { data } = response
         if (data.status === 'Create Success') {
-            window.$message.success(data.message, {
-                closable: true,
-                duration: 5000,
-            })
+            windowSuccessMessage(data.message)
             router.push({
                 path: '/workspace/',
             })
         } else {
-            window.$message.error(data.message, {
-                closable: true,
-                duration: 5000,
-            })
+            windowErrorMessage(data.message)
         }
     }
     loading.value = false
@@ -535,12 +546,8 @@ const gosubmithelper = () => {
 .outer-container {
     display: flex;
     flex-direction: column;
-    /* Stack children vertically */
     padding: 20px;
-    /* Optional padding */
     background-color: #f9f9f9;
-    /* Optional background color */
     border-radius: 8px;
-    /* Optional rounded corners */
 }
 </style>
