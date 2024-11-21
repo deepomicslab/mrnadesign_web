@@ -288,7 +288,7 @@
                         </el-select>
                     </el-form-item>
                 </el-row>
-                <el-row class="mt-10">
+                <el-row class="m-10">
                     <el-col :span="24" class="text-center">
                         <el-button type="info" @click="resetFilterForm()">Reset</el-button>
                     </el-col>
@@ -360,7 +360,7 @@ const paramform = ref({
     },
     // module 10
     utr5_mrl: {
-        run: false,
+        run: true,
         base_modify: 'unmod',
         trim_strategy: 'sliding_window',
     },

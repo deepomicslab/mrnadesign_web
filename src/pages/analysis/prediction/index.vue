@@ -59,7 +59,7 @@
                         <n-radio-group v-model:value="inputtype">
                             <n-radio-button value="upload">UPLOAD FILE</n-radio-button>
                             <!-- <n-radio-button value="enter">ENTER ANTIGEN/TANTIGEN ID</n-radio-button> -->
-                            <!-- <n-radio-button value="paste">PASTE SEQUENCE</n-radio-button> -->
+                            <n-radio-button value="paste">PASTE SEQUENCE</n-radio-button>
                         </n-radio-group>
                     </div>
                 </div>
@@ -160,14 +160,14 @@
                         </div>
                     </div>
                     <div
-                        class="rounded w-240 h-100 mt-5 rounded-2xl flex-col flex justify-center items-center"
+                        class="rounded w-240 mt-5 rounded-2xl flex-col flex justify-center items-center outer-container"
                         style="box-shadow: 0 0 64px #cfd5db"
                         v-if="inputtype === 'paste'"
                     >
                         <div class="text-lg mb-6 w-190">
                             Paste a fasta formatted protein/amino acid sequence.
                         </div>
-                        <div class="w-190 mt-1 flex flex-row text-lg">
+                        <!-- <div class="w-190 mt-1 flex flex-row text-lg">
                             <n-input
                                 round
                                 placeholder=">seq1&#10;sequence&#10;>seq2&#10;sequence&#10;"
@@ -176,21 +176,77 @@
                                 :rows="10"
                                 v-model:value="pastefile"
                             ></n-input>
-                        </div>
-                        <div class="mt-4">
-                            <n-button-group>
-                                <n-button
+                        </div> -->
+
+                        <div v-for="(inputGroup, index) in inputBlocks" :key="index" class="w-190">
+                            <hr class="mb-5" />
+                            <el-form-item label="Name" label-width="100px">
+                                <n-input-group>
+                                    <n-input
+                                        round
+                                        placeholder="Name"
+                                        type="textarea"
+                                        clearable
+                                        :rows="1"
+                                        v-model:value="inputGroup.name"
+                                    ></n-input>
+                                    <n-input-group-label @click="deleteInputBlock(index)">
+                                        Delete this entry
+                                    </n-input-group-label>
+                                </n-input-group>
+                            </el-form-item>
+                            <el-form-item label="3'UTR" label-width="100px">
+                                <n-input
                                     round
-                                    size="large"
-                                    class="w-50"
-                                    @click="
-                                        fillSequence('>seq1\nMPNTLACP\n>seq2\nMLDQVNKLKYPEVSLT*\n')
-                                    "
-                                >
-                                    Sample Input
-                                </n-button>
-                            </n-button-group>
+                                    placeholder="3'UTR"
+                                    type="textarea"
+                                    clearable
+                                    v-model:value="inputGroup.utr3"
+                                    :autosize="{
+                                        minRows: 1,
+                                        maxRows: 3,
+                                    }"
+                                ></n-input>
+                            </el-form-item>
+                            <el-form-item label="CDS" label-width="100px">
+                                <n-input
+                                    round
+                                    placeholder="CDS"
+                                    type="textarea"
+                                    clearable
+                                    v-model:value="inputGroup.cds"
+                                    :autosize="{
+                                        minRows: 1,
+                                        maxRows: 3,
+                                    }"
+                                ></n-input>
+                            </el-form-item>
+                            <el-form-item label="5'UTR" label-width="100px">
+                                <n-input
+                                    round
+                                    placeholder="5'UTR"
+                                    type="textarea"
+                                    clearable
+                                    v-model:value="inputGroup.utr5"
+                                    :autosize="{
+                                        minRows: 1,
+                                        maxRows: 3,
+                                    }"
+                                ></n-input>
+                            </el-form-item>
                         </div>
+                        <n-button-group>
+                            <n-button size="large" class="w-50 mt-4" @click="addInputBlock">
+                                Add Input Block
+                            </n-button>
+                            <n-button
+                                size="large"
+                                class="w-50 mt-4"
+                                @click="fillSequence('>seq1\nMPNTLACP\n>seq2\nMLDQVNKLKYPEVSLT*\n')"
+                            >
+                                Sample Input
+                            </n-button>
+                        </n-button-group>
                     </div>
                 </div>
 
@@ -236,13 +292,21 @@ import parameter from './parameter.vue'
 import { useUserIdGenerator } from '@/utils/userIdGenerator'
 import { encrypt } from '@/utils/crypto'
 // import { usePredictionParameterStore } from '@/store/mrna'
+const inputBlocks = ref([{ name: '', utr3: '', cds: '', utr5: '' }]) // Initialize with one input block
 
+const addInputBlock = () => {
+    inputBlocks.value.push({ name: '', utr3: '', cds: '', utr5: '' }) // Add a new input block
+}
+const deleteInputBlock = (index: number) => {
+    console.log('index', index)
+    inputBlocks.value.splice(index, 1)
+}
 // const paramform = usePredictionParameterStore().ParameterList
 const paramform = ref([])
 
 const fileList = ref<UploadFileInfo[]>([])
 const submitfile = ref<File>()
-const inputtype = ref('upload')
+const inputtype = ref('paste')
 const pastefile = ref('')
 
 const userid = ref('')
@@ -318,8 +382,10 @@ const opendemo = () => {
         path: '/task/result/prediction',
         query: {
             taskid: encrypt(
-                thistaskid, 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2')
-        }
+                thistaskid,
+                'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2'
+            ),
+        },
     })
 }
 
@@ -350,7 +416,8 @@ const submit = async () => {
             })
             precheck.value = false
         }
-    } else { // enter
+    } else {
+        // enter
         if (inputformValue.value.phage.length === 0) {
             window.$message.error('Please input Antigen/TAntigen IDs', {
                 closable: true,
@@ -453,8 +520,6 @@ onBeforeMount(() => {
     const { userId, getUserIdFromCookie } = useUserIdGenerator()
     getUserIdFromCookie()
     userid.value = userId.value as string
-
-    console.log('=========================userid.value', userid.value)
 })
 
 const gosubmithelper = () => {
