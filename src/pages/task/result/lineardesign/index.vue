@@ -23,7 +23,7 @@
                         :columns="columns"
                         :data="rnadataList"
                         :row-key="rowKey"
-                        :scroll-x="1000"
+                        :scroll-x="1200"
                         :max-height="200"
                         @update:sorter="handleSorterChange"
                     />
@@ -31,49 +31,24 @@
             </div>
         </div>
         <div class="mt-5 ml-15">
-            <!-- <div class="flex flex-row w-200">
-                <div class="text-2xl font-500 mb-5">Scorign Heatmap</div>
-            </div>
-            <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
-                <heatmap />
-            </div> -->
-            <div class="flex flex-row w-200">
-                <div class="text-2xl font-500 mb-5">Annotation</div>
-            </div>
-            <!-- <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
-                <mrnaAnnotation />
-            </div> -->
             <div class="flex flex-row w-300">
                 <div class="text-2xl font-500 mb-5">Structure Visualization</div>
                 <div class="text-2xl font-500 mb-5 ml-10">
                     <n-space align="center">
                         <n-radio-group v-model:value="activeTab">
-                            <n-radio-button value="primary">Primary Structure</n-radio-button>
                             <n-radio-button value="second">Secondary Structure</n-radio-button>
-                            <n-radio-button value="protein">Protein Structure</n-radio-button>
                         </n-radio-group>
                     </n-space>
                 </div>
             </div>
             <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
                 <div class="mb-2">
-                    <div v-if="activeTab === 'primary'">
-                        <!-- <seqdemoD3 /> -->
-                    </div>
-                    <div v-else-if="activeTab === 'second'">
+                    <div v-if="activeTab === 'second'">
                         <forna
                             :structure="forna_structure"
                             :sequence="forna_sequence"
                             :cur_time="cur_time"
                         />
-                    </div>
-                    <div v-else-if="activeTab === 'protein'">
-                        <!-- <iframe
-                            :src="protein_url"
-                            scrolling="auto"
-                            frameborder="no"
-                            class="w-full h-130"
-                        /> -->
                     </div>
                 </div>
             </div>
@@ -91,12 +66,14 @@ import { NButton, NTooltip } from 'naive-ui'
 import { CloudDownloadOutline as downicon } from '@vicons/ionicons5'
 import _ from 'lodash'
 import { decrypt } from '@/utils/crypto'
-// import seqdemoD3 from './seqdemoD3.vue'
 import forna from './forna.vue'
-// import mrnaAnnotation from './mrna_annotation.vue'
-// import heatmap from './heatmap.vue'
+import { windowSuccessMessage } from '@/utils/windowFunctions'
+import { useLinearDesign2PredictionTaskSunmissionStore } from '@/store/mrna'
 
-// const protein_url = ref('https://www.ncbi.nlm.nih.gov/Structure/icn3d/?mmdbid=1HHO&bu=1')
+const taskSubmissionStore = useLinearDesign2PredictionTaskSunmissionStore()
+
+const router = useRouter()
+
 const sorter_dict = ref('')
 const activeTab = ref('second')
 
@@ -135,6 +112,16 @@ const rowKey = (row: RowData) => {
 const openView = (row: any) => {
     forna_structure.value = row.structure
     forna_sequence.value = row.sequence
+}
+
+const runPrediction = (row: any) => {
+    taskSubmissionStore.cdsSequence = row.sequence
+    windowSuccessMessage(
+        'You will be directed to the Prediction task submission page. The CDS sequence will be used to do the analysis. You can do some modifications on it if needed.'
+    )
+    router.push({
+        path: '/analysis/prediction/index4lineardesign',
+    })
 }
 
 onBeforeMount(async () => {
@@ -196,7 +183,7 @@ const columnWidth = {
     structure: 150,
     folding_free_energy: 100,
     cai: 100,
-    actions: 100,
+    actions: 300,
 }
 const createColumns = (): DataTableColumns<RowData> => [
     {
@@ -284,7 +271,7 @@ const createColumns = (): DataTableColumns<RowData> => [
         sorter: true,
     },
     {
-        title: 'Structure Visualization',
+        title: 'Actions',
         key: 'actions',
         align: 'center',
         width: columnWidth.actions,
@@ -294,7 +281,7 @@ const createColumns = (): DataTableColumns<RowData> => [
                 'div',
                 {
                     style: {
-                        display: 'center', // flex
+                        display: 'flex', // center
                         justifyContent: 'space-between',
                     },
                 },
@@ -307,7 +294,17 @@ const createColumns = (): DataTableColumns<RowData> => [
                             type: 'info',
                             onClick: () => openView(row),
                         },
-                        { default: () => 'view' }
+                        { default: () => 'View Structure Visualization' }
+                    ),
+                    h(
+                        NButton,
+                        {
+                            strong: true,
+                            size: 'small',
+                            type: 'info',
+                            onClick: () => runPrediction(row),
+                        },
+                        { default: () => 'Run Prediction Analysis' }
                     ),
                 ]
             )
