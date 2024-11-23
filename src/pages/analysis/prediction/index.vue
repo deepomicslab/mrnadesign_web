@@ -167,17 +167,6 @@
                         <div class="text-lg mb-6 w-190">
                             Paste a fasta formatted protein/amino acid sequence.
                         </div>
-                        <!-- <div class="w-190 mt-1 flex flex-row text-lg">
-                            <n-input
-                                round
-                                placeholder=">seq1&#10;sequence&#10;>seq2&#10;sequence&#10;"
-                                type="textarea"
-                                clearable
-                                :rows="10"
-                                v-model:value="pastefile"
-                            ></n-input>
-                        </div> -->
-
                         <div v-for="(inputGroup, index) in inputBlocks" :key="index" class="w-190">
                             <hr class="mb-5" />
                             <el-form-item label="Name" label-width="100px" class="is-required">
@@ -190,6 +179,9 @@
                                         :rows="1"
                                         v-model:value="inputGroup.name"
                                     ></n-input>
+                                    <n-input-group-label @click="importFromDB(index)">
+                                        Import data from DB
+                                    </n-input-group-label>
                                     <n-input-group-label @click="deleteInputBlock(index)">
                                         Delete this entry
                                     </n-input-group-label>
@@ -277,28 +269,33 @@
             </span>
         </template>
     </el-dialog>
+    <el-dialog
+        v-model="selectionDialogVisible"
+        title="Please select sequences as you analysis input"
+        width="75%"
+    >
+        <selectFromDB
+            @selectionDialogVisible="handleSelectionDialogVisible"
+            @inputBlocktoPass="handleInputBlocktoPass"
+        />
+    </el-dialog>
 </template>
 <script setup lang="ts">
+/* eslint-disable camelcase */
 /* eslint no-underscore-dangle: 0 */
+/* eslint-disable */
 
 import type { UploadFileInfo } from 'naive-ui'
 import { InfoFilled } from '@element-plus/icons-vue'
 import axios from 'axios'
 import parameter from './parameter.vue'
+import selectFromDB from './select_window.vue'
 import { useUserIdGenerator } from '@/utils/userIdGenerator'
 import { encrypt } from '@/utils/crypto'
 import { windowErrorMessage, windowSuccessMessage } from '@/utils/windowFunctions'
-// import { usePredictionParameterStore } from '@/store/mrna'
 const inputBlocks = ref([{ name: '', utr3: '', cds: '', utr5: '' }]) // Initialize with one input block
+const inputBlocktoPass = ref({ utr3: '', cds: '', utr5: '' })
 
-const addInputBlock = () => {
-    inputBlocks.value.push({ name: '', utr3: '', cds: '', utr5: '' }) // Add a new input block
-}
-const deleteInputBlock = (index: number) => {
-    console.log('index', index)
-    inputBlocks.value.splice(index, 1)
-}
-// const paramform = usePredictionParameterStore().ParameterList
 const paramform = ref([])
 
 const fileList = ref<UploadFileInfo[]>([])
@@ -317,8 +314,23 @@ const inputfeedback = ref('')
 const validationstatus = ref()
 
 const dialogVisible = ref(false)
+const selectionDialogVisible = ref(false)
 const demotask = ref([] as any[])
 
+const importID = ref(0)
+
+const addInputBlock = () => {
+    inputBlocks.value.push({ name: '', utr3: '', cds: '', utr5: '' }) // Add a new input block
+}
+const importFromDB = (index: number) => {
+    console.log('index', index)
+    importID.value = index
+    selectionDialogVisible.value = true
+}
+const deleteInputBlock = (index: number) => {
+    console.log('index', index)
+    inputBlocks.value.splice(index, 1)
+}
 const fillSequence = () => {
     inputBlocks.value.length = 0
     inputBlocks.value.push({
@@ -335,10 +347,26 @@ const fillSequence = () => {
     })
 }
 
-/* eslint-disable */
-
 const handleParamSubmitted = (value: any) => {
     paramform.value = value
+}
+const handleSelectionDialogVisible = (value: any) => {
+    selectionDialogVisible.value = value
+}
+const handleInputBlocktoPass = (value: any) => {
+    inputBlocktoPass.value = value
+    if (inputBlocktoPass.value.utr3 != '') {
+        inputBlocks.value[importID.value].utr3 = inputBlocktoPass.value.utr3 
+        inputBlocktoPass.value.utr3 = ''
+    }
+    if (inputBlocktoPass.value.cds != '') {
+        inputBlocks.value[importID.value].cds = inputBlocktoPass.value.cds
+        inputBlocktoPass.value.cds = '' 
+    }
+    if (inputBlocktoPass.value.utr5 != '') {
+        inputBlocks.value[importID.value].utr5 = inputBlocktoPass.value.utr5
+        inputBlocktoPass.value.utr5 = '' 
+    }
 }
 
 const handleFileListChange = (data: UploadFileInfo[]) => {
@@ -390,7 +418,6 @@ const opendemo = () => {
 
 const checkPasteInput = () => {
     // error code: 0 for true, 1 for requiring input, 2 for requiring letters
-
     const isOnlyLetters = (str: string) => {
         const regex = /^[A-Za-z]+$/
         return regex.test(str)
@@ -403,8 +430,8 @@ const checkPasteInput = () => {
     if (inputBlocks.value.length === 0) {
         return 1
     }
-    for (let i = 0; i < inputBlocks.value.length; i++) {
-        let block = inputBlocks.value[i]
+    for (let i = 0; i < inputBlocks.value.length; i += 1) {
+        const block = inputBlocks.value[i]
         if (
             block.name.length === 0 ||
             block.utr3.length === 0 ||
@@ -445,7 +472,9 @@ const submit = async () => {
             windowErrorMessage('Please input sequence')
             precheck.value = false
         } else if (paster_input_code === 2) {
-            windowErrorMessage('Only letters and digits are allowed in the name; Only letters are allowed in the sequences')
+            windowErrorMessage(
+                'Only letters and digits are allowed in the name; Only letters are allowed in the sequences'
+            )
             precheck.value = false
         }
     } else {
@@ -467,9 +496,9 @@ const submit = async () => {
             idlist.value = res.idlist
             validationstatus.value = res.status
             inputfeedback.value = res.message
-            if (validationstatus.value == 'failed') {
+            if (validationstatus.value === 'failed') {
                 windowErrorMessage(inputfeedback.value)
-            } else if (validationstatus.value == 'success') {
+            } else if (validationstatus.value === 'success') {
                 submitdata.append('datatable', inputformValue.value.datatable)
                 submitdata.append('queryids', JSON.stringify(idlist.value))
                 precheck.value = true
