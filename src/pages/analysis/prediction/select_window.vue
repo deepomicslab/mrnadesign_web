@@ -68,11 +68,6 @@ import { ChevronBack, ChevronForward } from '@vicons/ionicons5'
 import axios from 'axios'
 import { ref, defineEmits } from 'vue'
 
-// const props = defineProps<{
-//     selectionDialogVisible: boolean
-//     inputBlocktoPass: { utr3: string; cds: string; utr5: string }
-// }>()
-// const { selectionDialogVisible, inputBlocktoPass } = toRefs(props)
 const inputBlocktoPass = ref({ utr3: '', cds: '', utr5: '' })
 const emit = defineEmits(['selectionDialogVisible', 'inputBlocktoPass'])
 
@@ -88,6 +83,36 @@ const sorter_dict = ref('')
 const tableData = ref()
 
 const checkedRowKeysRef = ref<DataTableRowKey[]>([])
+
+const columns = ref()
+
+type buttonClickedStatesType = {
+    seq_3_dataset: string
+    seq_3_rowid: number
+    seq_3: string
+
+    cds_dataset: string
+    cds_rowid: number
+    cds: string
+
+    seq_5_dataset: string
+    seq_5_rowid: number
+    seq_5: string
+}
+const buttonClickedStates = ref<buttonClickedStatesType>({
+    seq_3_dataset: '',
+    seq_3_rowid: 0,
+    seq_3: '',
+
+    cds_dataset: '',
+    cds_rowid: 0,
+    cds: '',
+
+    seq_5_dataset: '',
+    seq_5_rowid: 0,
+    seq_5: '',
+})
+
 function handleCheck(rowKeys: DataTableRowKey[]) {
     checkedRowKeysRef.value = rowKeys
 }
@@ -98,82 +123,44 @@ const renderTooltip = (trigger: any, content: any) => {
     })
 }
 
-type buttonClickedStatesType = {
-    seq_3_rowid: number
-    seq_3: string
-    cds_rowid: number
-    cds: string
-    seq_5_rowid: number
-    seq_5: string
-}
-const buttonClickedStates = ref<buttonClickedStatesType>({
-    seq_3_rowid: 0,
-    seq_3: '',
-    cds_rowid: 0,
-    cds: '',
-    seq_5_rowid: 0,
-    seq_5: '',
-})
-
 const clearSelection = () => {
+    buttonClickedStates.value.seq_3_dataset = dataset.value
     buttonClickedStates.value.seq_3_rowid = 0
     buttonClickedStates.value.seq_3 = ''
+
+    buttonClickedStates.value.cds_dataset = dataset.value
     buttonClickedStates.value.cds_rowid = 0
     buttonClickedStates.value.cds = ''
+
+    buttonClickedStates.value.seq_5_dataset = dataset.value
     buttonClickedStates.value.seq_5_rowid = 0
     buttonClickedStates.value.seq_5 = ''
 }
 const confirmSelection = () => {
-    inputBlocktoPass.value.utr3 = buttonClickedStates.value.seq_3
-    inputBlocktoPass.value.cds = buttonClickedStates.value.cds
-    inputBlocktoPass.value.utr5 = buttonClickedStates.value.seq_5
+    if (buttonClickedStates.value.seq_3 !== '')
+        inputBlocktoPass.value.utr3 = buttonClickedStates.value.seq_3.replaceAll('\n', '')
+    if (buttonClickedStates.value.cds !== '')
+        inputBlocktoPass.value.cds = buttonClickedStates.value.cds.replaceAll('\n', '')
+    if (buttonClickedStates.value.seq_5 !== '')
+        inputBlocktoPass.value.utr5 = buttonClickedStates.value.seq_5.replaceAll('\n', '')
     emit('selectionDialogVisible', false)
     emit('inputBlocktoPass', inputBlocktoPass.value)
 }
 
-const handleSelectSet = async (value: any) => {
-    url.value = `/${value}/`
-
-    loading.value = true
-    const response = await axios.get(url.value, {
-        baseURL: '/api',
-        timeout: 100000,
-        params: {
-            page: pagevalue.value,
-            pagesize: pageSize.value,
-        },
-    })
-    const { data } = response
-    tableData.value = data
-    loading.value = false
-}
-
-type RowData = {
+type TantigenRowData = {
     id: number
     seq_5: string
     cds: string
     seq_3: string
 }
-
-const rowKey = (row: RowData) => {
-    return row.id
+type ThreeUTRRowData = {
+    id: number
+    pattern: string
 }
 
-onBeforeMount(async () => {
-    loading.value = true
-    console.log('url', url.value)
-    const response = await axios.get(url.value, {
-        baseURL: '/api',
-        timeout: 10000,
-        params: {
-            page: pagevalue.value,
-            pagesize: pageSize.value,
-        },
-    })
-    const { data } = response
-    tableData.value = data
-    loading.value = false
-})
+const rowKey = (row: { id: any }) => {
+    return row.id
+}
 
 const tableList = computed(() => {
     return tableData.value?.results
@@ -188,7 +175,6 @@ const column_width = {
 }
 
 const select = (row: number, col: string, seq: string) => {
-    console.log(row)
     if (col === 'seq_3') {
         inputBlocktoPass.value.utr3 = seq
     } else if (col === 'cds') {
@@ -198,7 +184,8 @@ const select = (row: number, col: string, seq: string) => {
     }
 }
 
-const render_button = (row: any, col: string) => {
+const render_button = (thisdataset: string, row: any, col: string, data_col: string) => {
+    // 把数据里的 data_col 赋值给 button 里的 col
     return h(
         'div',
         {
@@ -217,16 +204,26 @@ const render_button = (row: any, col: string) => {
                         backgroundColor:
                             buttonClickedStates.value[
                                 `${col}_rowid` as keyof buttonClickedStatesType
-                            ] === row.id
+                            ] === row.id &&
+                            buttonClickedStates.value[
+                                `${col}_dataset` as keyof buttonClickedStatesType
+                            ] === thisdataset
                                 ? '#2196F3'
                                 : '#d6d6d6',
                         color: '#FFFFFF',
                     },
                     onClick: () => {
+                        console.log(thisdataset, row.id, col)
+                        console.log(row)
                         buttonClickedStates.value[`${col}_rowid` as keyof buttonClickedStatesType] =
                             row.id
-                        buttonClickedStates.value[col as keyof buttonClickedStatesType] = row[col]
+                        buttonClickedStates.value[
+                            `${col}_dataset` as keyof buttonClickedStatesType
+                        ] = thisdataset
+                        buttonClickedStates.value[col as keyof buttonClickedStatesType] =
+                            row[data_col]
                         select(row.id, col, row[col])
+                        console.log('buttonClickedStates.value', buttonClickedStates.value)
                     },
                 },
                 { default: () => '\u2713' }
@@ -235,7 +232,7 @@ const render_button = (row: any, col: string) => {
     )
 }
 
-const createColumns = (): DataTableColumns<RowData> => [
+const createTantigenColumns = (): DataTableColumns<TantigenRowData> => [
     {
         title() {
             return renderTooltip(h('div', null, { default: () => 'ID' }), 'ID')
@@ -259,7 +256,7 @@ const createColumns = (): DataTableColumns<RowData> => [
         ellipsis: {
             tooltip: true,
         },
-        width: column_width.seq_5,
+        width: column_width.seq_3,
     },
     {
         title: () => renderTooltip(h('div', null, ''), ''),
@@ -267,7 +264,7 @@ const createColumns = (): DataTableColumns<RowData> => [
         align: 'center',
         width: column_width.tick,
         render(row: any) {
-            return render_button(row, 'seq_3')
+            return render_button(dataset.value, row, 'seq_3', 'seq_3')
         },
     },
     {
@@ -288,7 +285,7 @@ const createColumns = (): DataTableColumns<RowData> => [
         align: 'center',
         width: column_width.tick,
         render(row: any) {
-            return render_button(row, 'cds')
+            return render_button(dataset.value, row, 'cds', 'cds')
         },
     },
     {
@@ -309,11 +306,91 @@ const createColumns = (): DataTableColumns<RowData> => [
         align: 'center',
         width: column_width.tick,
         render(row: any) {
-            return render_button(row, 'seq_5')
+            return render_button(dataset.value, row, 'seq_5', 'seq_5')
         },
     },
 ]
-const columns = createColumns()
+const createThreeUTRColumns = (): DataTableColumns<ThreeUTRRowData> => [
+    {
+        title() {
+            return renderTooltip(h('div', null, { default: () => 'ID' }), 'ID')
+        },
+        key: 'id',
+        align: 'center',
+        fixed: 'left',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: column_width.id,
+        sorter: true,
+    },
+    {
+        title() {
+            return renderTooltip(h('div', null, { default: () => 'Pattern' }), 'seq_3')
+        },
+        key: 'pattern',
+        align: 'center',
+        sorter: 'default',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: column_width.seq_3,
+    },
+    {
+        title: () => renderTooltip(h('div', null, ''), ''),
+        key: 'id',
+        align: 'center',
+        width: column_width.tick,
+        render(row: any) {
+            return render_button(dataset.value, row, 'seq_3', 'pattern')
+        },
+    },
+]
+
+const updateColumns = () => {
+    if (dataset.value === 'tantigen') {
+        columns.value = createTantigenColumns()
+    } else if (dataset.value === 'three_utr') {
+        columns.value = createThreeUTRColumns()
+    }
+    console.log(columns)
+}
+
+onBeforeMount(async () => {
+    loading.value = true
+    console.log('url', url.value)
+    const response = await axios.get(url.value, {
+        baseURL: '/api',
+        timeout: 10000,
+        params: {
+            page: pagevalue.value,
+            pagesize: pageSize.value,
+        },
+    })
+    const { data } = response
+    tableData.value = data
+    updateColumns()
+    loading.value = false
+})
+
+const handleSelectSet = async (value: any) => {
+    dataset.value = value
+    url.value = `/${value}/`
+
+    loading.value = true
+    const response = await axios.get(url.value, {
+        baseURL: '/api',
+        timeout: 100000,
+        params: {
+            page: pagevalue.value,
+            pagesize: pageSize.value,
+        },
+    })
+    const { data } = response
+    tableData.value = data
+    updateColumns()
+    loading.value = false
+}
 
 const axios_get_response = async (page_offset: number) => {
     const response = await axios.get(url.value, {
