@@ -161,6 +161,19 @@ const menuOptions: MenuOption[] = [
             ),
         key: '/analysis/prediction',
     },
+    {
+        label: () =>
+            h(
+                RouterLink,
+                {
+                    to: {
+                        path: '/analysis/safety',
+                    },
+                },
+                { default: () => 'Safety' }
+            ),
+        key: '/analysis/safety',
+    },
 ]
 const router = useRouter()
 const changeMenu = (_: string, option: MenuOption) => {

@@ -71,3 +71,25 @@ export const utr5MRLTrimStrategyOptions = [
         label: 'trim',
     },
 ]
+
+export const toxicityModelOptions = [
+    {
+        value: 'ML Model',
+        label: 'ML Model',
+    },
+    {
+        value: 'HybridModel',
+        label: 'HybridModel',
+    },
+]
+
+export const allergencityModelOptions = [
+    {
+        value: 'AAC based RF',
+        label: 'AAC based RF',
+    },
+    {
+        value: 'HybridModel',
+        label: 'HybridModel',
+    },
+]

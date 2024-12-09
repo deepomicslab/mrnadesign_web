@@ -108,6 +108,10 @@ const menuOptions: MenuOption[] = [
                 label: 'Prediction',
                 key: '/analysis/prediction',
             },
+            {
+                label: 'Safety',
+                key: '/analysis/safety',
+            },
 
             // {
             //     label: () =>

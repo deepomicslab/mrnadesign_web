@@ -239,6 +239,8 @@
                         <div class="flex flex-col">
                             <p class="text-xl mb-3">Analysis</p>
                             <p><a href="/analysis/linear_design">Linear Design</a></p>
+                            <p><a href="/analysis/prediction">Prediction</a></p>
+                            <p><a href="/analysis/safety">Safety</a></p>
                         </div>
                         <div class="flex flex-col mb-3">
                             <p class="text-xl mb-10"><a href="/workspace">Workspace</a></p>

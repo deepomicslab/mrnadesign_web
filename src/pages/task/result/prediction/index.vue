@@ -4,7 +4,7 @@
     <div class="flex flex-col mx-1/20 justify-start">
         <div class="w-300 mt-18 ml-10">
             <div class="flex flex-row w-350 border-b-2 border-gray-300">
-                <div class="text-4xl font-500 mb-8">Linear Design Result Display</div>
+                <div class="text-4xl font-500 mb-8">Prediction Result Display</div>
                 <div class="mt-1.5 ml-10">
                     <el-button class="ml-5" @click="downloadresult">
                         <template #icon>
