@@ -174,6 +174,19 @@ const menuOptions: MenuOption[] = [
             ),
         key: '/analysis/safety',
     },
+    {
+        label: () =>
+            h(
+                RouterLink,
+                {
+                    to: {
+                        path: '/analysis/sequence_align',
+                    },
+                },
+                { default: () => 'Sequence Align' }
+            ),
+        key: '/analysis/sequence_align',
+    },
 ]
 const router = useRouter()
 const changeMenu = (_: string, option: MenuOption) => {

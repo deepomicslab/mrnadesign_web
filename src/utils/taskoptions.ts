@@ -7,6 +7,14 @@ export const analysisTypeOptions = [
         value: 'Prediction',
         label: 'Prediction',
     },
+    {
+        value: 'Safety',
+        label: 'Safety',
+    },
+    {
+        value: 'Sequence Align',
+        label: 'Sequence Align',
+    },
 ]
 
 export const taskStatusOptions = [

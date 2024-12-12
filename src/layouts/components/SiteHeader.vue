@@ -112,6 +112,10 @@ const menuOptions: MenuOption[] = [
                 label: 'Safety',
                 key: '/analysis/safety',
             },
+            {
+                label: 'Sequence Align',
+                key: '/analysis/sequence_align',
+            },
 
             // {
             //     label: () =>
