@@ -129,7 +129,7 @@
                                     class="w-50"
                                     @click="
                                         fillSequence(
-                                            '>SQF22697.1 glycyl-tRNA synthetase alpha subunit [Streptococcus pyogenes]\nMSKKLTFQEIILTLQQYWNDQGCMLMQAYDNEKGAGTMSPYTFLRAIGPEPWNAAYVEPSRRPADGRYGENPNRLYQHHQFQVVMKPSPSNIQELYLASLEKLGINPLEHDIRFVEDNWE\n>SQF23511.1 bleomycin resistance protein [Streptococcus pyogenes]\nMKALHTCIRVKDLDQSVAFYTSAFPFKENYRKDFPDSQFTLVYLALEGESYELELTYNYGHGDYDLGNGYGHIALGSEHFEADHTKHRQAGFPVTDIKELADKSARYYFIQDPDGYKIEVIDLNN'
+                                            '>SQF22697.1 glycyl-tRNA synthetase alpha subunit [Streptococcus pyogenes]\nMSKKLTFQEIILTLQNEKGAGTMSPYTFLRAIGPEPWNAAYHQFQVVMKPSPSNIQELYLASLEKLGINPLEHDIRFVEDNWEVEPSRRPADGRYGENPNRLYQH\n>SQF22697.2 glycyl-tRNA synthetase alpha subunit [Streptococcus pyogenes]\nMSKKLTFQEIILTLQNEKGAGTMSPYTFLRAIGPEPWNAAYVEPSRRPADGRYGENPNRLYQHHQFQVVMKPSPSNIQELYLASLEKLGINPLEHDIRFVEDNWE'
                                         )
                                     "
                                 >

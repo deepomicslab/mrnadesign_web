@@ -1,4 +1,4 @@
-<meta http-equiv="Permissions-Policy" content="xr-spatial-tracking=(self)" />
+<!-- <meta http-equiv="Permissions-Policy" content="xr-spatial-tracking=(self)" /> -->
 <!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" /> -->
 <template>
     <div class="flex flex-col mx-1/20 justify-start">
@@ -33,26 +33,23 @@
         </div>
         <div class="mt-5 ml-15">
             <div class="flex flex-row w-300">
-                <div class="text-2xl font-500 mb-5">Structure Visualization</div>
-                <div class="text-2xl font-500 mb-5 ml-10">
-                    <n-space align="center">
-                        <n-radio-group v-model:value="activeTab">
-                            <n-radio-button value="second">Protein Structure</n-radio-button>
-                        </n-radio-group>
-                    </n-space>
+                <div class="text-2xl font-500 mb-5">Protein Structure</div>
+            </div>
+            <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
+                <div id="myViewer">
+                    <pdbe-molstar
+                        :key="shownseq"
+                        :custom-data-url="`/api/database/download_protein_cif/?protein_id=1&sequence=${shownseq}`"
+                        custom-data-format="cif"
+                        alphafold-view="true"
+                        bg-color-r="255"
+                        bg-color-g="255"
+                        bg-color-b="255"
+                        hide-selection-icon="true"
+                        hide-animation-icon="true"
+                    ></pdbe-molstar>
                 </div>
             </div>
-            <!-- <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
-                <div class="mb-2">
-                    <div v-if="activeTab === 'second'">
-                        <forna
-                            :structure="forna_structure"
-                            :sequence="forna_sequence"
-                            :cur_time="cur_time"
-                        />
-                    </div>
-                </div>
-            </div> -->
         </div>
     </div>
 </template>
@@ -65,27 +62,35 @@ import axios from 'axios'
 import type { DataTableColumns } from 'naive-ui'
 import { NButton, NTooltip } from 'naive-ui'
 import { CloudDownloadOutline as downicon } from '@vicons/ionicons5'
-// import _ from 'lodash'
 import { decrypt } from '@/utils/crypto'
-// import forna from './forna.vue'
-// import { windowSuccessMessage } from '@/utils/windowFunctions'
-// import { useLinearDesign2PredictionTaskSunmissionStore } from '@/store/mrna'
 
-// const taskSubmissionStore = useLinearDesign2PredictionTaskSunmissionStore()
+onMounted(async () => {
+    const script1 = document.createElement('script')
+    script1.src = '/esm/js/polyfill.min.js' // 'https://cdn.jsdelivr.net/npm/babel-polyfill/dist/polyfill.min.js'
+    document.body.appendChild(script1)
+    const script2 = document.createElement('script')
+    script2.src = '/esm/js/webcomponents-lite.js' // 'https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs/webcomponents-lite.js'
+    document.body.appendChild(script2)
+    const script3 = document.createElement('script')
+    script3.src = '/esm/js/custom-elements-es5-adapter.js' // 'https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js'
+    document.body.appendChild(script3)
+    const script4 = document.createElement('script')
+    script4.src = '/esm/js/pdbe-molstar-component.js' // 'https://cdn.jsdelivr.net/npm/pdbe-molstar@3.2.0/build/pdbe-molstar-component.js'
+    document.body.appendChild(script4)
 
-// const router = useRouter()
+    const style = document.createElement('link')
+    style.href = '/esm/css/pdbe-molstar.css' //  'https://cdn.jsdelivr.net/npm/pdbe-molstar@3.2.0/build/pdbe-molstar.css'
+    style.type = 'text/css'
+    style.rel = 'stylesheet'
+    document.body.appendChild(style)
+})
+
 const safetydata = ref()
-
-// const pagevalue = ref(1)
-// const pageSize = ref(10)
-// const count = computed(() => safetydata.value?.count)
+const shownseq = ref('')
 
 const sorter_dict = ref('')
 const filter_dict = ref('')
 const activeTab = ref('second')
-
-// const forna_structure = ref('')
-// const forna_sequence = ref('')
 
 const cur_time = ref('')
 
@@ -118,11 +123,6 @@ const rowKey = (row: RowData) => {
     return row.id
 }
 
-// const openView = (row: any) => {
-//     forna_structure.value = row.structure
-//     forna_sequence.value = row.sequence
-// }
-
 onBeforeMount(async () => {
     loading.value = true
     const response = await axios.get(`/tasks/safety_result/`, {
@@ -135,6 +135,8 @@ onBeforeMount(async () => {
     const { data } = response
     safetydata.value = data
     loading.value = false
+
+    shownseq.value = safetydata.value.results[0].sequence
 })
 
 const safetydataList = computed(() => {
@@ -358,8 +360,9 @@ const createColumns = (): DataTableColumns<RowData> => [
                             strong: true,
                             size: 'small',
                             type: 'info',
-                            // onClick: () => openView(row),
-                            onClick: () => console.log(row),
+                            onClick: () => {
+                                shownseq.value = row.sequence
+                            },
                         },
                         { default: () => 'View Structure Visualization' }
                     ),
@@ -370,3 +373,12 @@ const createColumns = (): DataTableColumns<RowData> => [
 ]
 const columns = createColumns()
 </script>
+
+<style scoped>
+#myViewer {
+    width: 100%;
+    height: 600px;
+    position: relative;
+    overflow: scroll;
+}
+</style>

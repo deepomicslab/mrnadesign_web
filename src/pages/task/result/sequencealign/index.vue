@@ -1,5 +1,4 @@
 <meta http-equiv="Permissions-Policy" content="xr-spatial-tracking=(self)" />
-<!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" /> -->
 <template>
     <div class="flex flex-col mx-1/20 justify-start">
         <div class="w-300 mt-18 ml-0">
@@ -52,13 +51,20 @@
             <div class="flex flex-row w-200">
                 <div class="text-2xl font-500 mb-5">Protein Structure</div>
             </div>
-            <div>
-                <iframe
-                    :src="link"
-                    scrolling="auto"
-                    frameborder="no"
-                    style="width: 100%; height: 450px"
-                />
+            <div style="box-shadow: 0 0 64px #cfd5db" class="w-310 h-140 mt-5 ml-10 mb-20">
+                <div id="myViewer">
+                    <pdbe-molstar
+                        :key="shownseq"
+                        :custom-data-url="`/api/database/download_protein_cif/?protein_id=1&sequence=${shownseq}`"
+                        custom-data-format="cif"
+                        alphafold-view="true"
+                        bg-color-r="255"
+                        bg-color-g="255"
+                        bg-color-b="255"
+                        hide-selection-icon="true"
+                        hide-animation-icon="true"
+                    ></pdbe-molstar>
+                </div>
             </div>
         </div>
 
@@ -101,6 +107,27 @@ import { NButton, NTooltip } from 'naive-ui'
 import comp from './comparison.vue'
 import { decrypt } from '@/utils/crypto'
 
+onMounted(async () => {
+    const script1 = document.createElement('script')
+    script1.src = '/esm/js/polyfill.min.js' // 'https://cdn.jsdelivr.net/npm/babel-polyfill/dist/polyfill.min.js'
+    document.body.appendChild(script1)
+    const script2 = document.createElement('script')
+    script2.src = '/esm/js/webcomponents-lite.js' // 'https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs/webcomponents-lite.js'
+    document.body.appendChild(script2)
+    const script3 = document.createElement('script')
+    script3.src = '/esm/js/custom-elements-es5-adapter.js' // 'https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js'
+    document.body.appendChild(script3)
+    const script4 = document.createElement('script')
+    script4.src = '/esm/js/pdbe-molstar-component.js' // 'https://cdn.jsdelivr.net/npm/pdbe-molstar@3.2.0/build/pdbe-molstar-component.js'
+    document.body.appendChild(script4)
+
+    const style = document.createElement('link')
+    style.href = '/esm/css/pdbe-molstar.css' //  'https://cdn.jsdelivr.net/npm/pdbe-molstar@3.2.0/build/pdbe-molstar.css'
+    style.type = 'text/css'
+    style.rel = 'stylesheet'
+    document.body.appendChild(style)
+})
+
 type AlignmentType = {
     Hit: string
     Hsp_hit_from: number
@@ -126,14 +153,9 @@ type SeqAlignResType = {
 const selectSeqWinPositionDialogVisible = ref(false)
 const selectRecord = ref('')
 
-const link = ref('')
 const alignmentData = ref([] as AlignmentType[])
-
-// const viewDetail = (index: number) => {
-//     link.value = `https://www.ncbi.nlm.nih.gov/Structure/icn3d/?type=pdb&amp&url=${alignmentData.value[index].pdb}`
-// }
-
 const seqaligndata = ref([] as SeqAlignResType[])
+const shownseq = ref('')
 
 const activeTab = ref('second')
 const cur_time = ref('')
@@ -172,6 +194,7 @@ onBeforeMount(async () => {
     if (seqaligndata.value.length > 0) {
         selectRecord.value = seqaligndata.value[0].window_position
         alignmentData.value = seqaligndata.value[0].alignments
+        shownseq.value = alignmentData.value[0].Hit
     }
 })
 
@@ -186,6 +209,8 @@ const selectSeqWinPosition = () => {
 const selectSeqWinPositionRequest = (item: SeqAlignResType) => {
     selectRecord.value = item.window_position
     alignmentData.value = item.alignments
+    shownseq.value = alignmentData.value[0].Hit
+    // console.log(selectRecord.value, alignmentData.value[0].sequence, alignmentData.value[0].Hit)
     selectSeqWinPositionDialogVisible.value = false
 }
 const renderTooltip = (trigger: any, content: any) => {
@@ -297,7 +322,7 @@ const createColumns = (): DataTableColumns<AlignmentType> => [
                 'div',
                 {
                     style: {
-                        display: 'flex', // center
+                        display: 'center', // center | flex
                         justifyContent: 'space-between',
                     },
                 },
@@ -308,8 +333,10 @@ const createColumns = (): DataTableColumns<AlignmentType> => [
                             strong: true,
                             size: 'small',
                             type: 'info',
-                            // onClick: () => openView(row),
-                            onClick: () => console.log(row),
+                            onClick: () => {
+                                // console.log(row.sequence, row.Hit)
+                                shownseq.value = row.Hit
+                            },
                         },
                         { default: () => 'View Structure Visualization' }
                     ),
@@ -322,7 +349,11 @@ const columns = createColumns()
 </script>
 
 <style scoped>
-.table {
-    margin-top: 20px;
+#myViewer {
+    width: 100%;
+    height: 600px;
+    position: relative;
+    overflow: scroll;
+    /* margin: 20px; */
 }
 </style>
