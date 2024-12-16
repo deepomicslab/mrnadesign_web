@@ -17,7 +17,7 @@
                 <div class="w-280 border-1 border-gray-700">
                     <downloadItem
                         description="Antigen Sequence"
-                        link="https://mrnaapi.deepomics.org/files/Antigen_se.csv"
+                        link="https://mrnaapi.deepomics.org/database/files/Antigen_se.csv/"
                     ></downloadItem>
                 </div>
             </div>
@@ -29,11 +29,11 @@
                 <div class="w-280 border-1 border-gray-700">
                     <downloadItem
                         description="Tantigen Sequence"
-                        link="https://mrnaapi.deepomics.org/files/Tantigen_rna_seq.csv"
+                        link="https://mrnaapi.deepomics.org/database/files/Tantigen_rna_seq.csv/"
                     ></downloadItem>
                     <downloadItem
                         description="Tantigen DB"
-                        link="https://mrnaapi.deepomics.org/files/TAntigendb_se.csv"
+                        link="https://mrnaapi.deepomics.org/database/files/TAntigendb_se.csv/"
                     ></downloadItem>
                 </div>
             </div>
@@ -45,7 +45,7 @@
                 <div class="w-280 border-1 border-gray-700">
                     <downloadItem
                         description="3'UTR Data"
-                        link="https://mrnaapi.deepomics.org/files/Complete_3_UTR_ARE_Data/Complete_3_UTR_Data.csv"
+                        link="https://mrnaapi.deepomics.org/database/files/Complete_3_UTR_ARE_Data/Complete_3_UTR_Data.csv/"
                     ></downloadItem>
                 </div>
             </div>
@@ -62,11 +62,11 @@
                 <div class="w-280 border-1 border-gray-700">
                     <downloadItem
                         description="Human 3'UTR"
-                        link="https://mrnaapi.deepomics.org/files/human-3UTR-refseq.fasta"
+                        link="https://mrnaapi.deepomics.org/database/files/human-3UTR-refseq.fasta/"
                     ></downloadItem>
                     <downloadItem
                         description="Human 5'UTR"
-                        link="https://mrnaapi.deepomics.org/files/human-5UTR-refseq.fasta"
+                        link="https://mrnaapi.deepomics.org/database/files/human-5UTR-refseq.fasta/"
                     ></downloadItem>
                 </div>
             </div>
