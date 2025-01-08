@@ -12,7 +12,7 @@
                                     <selectIcon />
                                 </n-icon>
                             </template>
-                            Choose Window Position
+                            Select Human Sequence
                         </el-button>
                         <el-button class="ml-5" @click="downloadresult">
                             <template #icon>
@@ -28,7 +28,28 @@
         </div>
 
         <div class="flex flex-col mx-0 justify-start">
-            <div class="w-400 mt-18 ml-0">
+            <el-descriptions
+                class="w-400 text-xl mt-10"
+                :column="2"
+                size="large"
+                border
+                v-loading="loading"
+            >
+                <el-descriptions-item :width="165">
+                    <template #label>
+                        <div class="cell-item">Selection</div>
+                    </template>
+                    {{ selectRecord && selectRecord.sequence }}
+                </el-descriptions-item>
+                <el-descriptions-item :width="165">
+                    <template #label>
+                        <div class="cell-item">NCBI</div>
+                    </template>
+                    {{ selectRecord && selectRecord.NCBI }}
+                </el-descriptions-item>
+            </el-descriptions>
+
+            <div class="w-400 mt-10 ml-0">
                 <div v-loading="loading" class="mb-2">
                     <n-data-table
                         :columns="columns"
@@ -67,19 +88,11 @@
                 </div>
             </div>
         </div>
-
-        <!-- <el-button
-            size="large"
-            style="margin-left: 1055px; margin-top: 20px"
-            @click="doSafetyCheck()"
-        >
-            Do Safety Check
-        </el-button> -->
     </div>
 
     <el-dialog
         v-model="selectSeqWinPositionDialogVisible"
-        title="Select Graph Type"
+        title="Select Human Sequence"
         width="40%"
         align-center
     >
@@ -90,7 +103,7 @@
                     style="margin-left: 20px; margin-top: 10px"
                     @click="selectSeqWinPositionRequest(item)"
                 >
-                    {{ item.window_position }}
+                    {{ item.sequence }}
                 </el-button>
             </n-grid-item>
         </n-grid>
@@ -136,22 +149,20 @@ type AlignmentType = {
     Hsp_query_to: number
     Hsp_score: number
     Match: string
-    NCBI: string
     Query: string
     align_len: number
     e_value: number
     gaps: number
     identity: number
-    pdb: string
-    sequence: string
 }
 type SeqAlignResType = {
-    window_position: string
+    sequence: string
     alignments: AlignmentType[]
+    NCBI: string
 }
 
 const selectSeqWinPositionDialogVisible = ref(false)
-const selectRecord = ref('')
+const selectRecord = ref<SeqAlignResType | null>(null)
 
 const alignmentData = ref([] as AlignmentType[])
 const seqaligndata = ref([] as SeqAlignResType[])
@@ -192,7 +203,7 @@ onBeforeMount(async () => {
     loading.value = false
 
     if (seqaligndata.value.length > 0) {
-        selectRecord.value = seqaligndata.value[0].window_position
+        selectRecord.value = toRaw(seqaligndata.value[0])
         alignmentData.value = seqaligndata.value[0].alignments
         shownseq.value = alignmentData.value[0].Hit
     }
@@ -207,10 +218,9 @@ const selectSeqWinPosition = () => {
 }
 
 const selectSeqWinPositionRequest = (item: SeqAlignResType) => {
-    selectRecord.value = item.window_position
+    selectRecord.value = item
     alignmentData.value = item.alignments
     shownseq.value = alignmentData.value[0].Hit
-    // console.log(selectRecord.value, alignmentData.value[0].sequence, alignmentData.value[0].Hit)
     selectSeqWinPositionDialogVisible.value = false
 }
 const renderTooltip = (trigger: any, content: any) => {
@@ -232,31 +242,6 @@ const columnWidth = {
 }
 
 const createColumns = (): DataTableColumns<AlignmentType> => [
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'Selection' }), 'Selection')
-        },
-        key: 'selection', // Use a custom key
-        align: 'center',
-        render: () => {
-            return selectRecord.value
-        },
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.selection, // Define a width for your new column
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'Sequence' }), 'Sequence')
-        },
-        key: 'sequence',
-        align: 'center',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.sequence,
-    },
     {
         title() {
             return renderTooltip(h('div', null, { default: () => 'e Value' }), 'e_value')
@@ -334,7 +319,6 @@ const createColumns = (): DataTableColumns<AlignmentType> => [
                             size: 'small',
                             type: 'info',
                             onClick: () => {
-                                // console.log(row.sequence, row.Hit)
                                 shownseq.value = row.Hit
                             },
                         },
@@ -354,6 +338,5 @@ const columns = createColumns()
     height: 600px;
     position: relative;
     overflow: scroll;
-    /* margin: 20px; */
 }
 </style>

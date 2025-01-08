@@ -62,14 +62,14 @@ watch(scoring, () => {
 })
 
 const Width = ref(1800)
-const Height = ref(700)
+const Height = ref(1000)
 const width = ref(1000)
 const height = ref(500)
-const leftMargin = ref(200)
+const leftMargin = ref(120)
 const rightMargin = ref(100)
 const topMargin = ref(0)
 const bottomMargin = ref(500)
-const yoffset = ref(5)
+const headeroffset = ref(150)
 
 const parameterclass2 = ['Header 2', 'Header 1']
 
@@ -166,7 +166,6 @@ const process_svg = () => {
         .scaleBand()
         .range([0, width.value - leftMargin.value])
         .domain(xdomain)
-        // .domain(demoheader.value)
         .padding(0.001)
     let xAix = svg
         .append('g')
@@ -177,28 +176,19 @@ const process_svg = () => {
     xAix.selectAll('text')
         .style('text-anchor', 'end')
         .style('font-size', 20)
-        .attr('dx', '-.5em')
+        .attr('dx', '+.4em')
         .attr('dy', '+.7em')
         .attr('transform', 'rotate(0)')
 
-    const y = d3
-        .scaleBand()
-        .range([height.value / 2 - yoffset.value, 0])
-        .domain(parameterclass.value)
-        .padding(0.01)
-
     const y1 = d3
         .scaleBand()
-        .range([height.value, height.value / 2 + yoffset.value])
+        .range([height.value, headeroffset.value + 0])
         .domain(parameterclass.value)
         .padding(0.01)
 
     const y3 = d3
         .scaleBand()
-        .range([
-            height.value / 2 - yoffset.value,
-            height.value / 2 - yoffset.value - 4 * y1.bandwidth(),
-        ])
+        .range([height.value + 0, 0])
         .domain(parameterclass2)
         .padding(0.01)
 
@@ -207,14 +197,13 @@ const process_svg = () => {
         .append('g')
         .attr(
             'transform',
-            'translate(' + leftMargin.value + ',' + (height.value / 2 + yoffset.value) + ')'
+            'translate(' + leftMargin.value + ', 0)'
         )
-        .call(d3.axisLeft(y))
+        .call(d3.axisLeft(y1))
     y1Aix.select('.domain').remove()
     y1Aix.selectAll('.tick').selectAll('line').remove()
     y1Aix
         .selectAll('text')
-        .attr('transform', 'translate(' + -y.bandwidth() + ',0)')
         .style('font-size', 20)
 
     y1Aix
@@ -223,76 +212,16 @@ const process_svg = () => {
         .enter()
         .append('rect')
         .attr('x', function (d) {
-            return -y.bandwidth()
+            return 0
         })
         .attr('y', function (d) {
-            return y(d) + y.bandwidth() / 4
+            return y1(d.class)
         })
-        .style('width', y.bandwidth() / 2)
-        .style('height', y.bandwidth() / 2)
+        .style('width', y1.bandwidth() / 2)
+        .style('height', y1.bandwidth() / 2)
         .style('fill', function (d) {
             return chooseColor(d, 1)
         })
-    const tooltip = svg.append('svg').attr('height', 100).attr('width', 230).style('opacity', 0)
-    tooltip
-        .append('rect')
-        .attr('x', 0)
-        .attr('width', 210)
-        .attr('height', 70)
-        .style('fill', '')
-        .style('opacity', 0)
-    const toolText1 = tooltip
-        .append('text')
-        .style('fill', 'black')
-        .attr('transform', `translate(10,20)`)
-        .style('font-size', 20)
-
-    // create the black box, emerge when a column is selected
-    const myCol = svg
-        .append('rect')
-        .style('opacity', 0)
-        .style('fill-opacity', 0)
-        .style('height', height.value / 2)
-        .style('width', x.bandwidth())
-        .style('stroke', 'black')
-        .style('stroke-width', '2')
-    // Three function that change the tooltip when user hover / move / leave a cell
-    const mouseover = function () {
-        tooltip.style('opacity', 1)
-        myCol.style('opacity', 1)
-    }
-    const mousemove = function (
-        md: { layerX: number; layerY: number },
-        d: { value: any; perc: any }
-    ) {
-        svg.selectAll('.myRec').style('opacity', 0.2)
-        d3.select(this).style('opacity', 1)
-        myCol
-            .attr(
-                'x',
-                Math.floor((md.layerX - 2.9 * leftMargin.value) / x.bandwidth()) * x.bandwidth() +
-                    leftMargin.value
-            )
-            .attr('y', height.value / 2 - yoffset.value)
-
-        tooltip
-            .style('opacity', 1)
-            .attr(
-                'x',
-                Math.floor((md.layerX - 2.9 * leftMargin.value) / x.bandwidth()) * x.bandwidth() +
-                    leftMargin.value
-            )
-            .attr('y', height.value / 2 - 30)
-
-        toolText1.text(function () {
-            return `${d.value}`
-        })
-    }
-    const mouseleave = function () {
-        svg.selectAll('.myRec').style('opacity', 1)
-        tooltip.style('opacity', 0)
-        myCol.style('opacity', 0)
-    }
 
     let final = []
     for (let m = 0; m < parameterclass.value.length; m++) {
@@ -300,7 +229,6 @@ const process_svg = () => {
             final.push({
                 id: n + 1, // col
                 class: parameterclass.value[m], // row
-                // value: demodata[m][n + 1],
                 value: scoring.value[demoheader.value[n]][m],
             })
         }
@@ -308,14 +236,18 @@ const process_svg = () => {
 
     // Build gradient color scale
     let recColor = function (d) {
+        const _values = final.map(d => d.value); // Extract values
+        const largestValue = Math.max(..._values); // Find largest value
+        const smallestValue = Math.min(..._values); // Find smallest value
+
         let color = chooseColor(d, 0)
-        return d3.scaleLinear().range(['#F7F7F7', color]).domain([0, 100])
+        return d3.scaleLinear().range(['#F7F7F7', color]).domain([smallestValue, largestValue])
     }
 
     // gradient color rect
     let label = svg
         .append('g')
-        .attr('transform', 'translate(20,' + (height.value / 2 + yoffset.value) + ')')
+        .attr('transform', 'translate(20,' + (height.value / 2) + ')')
     const defs = label.append('defs') //append defs
     const linearGradient = defs
         .selectAll('graDef') //append <linearGradient> in defs
@@ -335,7 +267,7 @@ const process_svg = () => {
 
     // heatmap
     svg.selectAll('myRec')
-        .data(final) //, function(d) { return d.class+':'+d.id;})
+        .data(final)
         .enter()
         .append('rect')
         .attr('class', 'myRec')
@@ -350,15 +282,27 @@ const process_svg = () => {
         .style('fill', function (d) {
             return recColor(d)(d.value)
         })
-        .on('mouseover', mouseover)
-        .on('mousemove', mousemove)
-        .on('mouseleave', mouseleave)
+        .style('opacity', 1)
+        .on('mouseover', function (event, d) {
+            svg.append('text')
+                .attr('class', 'hover-text')
+                .attr('x', x(d.id) + x.bandwidth() + leftMargin.value)
+                .attr('y', y1(d.class) + y1.bandwidth() / 2)
+                .attr('text-anchor', 'middle')
+                .text(`Value: ${d.value}`);
+            // svg.selectAll('.myRec').style('opacity', 0.2)
+            d3.select(this).style('opacity', 1)
+        })
+        .on('mouseleave', function () {
+            svg.selectAll('.hover-text').remove();
+            // svg.selectAll('.myRec').style('opacity', 1)
+        });
 
     // header
     let header = []
     for (let m = 0; m < demoheader.value.length; m++) {
         header.push({
-            id: m + 1, // index starst from 1, according to demodata
+            id: m + 1, // index starst from 1, according to final
             class: 'Header 2',
             value: demoheader.value[m],
         })
@@ -372,10 +316,10 @@ const process_svg = () => {
             return x(d.id) + leftMargin.value + 1
         })
         .attr('y', function (d) {
-            return y3(d.class)
+            return 10
         })
         .attr('width', x.bandwidth() - 2)
-        .attr('height', (y.bandwidth() - 1) * 2)
+        .attr('height', 130)
         .style('fill', '#d4d4d4')
     svg.selectAll('.arrow')
         .data(header)
@@ -383,9 +327,9 @@ const process_svg = () => {
         .append('polygon') // Using polyline for the down arrow
         .attr('class', 'uparrow')
         .attr('points', function (d) {
-            const xPos = x(d.id) + leftMargin.value + x.bandwidth() / 2 + 20
-            const yPos = y3(d.class) + (y.bandwidth() - 1) - 5 // Position below the rectangle
-            return `${xPos - 7},${yPos} ${xPos},${yPos - 7} ${xPos + 7},${yPos}` // Down arrow points
+            const xPos = x(d.id) + leftMargin.value + x.bandwidth() / 2 + 40
+            const yPos = 30
+            return `${xPos - 7},${yPos} ${xPos},${yPos - 7} ${xPos + 7},${yPos}` // Up arrow points
         })
         .style('stroke', 'grey') // Colour the line
         .style('stroke-width', 2) // Line width
@@ -402,8 +346,8 @@ const process_svg = () => {
         .append('polygon') // Using polyline for the down arrow
         .attr('class', 'downarrow')
         .attr('points', function (d) {
-            const xPos = x(d.id) + leftMargin.value + x.bandwidth() / 2 + 20
-            const yPos = y3(d.class) + (y.bandwidth() - 1) + 5 // Position below the rectangle
+            const xPos = x(d.id) + leftMargin.value + x.bandwidth() / 2 + 40
+            const yPos = 35
             return `${xPos - 7},${yPos} ${xPos},${yPos + 7} ${xPos + 7},${yPos}` // Down arrow points
         })
         .style('stroke', 'grey') // Colour the line
@@ -424,7 +368,7 @@ const process_svg = () => {
             return x(d.id) + leftMargin.value + x.bandwidth() / 2 // Center the text
         })
         .attr('y', function (d) {
-            return y3(d.class) + y3.bandwidth() / 3 // Position above the rectangle
+            return headeroffset.value / 2 - 5
         })
         .attr('text-anchor', 'middle') // Center the text
         .style('font-size', '14px')

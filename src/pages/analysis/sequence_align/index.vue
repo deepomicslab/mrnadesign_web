@@ -109,12 +109,13 @@
                         v-if="inputtype === 'paste'"
                     >
                         <div class="text-lg mb-6 w-190">
-                            Paste a fasta formatted protein/amino acid sequence.
+                            Paste a fasta formatted protein/amino acid sequence. We accept only one
+                            sequence here.
                         </div>
                         <div class="w-190 mt-1 flex flex-row text-lg">
                             <n-input
                                 round
-                                placeholder=">seq1&#10;sequence&#10;>seq2&#10;sequence&#10;"
+                                placeholder=">seq&#10;sequence&#10;"
                                 type="textarea"
                                 clearable
                                 :rows="10"
@@ -129,7 +130,7 @@
                                     class="w-50"
                                     @click="
                                         fillSequence(
-                                            '>SQF22697.1 glycyl-tRNA synthetase alpha subunit [Streptococcus pyogenes]\nMSKKLTFQEIILTLQNEKGAGTMSPYTFLRAIGPEPWNAAYHQFQVVMKPSPSNIQELYLASLEKLGINPLEHDIRFVEDNWEVEPSRRPADGRYGENPNRLYQH\n>SQF22697.2 glycyl-tRNA synthetase alpha subunit [Streptococcus pyogenes]\nMSKKLTFQEIILTLQNEKGAGTMSPYTFLRAIGPEPWNAAYVEPSRRPADGRYGENPNRLYQHHQFQVVMKPSPSNIQELYLASLEKLGINPLEHDIRFVEDNWE'
+                                            '>SQF22697.1 glycyl-tRNA synthetase alpha subunit [Streptococcus pyogenes]\nVLHCVAFAVPKSSSNEEVMFLTVQVKGPGYKNSRNKLDLETLTDILEHQIRAVPFYLAYAIAMEEISRGCASTGVIMSVNNSLYL'
                                         )
                                     "
                                 >
