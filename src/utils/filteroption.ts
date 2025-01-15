@@ -13,6 +13,78 @@ export const annotationRefOptions = [
     },
 ]
 
+export const mirtarbaseSpeciesMiRNARefOptions = [
+    { value: 'Arabidopsis thaliana', label: 'Arabidopsis thaliana' },
+    { value: 'Bombyx mori', label: 'Bombyx mori' },
+    { value: 'Bos taurus', label: 'Bos taurus' },
+    { value: 'Caenorhabditis elegans', label: 'Caenorhabditis elegans' },
+    { value: 'Canis familiaris', label: 'Canis familiaris' },
+    { value: 'Capra hircus', label: 'Capra hircus' },
+    { value: 'Cricetulus griseus', label: 'Cricetulus griseus' },
+    { value: 'Danio rerio', label: 'Danio rerio' },
+    { value: 'Drosophila melanogaster', label: 'Drosophila melanogaster' },
+    { value: 'Epstein Barr virus', label: 'Epstein Barr virus' },
+    { value: 'Gallus gallus', label: 'Gallus gallus' },
+    { value: 'Gorilla gorilla', label: 'Gorilla gorilla' },
+    { value: 'Homo sapiens', label: 'Homo sapiens' },
+    { value: 'Human cytomegalovirus', label: 'Human cytomegalovirus' },
+    {
+        value: 'Kaposi sarcoma-associated herpesvirus',
+        label: 'Kaposi sarcoma-associated herpesvirus',
+    },
+    { value: 'Macaca mulatta', label: 'Macaca mulatta' },
+    { value: 'Macaca nemestrina', label: 'Macaca nemestrina' },
+    { value: 'Mareks disease virus', label: 'Mareks disease virus' },
+    { value: 'Mus musculus', label: 'Mus musculus' },
+    { value: 'Oryzias latipes', label: 'Oryzias latipes' },
+    { value: 'Ovis aries', label: 'Ovis aries' },
+    { value: 'Pan troglodytes', label: 'Pan troglodytes' },
+    { value: 'Pongo pygmaeus', label: 'Pongo pygmaeus' },
+    { value: 'Rattus norvegicus', label: 'Rattus norvegicus' },
+    { value: 'Sus scrofa', label: 'Sus scrofa' },
+    { value: 'Taeniopygia guttata', label: 'Taeniopygia guttata' },
+    { value: 'Vesicular stomatitis Indiana virus', label: 'Vesicular stomatitis Indiana virus' },
+]
+
+export const mirtarbaseSpeciesTargetGeneRefOptions = [
+    { value: 'Arabidopsis thaliana', label: 'Arabidopsis thaliana' },
+    { value: 'Bombyx mori', label: 'Bombyx mori' },
+    { value: 'Bos taurus', label: 'Bos taurus' },
+    { value: 'Caenorhabditis elegans', label: 'Caenorhabditis elegans' },
+    { value: 'Canis familiaris', label: 'Canis familiaris' },
+    { value: 'Capra hircus', label: 'Capra hircus' },
+    { value: 'Cricetulus griseus', label: 'Cricetulus griseus' },
+    { value: 'Danio rerio', label: 'Danio rerio' },
+    { value: 'Drosophila melanogaster', label: 'Drosophila melanogaster' },
+    { value: 'Epstein Barr virus', label: 'Epstein Barr virus' },
+    { value: 'Gallus gallus', label: 'Gallus gallus' },
+    { value: 'Gorilla gorilla', label: 'Gorilla gorilla' },
+    { value: 'Homo sapiens', label: 'Homo sapiens' },
+    { value: 'Human cytomegalovirus', label: 'Human cytomegalovirus' },
+    {
+        value: 'Kaposi sarcoma-associated herpesvirus',
+        label: 'Kaposi sarcoma-associated herpesvirus',
+    },
+    { value: 'Macaca mulatta', label: 'Macaca mulatta' },
+    { value: 'Macaca nemestrina', label: 'Macaca nemestrina' },
+    { value: 'Mus musculus', label: 'Mus musculus' },
+    { value: 'Oryzias latipes', label: 'Oryzias latipes' },
+    { value: 'Ovis aries', label: 'Ovis aries' },
+    { value: 'Pan troglodytes', label: 'Pan troglodytes' },
+    { value: 'Pongo pygmaeus', label: 'Pongo pygmaeus' },
+    { value: 'Rattus norvegicus', label: 'Rattus norvegicus' },
+    { value: 'Sus scrofa', label: 'Sus scrofa' },
+    { value: 'Taeniopygia guttata', label: 'Taeniopygia guttata' },
+    { value: 'Vesicular stomatitis Indiana virus', label: 'Vesicular stomatitis Indiana virus' },
+]
+
+export const mirtarbaseSupportTypeRefOptions = [
+    { value: 'Functional MTI', label: 'Functional MTI' },
+    { value: 'Functional MTI (Weak)', label: 'Functional MTI (Weak)' },
+    { value: '', label: '' },
+    { value: 'Non-Functional MTI', label: 'Non-Functional MTI' },
+]
+
 export const datasetsOptions = [
     {
         value: 'Genbank',

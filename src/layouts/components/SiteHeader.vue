@@ -89,6 +89,10 @@ const menuOptions: MenuOption[] = [
                 label: "3' UTR List",
                 key: '/database/three_utr',
             },
+            {
+                label: 'MicroRNA Target Sites String Evidence',
+                key: '/database/mirtarbase',
+            },
             // {
             //     label: 'Sequence Filter',
             //     key: '/database/filter',

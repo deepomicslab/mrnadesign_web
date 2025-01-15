@@ -233,6 +233,11 @@
                             <p><a href="/database/antigen">Antigen List</a></p>
                             <p><a href="/database/tantigen">Tantigen List</a></p>
                             <p><a href="/database/three_utr">3'UTR List</a></p>
+                            <p>
+                                <a href="/database/mirtarbase">
+                                    MicroRNA Target Sites String Evidence
+                                </a>
+                            </p>
                             <!-- <p><a href="/database/filter">Sequence Filter</a></p> -->
                         </div>
 
