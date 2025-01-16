@@ -85,6 +85,43 @@ export const mirtarbaseSupportTypeRefOptions = [
     { value: 'Non-Functional MTI', label: 'Non-Functional MTI' },
 ]
 
+export const gtrnadbDomainRefOptions = [
+    { value: 'Archaea', label: 'Archaea' },
+    { value: 'Bacteria', label: 'Bacteria' },
+    { value: 'Eukaryota', label: 'Eukaryota' },
+]
+
+export const gtrnadbDetailStrandRefOptions = [
+    { value: '(+)', label: '(+)' },
+    { value: '(-)', label: '(-)' },
+]
+
+export const gtrnadbDetailIsotypeRefOptions = [
+    { value: 'Ala', label: 'Ala' },
+    { value: 'Arg', label: 'Arg' },
+    { value: 'Asn', label: 'Asn' },
+    { value: 'Asp', label: 'Asp' },
+    { value: 'Cys', label: 'Cys' },
+    { value: 'Gln', label: 'Gln' },
+    { value: 'Glu', label: 'Glu' },
+    { value: 'Gly', label: 'Gly' },
+    { value: 'His', label: 'His' },
+    { value: 'Ile', label: 'Ile' },
+    { value: 'Leu', label: 'Leu' },
+    { value: 'Lys', label: 'Lys' },
+    { value: 'Met', label: 'Met' },
+    { value: 'Phe', label: 'Phe' },
+    { value: 'Pro', label: 'Pro' },
+    { value: 'SeC', label: 'SeC' },
+    { value: 'Ser', label: 'Ser' },
+    { value: 'Sup', label: 'Sup' },
+    { value: 'Thr', label: 'Thr' },
+    { value: 'Trp', label: 'Trp' },
+    { value: 'Tyr', label: 'Tyr' },
+    { value: 'Undet', label: 'Undet' },
+    { value: 'Val', label: 'Val' },
+]
+
 export const datasetsOptions = [
     {
         value: 'Genbank',

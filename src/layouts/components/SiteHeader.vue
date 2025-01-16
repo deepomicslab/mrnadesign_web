@@ -93,6 +93,10 @@ const menuOptions: MenuOption[] = [
                 label: 'MicroRNA Target Sites String Evidence',
                 key: '/database/mirtarbase',
             },
+            {
+                label: 'GtRNAdb',
+                key: '/database/gtrnadb',
+            },
             // {
             //     label: 'Sequence Filter',
             //     key: '/database/filter',

@@ -238,6 +238,7 @@
                                     MicroRNA Target Sites String Evidence
                                 </a>
                             </p>
+                            <p><a href="/database/gtrnadb">GtRNAdb</a></p>
                             <!-- <p><a href="/database/filter">Sequence Filter</a></p> -->
                         </div>
 
