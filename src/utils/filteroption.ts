@@ -122,6 +122,59 @@ export const gtrnadbDetailIsotypeRefOptions = [
     { value: 'Val', label: 'Val' },
 ]
 
+export const rebaseEnzymeTypeRefOptions = [
+    { value: 'Type III', label: 'Type III' },
+    { value: 'Type II', label: 'Type II' },
+    { value: 'Type II, Type IV', label: 'Type II, Type IV' },
+    { value: 'Type I', label: 'Type I' },
+    { value: 'Type I, Type III', label: 'Type I, Type III' },
+    { value: 'Type I, Type II', label: 'Type I, Type II' },
+    { value: 'Type I, Type II, Type III', label: 'Type I, Type II, Type III' },
+    { value: 'Type I, Type II, Type V', label: 'Type I, Type II, Type V' },
+    { value: 'Type I, Type IV', label: 'Type I, Type IV' },
+    { value: 'Type I, Type V', label: 'Type I, Type V' },
+    { value: 'Type V', label: 'Type V' },
+]
+
+export const tsnadb2ValidRefOptions = [
+    { value: 'tier1', label: 'tier1' },
+    { value: 'tier2', label: 'tier2' },
+    { value: 'tier3', label: 'tier3' },
+]
+
+export const tsnadb2ValidSNVRefOptions = [
+    { value: 'Fusion', label: 'Fusion' },
+    { value: 'INDEL', label: 'INDEL' },
+    { value: 'Non-coding', label: 'Non-coding' },
+    { value: 'RNA splicing', label: 'RNA splicing' },
+    { value: 'SNV', label: 'SNV' },
+]
+
+export const tsnadb2NeoantigenTypeRefOptions = [
+    { value: 'Fusion', label: 'Fusion' },
+    { value: 'INDEL', label: 'INDEL' },
+    { value: 'SNV', label: 'SNV' },
+]
+
+export const tsnadb2NeoantigenTissueRefOptions = [
+    { value: 'Bladder', label: 'Bladder' },
+    { value: 'Brain', label: 'Brain' },
+    { value: 'Breast', label: 'Breast' },
+    { value: 'Cervix', label: 'Cervix' },
+    { value: 'Colorectal', label: 'Colorectal' },
+    { value: 'Head_and_Neck', label: 'Head_and_Neck' },
+    { value: 'Kidney', label: 'Kidney' },
+    { value: 'Liver', label: 'Liver' },
+    { value: 'Lung', label: 'Lung' },
+    { value: 'Ovary', label: 'Ovary' },
+    { value: 'Pancreas', label: 'Pancreas' },
+    { value: 'Prostate', label: 'Prostate' },
+    { value: 'Skin', label: 'Skin' },
+    { value: 'Stomach', label: 'Stomach' },
+    { value: 'Thyroid', label: 'Thyroid' },
+    { value: 'Uterus', label: 'Uterus' },
+]
+
 export const datasetsOptions = [
     {
         value: 'Genbank',

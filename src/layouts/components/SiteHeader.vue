@@ -97,6 +97,24 @@ const menuOptions: MenuOption[] = [
                 label: 'GtRNAdb',
                 key: '/database/gtrnadb',
             },
+            {
+                label: 'TSNAdb v2.0',
+                key: '/database/tsnadb2/',
+                children: [
+                    {
+                        label: 'All Collected Experimentally Validated Neoantigens',
+                        key: '/database/tsnadb2/validated',
+                    },
+                    {
+                        label: 'Detailed Neoantigen Information Predicted by Three Tools',
+                        key: '/database/tsnadb2/neoantigen',
+                    },
+                ],
+            },
+            {
+                label: 'REBASE',
+                key: '/database/rebase',
+            },
             // {
             //     label: 'Sequence Filter',
             //     key: '/database/filter',
@@ -143,46 +161,46 @@ const menuOptions: MenuOption[] = [
             //             key: '/analysis/annopipline/quality',
             //         },
             //         {
-            //             label: () =>
-            //                 h(
-            //                     RouterLink,
-            //                     {
-            //                         to: {
-            //                             path: '/analysis/annopipline/phenotype',
-            //                         },
-            //                     },
-            //                     { default: () => 'Phenotype Annotation' }
-            //                 ),
-            //             key: '/analysis/annopipline/phenotype',
-            //             children: [
-            //                 {
-            //                     label: 'Host Assignment',
-            //                     key: '/analysis/annopipline/phenotype/host',
+            //     label: () =>
+            //         h(
+            //             RouterLink,
+            //             {
+            //                 to: {
+            //                     path: '/analysis/annopipline/phenotype',
             //                 },
-            //                 {
-            //                     label: 'Lifestyle Prediction',
-            //                     key: '/analysis/annopipline/phenotype/lifestyle',
-            //                 },
-            //             ],
-            //         },
-
+            //             },
+            //             { default: () => 'Phenotype Annotation' }
+            //         ),
+            //     key: '/analysis/annopipline/phenotype',
+            //     children: [
             //         {
-            //             label: () =>
-            //                 h(
-            //                     RouterLink,
-            //                     {
-            //                         to: {
-            //                             path: '/analysis/annopipline/structural',
-            //                         },
-            //                     },
-            //                     { default: () => 'Structural Annotation' }
-            //                 ),
-            //             key: '/analysis/annopipline/structural',
-            //             children: [
-            //                 {
-            //                     label: 'ORF prediction & Protein Classification',
-            //                     key: '/analysis/annopipline/structural/annotation',
+            //             label: 'Host Assignment',
+            //             key: '/analysis/annopipline/phenotype/host',
+            //         },
+            //         {
+            //             label: 'Lifestyle Prediction',
+            //             key: '/analysis/annopipline/phenotype/lifestyle',
+            //         },
+            //     ],
+            // },
+
+            // {
+            //     label: () =>
+            //         h(
+            //             RouterLink,
+            //             {
+            //                 to: {
+            //                     path: '/analysis/annopipline/structural',
             //                 },
+            //             },
+            //             { default: () => 'Structural Annotation' }
+            //         ),
+            //     key: '/analysis/annopipline/structural',
+            //     children: [
+            //         {
+            //             label: 'ORF prediction & Protein Classification',
+            //             key: '/analysis/annopipline/structural/annotation',
+            //         },
             //                 {
             //                     label: 'Transcription Terminator Annotation',
             //                     key: '/analysis/annopipline/structural/terminators',

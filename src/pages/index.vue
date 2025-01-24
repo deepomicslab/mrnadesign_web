@@ -239,6 +239,8 @@
                                 </a>
                             </p>
                             <p><a href="/database/gtrnadb">GtRNAdb</a></p>
+                            <p><a href="/database/tsnadb2/validated">TSNAdb v2.0</a></p>
+                            <p><a href="/database/rebase">REBASE</a></p>
                             <!-- <p><a href="/database/filter">Sequence Filter</a></p> -->
                         </div>
 
