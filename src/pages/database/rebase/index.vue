@@ -145,7 +145,6 @@ onBeforeMount(async () => {
         params: {},
     })
     LinkMapping.value = response2.data.results
-    console.log(LinkMapping.value, LinkMapping.value.AanI)
     loading.value = false
 })
 

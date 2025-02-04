@@ -6,6 +6,7 @@
             mode="horizontal"
             @select="handleSelectSet"
         >
+            <el-menu-item index="antigen" class="text-lg">Antigen</el-menu-item>
             <el-menu-item index="tantigen" class="text-lg">Tantigen</el-menu-item>
             <el-menu-item index="three_utr" class="text-lg">3'UTR</el-menu-item>
         </el-menu>
@@ -62,6 +63,7 @@
 
 <script setup lang="ts">
 /* eslint-disable camelcase */
+/* eslint-disable */
 import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
 import { NButton, NTooltip } from 'naive-ui'
 import { ChevronBack, ChevronForward } from '@vicons/ionicons5'
@@ -147,11 +149,15 @@ const confirmSelection = () => {
     emit('inputBlocktoPass', inputBlocktoPass.value)
 }
 
+type AntigenRowData = {
+    id: number
+    sequence: string
+}
 type TantigenRowData = {
     id: number
-    seq_5: string
-    cds: string
-    seq_3: string
+    seq_5: string // rna seq
+    cds: string // protein seq
+    seq_3: string // rna seq
 }
 type ThreeUTRRowData = {
     id: number
@@ -205,9 +211,9 @@ const render_button = (thisdataset: string, row: any, col: string, data_col: str
                             buttonClickedStates.value[
                                 `${col}_rowid` as keyof buttonClickedStatesType
                             ] === row.id &&
-                            buttonClickedStates.value[
+                                buttonClickedStates.value[
                                 `${col}_dataset` as keyof buttonClickedStatesType
-                            ] === thisdataset
+                                ] === thisdataset
                                 ? '#2196F3'
                                 : '#d6d6d6',
                         color: '#FFFFFF',
@@ -228,6 +234,46 @@ const render_button = (thisdataset: string, row: any, col: string, data_col: str
         ]
     )
 }
+
+const createAntigenColumns = (): DataTableColumns<AntigenRowData> => [
+    {
+        title() {
+            return renderTooltip(h('div', null, { default: () => 'ID' }), 'ID')
+        },
+        key: 'id',
+        align: 'center',
+        fixed: 'left',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: column_width.id,
+        sorter: true,
+    },
+    {
+        title() {
+            return renderTooltip(
+                h('div', null, { default: () => 'Antigen' }),
+                'Antigen protein sequence as CDS'
+            )
+        },
+        key: 'sequence',
+        align: 'center',
+        sorter: 'default',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: column_width.cds,
+    },
+    {
+        title: () => renderTooltip(h('div', null, ''), ''),
+        key: 'id',
+        align: 'center',
+        width: column_width.tick,
+        render(row: any) {
+            return render_button(dataset.value, row, 'cds', 'sequence')
+        },
+    },
+]
 
 const createTantigenColumns = (): DataTableColumns<TantigenRowData> => [
     {
@@ -268,7 +314,7 @@ const createTantigenColumns = (): DataTableColumns<TantigenRowData> => [
         title() {
             return renderTooltip(h('div', null, { default: () => 'CDS' }), 'CDS')
         },
-        key: 'cds',
+        key: 'antigen_sequence',
         align: 'center',
         sorter: 'default',
         ellipsis: {
@@ -278,11 +324,11 @@ const createTantigenColumns = (): DataTableColumns<TantigenRowData> => [
     },
     {
         title: () => renderTooltip(h('div', null, ''), ''),
-        key: 'cds',
+        key: 'antigen_sequence',
         align: 'center',
         width: column_width.tick,
         render(row: any) {
-            return render_button(dataset.value, row, 'cds', 'cds')
+            return render_button(dataset.value, row, 'cds', 'antigen_sequence')
         },
     },
     {
@@ -345,7 +391,9 @@ const createThreeUTRColumns = (): DataTableColumns<ThreeUTRRowData> => [
 ]
 
 const updateColumns = () => {
-    if (dataset.value === 'tantigen') {
+    if (dataset.value === 'antigen') {
+        columns.value = createAntigenColumns()
+    } else if (dataset.value === 'tantigen') {
         columns.value = createTantigenColumns()
     } else if (dataset.value === 'three_utr') {
         columns.value = createThreeUTRColumns()

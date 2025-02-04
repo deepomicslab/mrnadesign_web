@@ -141,12 +141,22 @@ const menuOptions: MenuOption[] = [
                 RouterLink,
                 {
                     to: {
-                        path: '/analysis/linear_design',
+                        path: '/analysis/linear_design/cds_plus_35utr',
                     },
                 },
                 { default: () => 'Linear Design' }
             ),
         key: '/analysis/linear_design',
+        children: [
+            {
+                label: 'CDS Only',
+                key: '/analysis/linear_design/cds_only',
+            },
+            {
+                label: "CDS plus 3'UTR and 5'UTR",
+                key: '/analysis/linear_design/cds_plus_35utr',
+            },
+        ],
     },
     {
         label: () =>

@@ -3,7 +3,7 @@
         <el-scrollbar class="w-full" ref="scrollbarRef" v-load="loading">
             <div class="flex flex-col outer-container">
                 <div class="font-600 ml-20 mt-16 flex flex-row border-b-2 w-9/10 pb-5">
-                    <div class="text-4xl text-[#253959]">Prediction</div>
+                    <div class="text-4xl text-[#253959]">Linear Design (CDS only)</div>
                     <el-button
                         round
                         size="large"
@@ -43,13 +43,13 @@
                     1. Input Sequence
                     <n-button
                         text
-                        href="https://mrnadesign.deepomics.org/dataExample/mrna/prediction/task0001_input_seq.tsv"
+                        href="https://mrnadesign.deepomics.org/dataExample/mrna/lineardesign/sequence.fasta"
                         tag="a"
                         target="_blank"
                         type="primary"
                         class="text-lg"
                     >
-                        See Example TSV sequence
+                        See Example FASTA sequence
                     </n-button>
                 </div>
                 <div class="ml-25 mt-5 flex flex-row mb-5">
@@ -58,7 +58,6 @@
                     <div class="ml-5">
                         <n-radio-group v-model:value="inputtype">
                             <n-radio-button value="upload">UPLOAD FILE</n-radio-button>
-                            <!-- <n-radio-button value="enter">ENTER ANTIGEN/TANTIGEN ID</n-radio-button> -->
                             <n-radio-button value="paste">PASTE SEQUENCE</n-radio-button>
                         </n-radio-group>
                     </div>
@@ -71,13 +70,12 @@
                         v-if="inputtype === 'upload'"
                     >
                         <n-upload
+                            :max="1"
                             v-model:file-list="fileList"
                             directory-dnd
                             :default-upload="false"
-                            accept=".tsv"
+                            accept=".fasta,.fa"
                             @update:file-list="handleFileListChange"
-                            @remove="remove"
-                            show-remove-button
                         >
                             <n-upload-dragger>
                                 <div class="flex flex-col justify-center items-center">
@@ -92,13 +90,13 @@
                                         class="text-base mt-3 mb-3 text-opacity-100"
                                         style="color: #f07167"
                                     >
-                                        TSV file size should be less than 10MB
+                                        fasta file size should be less than 10MB
                                     </p>
                                     <p
                                         class="text-base mb-3 text-opacity-100"
                                         style="color: #f07167"
                                     >
-                                        Supported formats: .tsv
+                                        Supported formats: .fasta / .fa
                                     </p>
                                 </div>
                             </n-upload-dragger>
@@ -187,19 +185,6 @@
                                     </n-input-group-label>
                                 </n-input-group>
                             </el-form-item>
-                            <el-form-item label="3'UTR" label-width="100px" class="is-required">
-                                <n-input
-                                    round
-                                    placeholder="3'UTR"
-                                    type="textarea"
-                                    clearable
-                                    v-model:value="inputGroup.utr3"
-                                    :autosize="{
-                                        minRows: 1,
-                                        maxRows: 3,
-                                    }"
-                                ></n-input>
-                            </el-form-item>
                             <el-form-item label="CDS" label-width="100px" class="is-required">
                                 <n-input
                                     round
@@ -207,19 +192,6 @@
                                     type="textarea"
                                     clearable
                                     v-model:value="inputGroup.cds"
-                                    :autosize="{
-                                        minRows: 1,
-                                        maxRows: 3,
-                                    }"
-                                ></n-input>
-                            </el-form-item>
-                            <el-form-item label="5'UTR" label-width="100px" class="is-required">
-                                <n-input
-                                    round
-                                    placeholder="5'UTR"
-                                    type="textarea"
-                                    clearable
-                                    v-model:value="inputGroup.utr5"
                                     :autosize="{
                                         minRows: 1,
                                         maxRows: 3,
@@ -238,10 +210,54 @@
                     </div>
                 </div>
 
-                <div class="font-600 text-3xl ml-20 mt-10 mb-10">
-                    2.Apply Modules & Specify Parameters
+                <div class="font-600 text-3xl ml-20 mt-10">2. Parameters</div>
+                <div class="flex flex-row justify-center">
+                    <div
+                        class="rounded w-200 h-60 mt-15 rounded-xl"
+                        style="box-shadow: 0 0 64px #cfd5db"
+                    >
+                        <div class="mt-10">
+                            <el-form status-icon label-width="auto" label-position="right">
+                                <el-row justify="space-evenly">
+                                    <el-col :span="16">
+                                        <el-form-item label="Codon Usage" class="is-required">
+                                            <el-select
+                                                v-model="paramform.codonusage"
+                                                placeholder="Please Select"
+                                                class="w-60"
+                                                clearable
+                                            >
+                                                <el-option
+                                                    v-for="option in codonUsageOptions"
+                                                    :key="option.value"
+                                                    :label="option.label"
+                                                    :value="option.value"
+                                                ></el-option>
+                                            </el-select>
+                                        </el-form-item>
+                                    </el-col>
+                                </el-row>
+                                <el-row justify="space-evenly">
+                                    <el-col :span="16">
+                                        <el-form-item
+                                            label="Codon Adaption Index (&lambda;)"
+                                            class="is-required"
+                                        >
+                                            <el-input v-model="paramform.lambda" class="w-60" />
+                                        </el-form-item>
+                                    </el-col>
+                                </el-row>
+                                <el-row class="mt-10">
+                                    <el-col :span="24" class="text-center">
+                                        <el-button type="info" @click="resetFilterForm()">
+                                            Reset
+                                        </el-button>
+                                    </el-col>
+                                </el-row>
+                            </el-form>
+                        </div>
+                    </div>
                 </div>
-                <parameter @paramform_submitted="handleParamSubmitted" />
                 <div class="mt-10 flex flex-row justify-center">
                     <el-button
                         size="large"
@@ -256,19 +272,6 @@
             </div>
         </el-scrollbar>
     </div>
-    <el-dialog v-model="dialogVisible" title="Please select the demo result to view" width="30%">
-        <el-checkbox-group v-model="demotask" :max="1">
-            <el-checkbox label="Task 0001" />
-            <el-checkbox label="Task 0002" />
-            <el-checkbox label="Task 0003" />
-        </el-checkbox-group>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="dialogVisible = false">Cancel</el-button>
-                <el-button @click="opendemo">Confirm</el-button>
-            </span>
-        </template>
-    </el-dialog>
     <el-dialog
         v-model="selectionDialogVisible"
         title="Please select sequences as you analysis input"
@@ -282,25 +285,22 @@
 </template>
 <script setup lang="ts">
 /* eslint-disable camelcase */
-/* eslint no-underscore-dangle: 0 */
-/* eslint-disable */
 
 import type { UploadFileInfo } from 'naive-ui'
 import { InfoFilled } from '@element-plus/icons-vue'
 import axios from 'axios'
-import parameter from './parameter.vue'
-import selectFromDB from './select_window.vue'
+import selectFromDB from './select_window_cds_only.vue'
 import { useUserIdGenerator } from '@/utils/userIdGenerator'
 import { encrypt } from '@/utils/crypto'
 import { windowErrorMessage, windowSuccessMessage } from '@/utils/windowFunctions'
-const inputBlocks = ref([{ name: '', utr3: '', cds: '', utr5: '' }]) // Initialize with one input block
-const inputBlocktoPass = ref({ utr3: '', cds: '', utr5: '' })
+import { codonUsageOptions } from '@/utils/taskoptions'
 
-const paramform = ref([])
+const inputBlocks = ref([{ name: '', cds: '' }]) // Initialize with one input block
+const inputBlocktoPass = ref({ cds: '' })
 
 const fileList = ref<UploadFileInfo[]>([])
-const submitfile = ref<File>()
-const inputtype = ref('paste')
+const submitfile = ref<File[]>([])
+const inputtype = ref('upload')
 
 const userid = ref('')
 const loading = ref(false)
@@ -309,18 +309,13 @@ const inputformValue = ref({
     phage: '',
     datatable: '',
 })
-const idlist = ref([])
-const inputfeedback = ref('')
-const validationstatus = ref()
 
-const dialogVisible = ref(false)
 const selectionDialogVisible = ref(false)
-const demotask = ref([] as any[])
 
 const importID = ref(0)
 
 const addInputBlock = () => {
-    inputBlocks.value.push({ name: '', utr3: '', cds: '', utr5: '' }) // Add a new input block
+    inputBlocks.value.push({ name: '', cds: '' }) // Add a new input block
 }
 const importFromDB = (index: number) => {
     importID.value = index
@@ -332,82 +327,63 @@ const deleteInputBlock = (index: number) => {
 const fillSequence = () => {
     inputBlocks.value.length = 0
     inputBlocks.value.push({
-        name: 'SEQ000000',
-        utr3: 'CUAAUGCCAUGAUCCAGGUGACAUGUAGAAGCUUGGAUCAGAUGCUGCACUUUGCGUUCGAUGUGGGAGCGUGCUUUCCACGACGGUGACACGCUUCCCUGGAUUGGCAGCCAGACUGCCUUCCGGGUCACUGCC',
-        cds: 'AUGCCCAUGCCCAUCGGCAGCAAGGAGAGGCCCACCUUCUUCGAGAUCUUCAAGACCAGGUGCAACAAGGCCGACCUGGGCCCCAUCAGCCUGAACUGA',
-        utr5: 'AUUGAUUUU',
+        name: 'seq1',
+        cds: 'MPNTLACP',
     })
     inputBlocks.value.push({
-        name: 'SEQ000001',
-        utr3: 'CUAAUGCCAUGAUCCAACAUGUGGAAGCUUGGAUCAGAUGCUGCACCCUGGAUUGGCUGCC',
-        cds: 'AUGCCCAUGCCCAUCGGCAGCAAGGAGAGGCCCACCUUCUUCGAGAUCUUCAAGACCAGGUGCAACAAGGCCGACCUGGGCCCCAUCAGCCUGAACUGA',
-        utr5: 'AUUGAUUGGGGUAAUAAAGGGU',
+        name: 'seq2',
+        cds: 'MLDQVNKLKYPEVSLT',
     })
 }
 
-const handleParamSubmitted = (value: any) => {
-    paramform.value = value
-}
 const handleSelectionDialogVisible = (value: any) => {
     selectionDialogVisible.value = value
 }
 const handleInputBlocktoPass = (value: any) => {
     inputBlocktoPass.value = value
-    if (inputBlocktoPass.value.utr3 != '') {
-        inputBlocks.value[importID.value].utr3 = inputBlocktoPass.value.utr3
-        inputBlocktoPass.value.utr3 = ''
-    }
-    if (inputBlocktoPass.value.cds != '') {
+    if (inputBlocktoPass.value.cds !== '') {
         inputBlocks.value[importID.value].cds = inputBlocktoPass.value.cds
         inputBlocktoPass.value.cds = ''
     }
-    if (inputBlocktoPass.value.utr5 != '') {
-        inputBlocks.value[importID.value].utr5 = inputBlocktoPass.value.utr5
-        inputBlocktoPass.value.utr5 = ''
+}
+
+const checkfile = (data: UploadFileInfo) => {
+    if (data.name.match(/(.fasta)$/g) === null && data.name.match(/(.fa)$/g) === null) {
+        windowErrorMessage('Uploaded file must be in fasta format.')
+        return false
     }
+    if (data.file?.size === 0 || data.file?.size === undefined) {
+        windowErrorMessage('Uploaded file cannot be empty.')
+        return false
+    }
+    if (data.file.size / 1024 / 1024 > 10) {
+        windowErrorMessage('Uploaded file cannot exceed 10MB.')
+        return false
+    }
+    if (data.name !== 'cds.fasta' && data.name !== 'cds.fa') {
+        windowErrorMessage('The name of the uploaded files are not correct.')
+        return false
+    }
+    return true
 }
 
 const handleFileListChange = (data: UploadFileInfo[]) => {
-    if (data[0].name.match(/(.tsv)$/g) === null) {
-        windowErrorMessage('Uploaded file must be in TSV format.')
-        data.pop()
-    } else if (data[0].file?.size === 0 || data[0].file?.size === undefined) {
-        windowErrorMessage('Uploaded file cannot be empty.')
-        data.pop()
-    } else if (data[0].file.size / 1024 / 1024 > 10) {
-        windowErrorMessage('Uploaded file cannot exceed 10MB.')
-        data.pop()
-    } else if (data.length > 1) {
-        windowErrorMessage('Cannot upload more than one files.')
-        data.pop()
-    } else if (data.length === 1) {
-        submitfile.value = data[0].file
-        fileList.value[0] = data[0]
+    if (data.length > 0) {
+        const f = data[0]
+        if (checkfile(f) === false) {
+            data.pop()
+        }
     }
 }
-const remove = () => {
-    submitfile.value = undefined
-    fileList.value.pop()
-}
+
 const router = useRouter()
 
 const godemo = () => {
-    dialogVisible.value = true
-}
-const opendemo = () => {
-    let thistaskid = ''
-    if (demotask.value[0] === 'Task 0001') {
-        thistaskid = '-95'
-    } else if (demotask.value[0] === 'Task 0002') {
-        thistaskid = '-94'
-    } else if (demotask.value[0] === 'Task 0003') {
-        thistaskid = '-93'
-    }
     router.push({
-        path: '/task/result/prediction',
+        path: '/task/result/lineardesign',
         query: {
             taskid: encrypt(
-                thistaskid,
+                '-98',
                 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2'
             ),
         },
@@ -430,22 +406,28 @@ const checkPasteInput = () => {
     }
     for (let i = 0; i < inputBlocks.value.length; i += 1) {
         const block = inputBlocks.value[i]
-        if (
-            block.name.length === 0 ||
-            block.utr3.length === 0 ||
-            block.cds.length === 0 ||
-            block.utr5.length === 0
-        ) {
+        if (block.name.length === 0 || block.cds.length === 0) {
             return 1
         }
         if (!isOnlyLettersAndDigits(block.name)) {
             return 2
         }
-        if (!isOnlyLetters(block.utr3) && !isOnlyLetters(block.cds) && !isOnlyLetters(block.utr5)) {
+        if (!isOnlyLetters(block.cds)) {
             return 2
         }
     }
     return 0
+}
+
+const paramform = ref({
+    codonusage: '',
+    lambda: 0.0,
+})
+const resetFilterForm = () => {
+    paramform.value = {
+        codonusage: '',
+        lambda: 0.0,
+    }
 }
 
 const submit = async () => {
@@ -455,10 +437,13 @@ const submit = async () => {
     const precheck = ref(false)
 
     if (inputtype.value === 'upload') {
-        if (typeof submitfile.value === 'undefined') {
+        if (fileList.value.length !== 1) {
             windowErrorMessage('Please upload file')
             precheck.value = false
         } else {
+            fileList.value.forEach(element => {
+                submitfile.value.push(element.file)
+            })
             precheck.value = true
         }
     } else if (inputtype.value === 'paste') {
@@ -475,42 +460,16 @@ const submit = async () => {
             )
             precheck.value = false
         }
-    } else {
-        // enter
-        if (inputformValue.value.phage.length === 0) {
-            windowErrorMessage('Please input Antigen/TAntigen IDs')
-            precheck.value = false
-        } else if (inputformValue.value.datatable === '') {
-            windowErrorMessage('Please select the data table that the IDs come from')
-        } else {
-            const checkdata = new FormData()
-            checkdata.append('antigen_tantigen_ids', inputformValue.value.phage)
-            checkdata.append('datatable', inputformValue.value.datatable)
-            const response = await axios.post(`/analyze/prediction_inputcheck/`, checkdata, {
-                baseURL: '/api',
-                timeout: 10000,
-            })
-            const res = response.data
-            idlist.value = res.idlist
-            validationstatus.value = res.status
-            inputfeedback.value = res.message
-            if (validationstatus.value === 'failed') {
-                windowErrorMessage(inputfeedback.value)
-            } else if (validationstatus.value === 'success') {
-                submitdata.append('datatable', inputformValue.value.datatable)
-                submitdata.append('queryids', JSON.stringify(idlist.value))
-                precheck.value = true
-            }
-        }
     }
 
     if (precheck.value) {
-        submitdata.append('analysistype', 'Prediction')
+        submitdata.append('analysistype', 'Linear Design')
+        submitdata.append('lineardesignanalysistype', 'cds_only')
         submitdata.append('userid', userid.value)
         submitdata.append('inputtype', inputtype.value)
         submitdata.append('parameters', JSON.stringify(paramform.value))
-        submitdata.append('submitfile', submitfile.value as File)
-        const response = await axios.post(`/analyze/prediction/`, submitdata, {
+        submitdata.append('submitfile1', submitfile.value[0] as File)
+        const response = await axios.post(`/analyze/linear_design/`, submitdata, {
             baseURL: '/api',
             timeout: 10000,
         })
@@ -533,12 +492,14 @@ const submitdemo = async () => {
     const precheck = ref(true)
 
     if (precheck.value) {
-        submitdata.append('analysistype', 'Prediction')
+        submitdata.append('analysistype', 'Linear Design')
+        submitdata.append('lineardesignanalysistype', 'cds_only')
         submitdata.append('userid', userid.value)
         submitdata.append('inputtype', 'rundemo')
-        submitdata.append('codonusage', 'human')
-        submitdata.append('lambda', '0')
-        const response = await axios.post(`/analyze/prediction/`, submitdata, {
+        paramform.value.codonusage = 'human'
+        paramform.value.lambda = 0
+        submitdata.append('parameters', JSON.stringify(paramform.value))
+        const response = await axios.post(`/analyze/linear_design/`, submitdata, {
             baseURL: '/api',
             timeout: 10000,
         })

@@ -128,7 +128,17 @@ const menuOptions: MenuOption[] = [
         children: [
             {
                 label: 'Linear Design',
-                key: '/analysis/linear_design',
+                key: '/analysis/linear_design/cds_plus_35utr',
+                children: [
+                    {
+                        label: 'CDS Only',
+                        key: '/analysis/linear_design/cds_only',
+                    },
+                    {
+                        label: "CDS plus 3'UTR and 5'UTR",
+                        key: '/analysis/linear_design/cds_plus_35utr',
+                    },
+                ],
             },
             {
                 label: 'Prediction',

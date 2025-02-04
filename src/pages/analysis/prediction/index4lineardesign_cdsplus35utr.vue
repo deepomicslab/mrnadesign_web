@@ -3,7 +3,9 @@
         <el-scrollbar class="w-full" ref="scrollbarRef" v-load="loading">
             <div class="flex flex-col outer-container">
                 <div class="font-600 ml-20 mt-16 flex flex-row border-b-2 w-9/10 pb-5">
-                    <div class="text-4xl text-[#253959]">Prediction</div>
+                    <div class="text-4xl text-[#253959]">
+                        Prediction (From Linear Design Result)
+                    </div>
                     <el-button
                         round
                         size="large"
@@ -293,7 +295,18 @@ import selectFromDB from './select_window.vue'
 import { useUserIdGenerator } from '@/utils/userIdGenerator'
 import { encrypt } from '@/utils/crypto'
 import { windowErrorMessage, windowSuccessMessage } from '@/utils/windowFunctions'
+
+import { useLinearDesign2PredictionTaskSunmissionStore } from '@/store/mrna'
+
+const taskSubmissionStore = useLinearDesign2PredictionTaskSunmissionStore()
+
+
 const inputBlocks = ref([{ name: '', utr3: '', cds: '', utr5: '' }]) // Initialize with one input block
+inputBlocks.value[0]['name'] = taskSubmissionStore.name
+inputBlocks.value[0]['utr3'] = taskSubmissionStore.utr3Sequence
+inputBlocks.value[0]['cds'] = taskSubmissionStore.cdsSequence
+inputBlocks.value[0]['utr5'] = taskSubmissionStore.utr5Sequence
+
 const inputBlocktoPass = ref({ utr3: '', cds: '', utr5: '' })
 
 const paramform = ref([])

@@ -6,8 +6,9 @@
             mode="horizontal"
             @select="handleSelectSet"
         >
+            <el-menu-item index="antigen" class="text-lg">Antigen</el-menu-item>
             <el-menu-item index="tantigen" class="text-lg">Tantigen</el-menu-item>
-            <el-menu-item index="three_utr" class="text-lg">3'UTR</el-menu-item>
+            <!-- <el-menu-item index="three_utr" class="text-lg">3'UTR</el-menu-item> -->
         </el-menu>
     </div>
     <div class="h-220 flex flex-col py-10 px-30">
@@ -62,13 +63,14 @@
 
 <script setup lang="ts">
 /* eslint-disable camelcase */
+/* eslint-disable */
 import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
 import { NButton, NTooltip } from 'naive-ui'
 import { ChevronBack, ChevronForward } from '@vicons/ionicons5'
 import axios from 'axios'
 import { ref, defineEmits } from 'vue'
 
-const inputBlocktoPass = ref({ utr3: '', cds: '', utr5: '' })
+const inputBlocktoPass = ref({ cds: '' })
 const emit = defineEmits(['selectionDialogVisible', 'inputBlocktoPass'])
 
 const loading = ref(false)
@@ -87,30 +89,14 @@ const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 const columns = ref()
 
 type buttonClickedStatesType = {
-    seq_3_dataset: string
-    seq_3_rowid: number
-    seq_3: string
-
     cds_dataset: string
     cds_rowid: number
     cds: string
-
-    seq_5_dataset: string
-    seq_5_rowid: number
-    seq_5: string
 }
 const buttonClickedStates = ref<buttonClickedStatesType>({
-    seq_3_dataset: '',
-    seq_3_rowid: 0,
-    seq_3: '',
-
     cds_dataset: '',
     cds_rowid: 0,
     cds: '',
-
-    seq_5_dataset: '',
-    seq_5_rowid: 0,
-    seq_5: '',
 })
 
 function handleCheck(rowKeys: DataTableRowKey[]) {
@@ -124,38 +110,24 @@ const renderTooltip = (trigger: any, content: any) => {
 }
 
 const clearSelection = () => {
-    buttonClickedStates.value.seq_3_dataset = dataset.value
-    buttonClickedStates.value.seq_3_rowid = 0
-    buttonClickedStates.value.seq_3 = ''
-
     buttonClickedStates.value.cds_dataset = dataset.value
     buttonClickedStates.value.cds_rowid = 0
     buttonClickedStates.value.cds = ''
-
-    buttonClickedStates.value.seq_5_dataset = dataset.value
-    buttonClickedStates.value.seq_5_rowid = 0
-    buttonClickedStates.value.seq_5 = ''
 }
 const confirmSelection = () => {
-    if (buttonClickedStates.value.seq_3 !== '')
-        inputBlocktoPass.value.utr3 = buttonClickedStates.value.seq_3.replaceAll('\n', '')
     if (buttonClickedStates.value.cds !== '')
         inputBlocktoPass.value.cds = buttonClickedStates.value.cds.replaceAll('\n', '')
-    if (buttonClickedStates.value.seq_5 !== '')
-        inputBlocktoPass.value.utr5 = buttonClickedStates.value.seq_5.replaceAll('\n', '')
     emit('selectionDialogVisible', false)
     emit('inputBlocktoPass', inputBlocktoPass.value)
 }
 
+type AntigenRowData = {
+    id: number
+    sequence: string
+}
 type TantigenRowData = {
     id: number
-    seq_5: string
-    cds: string
-    seq_3: string
-}
-type ThreeUTRRowData = {
-    id: number
-    pattern: string
+    cds: string // protein seq
 }
 
 const rowKey = (row: { id: any }) => {
@@ -168,19 +140,13 @@ const tableList = computed(() => {
 
 const column_width = {
     id: 25,
-    seq_3: 100,
     cds: 100,
-    seq_5: 100,
     tick: 20,
 }
 
 const select = (row: number, col: string, seq: string) => {
-    if (col === 'seq_3') {
-        inputBlocktoPass.value.utr3 = seq
-    } else if (col === 'cds') {
+    if (col === 'cds') {
         inputBlocktoPass.value.cds = seq
-    } else if (col === 'seq_5') {
-        inputBlocktoPass.value.utr5 = seq
     }
 }
 
@@ -205,9 +171,9 @@ const render_button = (thisdataset: string, row: any, col: string, data_col: str
                             buttonClickedStates.value[
                                 `${col}_rowid` as keyof buttonClickedStatesType
                             ] === row.id &&
-                            buttonClickedStates.value[
+                                buttonClickedStates.value[
                                 `${col}_dataset` as keyof buttonClickedStatesType
-                            ] === thisdataset
+                                ] === thisdataset
                                 ? '#2196F3'
                                 : '#d6d6d6',
                         color: '#FFFFFF',
@@ -229,6 +195,46 @@ const render_button = (thisdataset: string, row: any, col: string, data_col: str
     )
 }
 
+const createAntigenColumns = (): DataTableColumns<AntigenRowData> => [
+    {
+        title() {
+            return renderTooltip(h('div', null, { default: () => 'ID' }), 'ID')
+        },
+        key: 'id',
+        align: 'center',
+        fixed: 'left',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: column_width.id,
+        sorter: true,
+    },
+    {
+        title() {
+            return renderTooltip(
+                h('div', null, { default: () => 'Antigen' }),
+                'Antigen protein sequence as CDS'
+            )
+        },
+        key: 'sequence',
+        align: 'center',
+        sorter: 'default',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: column_width.cds,
+    },
+    {
+        title: () => renderTooltip(h('div', null, ''), ''),
+        key: 'id',
+        align: 'center',
+        width: column_width.tick,
+        render(row: any) {
+            return render_button(dataset.value, row, 'cds', 'sequence')
+        },
+    },
+]
+
 const createTantigenColumns = (): DataTableColumns<TantigenRowData> => [
     {
         title() {
@@ -245,30 +251,9 @@ const createTantigenColumns = (): DataTableColumns<TantigenRowData> => [
     },
     {
         title() {
-            return renderTooltip(h('div', null, { default: () => "3'UTR" }), 'seq_3')
-        },
-        key: 'seq_3',
-        align: 'center',
-        sorter: 'default',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: column_width.seq_3,
-    },
-    {
-        title: () => renderTooltip(h('div', null, ''), ''),
-        key: 'seq_3',
-        align: 'center',
-        width: column_width.tick,
-        render(row: any) {
-            return render_button(dataset.value, row, 'seq_3', 'seq_3')
-        },
-    },
-    {
-        title() {
             return renderTooltip(h('div', null, { default: () => 'CDS' }), 'CDS')
         },
-        key: 'cds',
+        key: 'antigen_sequence',
         align: 'center',
         sorter: 'default',
         ellipsis: {
@@ -278,77 +263,20 @@ const createTantigenColumns = (): DataTableColumns<TantigenRowData> => [
     },
     {
         title: () => renderTooltip(h('div', null, ''), ''),
-        key: 'cds',
+        key: 'antigen_sequence',
         align: 'center',
         width: column_width.tick,
         render(row: any) {
-            return render_button(dataset.value, row, 'cds', 'cds')
-        },
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => "5'UTR" }), 'seq_5')
-        },
-        key: 'seq_5',
-        align: 'center',
-        sorter: 'default',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: column_width.seq_5,
-    },
-    {
-        title: () => renderTooltip(h('div', null, ''), ''),
-        key: 'seq_5',
-        align: 'center',
-        width: column_width.tick,
-        render(row: any) {
-            return render_button(dataset.value, row, 'seq_5', 'seq_5')
-        },
-    },
-]
-const createThreeUTRColumns = (): DataTableColumns<ThreeUTRRowData> => [
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'ID' }), 'ID')
-        },
-        key: 'id',
-        align: 'center',
-        fixed: 'left',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: column_width.id,
-        sorter: true,
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'Pattern' }), 'seq_3')
-        },
-        key: 'pattern',
-        align: 'center',
-        sorter: 'default',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: column_width.seq_3,
-    },
-    {
-        title: () => renderTooltip(h('div', null, ''), ''),
-        key: 'id',
-        align: 'center',
-        width: column_width.tick,
-        render(row: any) {
-            return render_button(dataset.value, row, 'seq_3', 'pattern')
+            return render_button(dataset.value, row, 'cds', 'antigen_sequence')
         },
     },
 ]
 
 const updateColumns = () => {
-    if (dataset.value === 'tantigen') {
+    if (dataset.value === 'antigen') {
+        columns.value = createAntigenColumns()
+    } else if (dataset.value === 'tantigen') {
         columns.value = createTantigenColumns()
-    } else if (dataset.value === 'three_utr') {
-        columns.value = createThreeUTRColumns()
     }
 }
 

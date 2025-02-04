@@ -27,7 +27,6 @@ const barHeight = ref(30)
 
 const props = defineProps(['alignmentData'])
 const data = computed(() => {
-    // console.log('props.alignmentData', props.alignmentData)
     return props.alignmentData
 })
 
@@ -35,7 +34,6 @@ function complink(ss, se, ts, te, y) {
     return `M ${ss} ${y} H ${se}  L ${te}  ${y + 123} H ${ts} Z`
 }
 function forwordtriangle(start, end, y) {
-    console.log('start end y: ', start, end, y)
     if (end - start > triangleOffset.value) {
         return `M ${end} ${y + barHeight.value / 2} L ${end - triangleOffset.value} ${y} V ${y + arrowWeight.value
             }  H ${start} V ${y + barHeight.value - arrowWeight.value} H  ${end - triangleOffset.value

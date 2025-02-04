@@ -3,23 +3,16 @@
         <el-scrollbar class="w-full" ref="scrollbarRef" v-load="loading">
             <div class="flex flex-col outer-container">
                 <div class="font-600 ml-20 mt-16 flex flex-row border-b-2 w-9/10 pb-5">
-                    <div class="text-4xl text-[#253959]">Prediction</div>
-                    <el-button
-                        round
-                        size="large"
-                        color="#EE7E7D"
+                    <div class="text-4xl text-[#253959]">
+                        Prediction (From Linear Design Result)
+                    </div>
+                    <el-button round size="large" color="#EE7E7D"
                         class="text-white hover:text-white focus:text-white active:text-white ml-40"
-                        @click="submitdemo"
-                    >
+                        @click="submitdemo">
                         Run Demo
                     </el-button>
-                    <el-button
-                        round
-                        size="large"
-                        color="#EE7E7D"
-                        class="ml-5 text-white hover:text-white focus:text-white active:text-white"
-                        @click="godemo"
-                    >
+                    <el-button round size="large" color="#EE7E7D"
+                        class="ml-5 text-white hover:text-white focus:text-white active:text-white" @click="godemo">
                         View Demo Result
                     </el-button>
                     <el-button round size="large" color="#34498E" @click="gosubmithelper">
@@ -41,14 +34,9 @@
                 </div>
                 <div class="font-600 text-3xl ml-20 mt-10">
                     1. Input Sequence
-                    <n-button
-                        text
+                    <n-button text
                         href="https://mrnadesign.deepomics.org/dataExample/mrna/prediction/task0001_input_seq.tsv"
-                        tag="a"
-                        target="_blank"
-                        type="primary"
-                        class="text-lg"
-                    >
+                        tag="a" target="_blank" type="primary" class="text-lg">
                         See Example TSV sequence
                     </n-button>
                 </div>
@@ -65,20 +53,10 @@
                 </div>
 
                 <div class="flex flex-row justify-center">
-                    <div
-                        class="rounded w-200 h-90 mt-5 rounded-2xl"
-                        style="box-shadow: 0 0 64px #cfd5db"
-                        v-if="inputtype === 'upload'"
-                    >
-                        <n-upload
-                            v-model:file-list="fileList"
-                            directory-dnd
-                            :default-upload="false"
-                            accept=".tsv"
-                            @update:file-list="handleFileListChange"
-                            @remove="remove"
-                            show-remove-button
-                        >
+                    <div class="rounded w-200 h-90 mt-5 rounded-2xl" style="box-shadow: 0 0 64px #cfd5db"
+                        v-if="inputtype === 'upload'">
+                        <n-upload v-model:file-list="fileList" directory-dnd :default-upload="false" accept=".tsv"
+                            @update:file-list="handleFileListChange" @remove="remove" show-remove-button>
                             <n-upload-dragger>
                                 <div class="flex flex-col justify-center items-center">
                                     <div class="text-[90px] mt-10" style="color: #028090">
@@ -88,16 +66,10 @@
                                         Click or drag a file to this area to upload your file
                                     </p>
 
-                                    <p
-                                        class="text-base mt-3 mb-3 text-opacity-100"
-                                        style="color: #f07167"
-                                    >
+                                    <p class="text-base mt-3 mb-3 text-opacity-100" style="color: #f07167">
                                         TSV file size should be less than 10MB
                                     </p>
-                                    <p
-                                        class="text-base mb-3 text-opacity-100"
-                                        style="color: #f07167"
-                                    >
+                                    <p class="text-base mb-3 text-opacity-100" style="color: #f07167">
                                         Supported formats: .tsv
                                     </p>
                                 </div>
@@ -105,11 +77,8 @@
                         </n-upload>
                     </div>
 
-                    <div
-                        class="rounded w-200 h-60 mt-5 rounded-2xl flex-col flex justify-center items-center"
-                        style="box-shadow: 0 0 64px #cfd5db"
-                        v-if="inputtype === 'enter'"
-                    >
+                    <div class="rounded w-200 h-60 mt-5 rounded-2xl flex-col flex justify-center items-center"
+                        style="box-shadow: 0 0 64px #cfd5db" v-if="inputtype === 'enter'">
                         <div class="text-lg flex flex-row mt-20">
                             Enter the
                             <p class="text-red-400 mx-2">Antigen/Tantigen IDs</p>
@@ -122,29 +91,19 @@
                                     <el-row justify="space-evenly">
                                         <el-col :span="16">
                                             <el-form-item label="ID" class="is-required">
-                                                <n-input
-                                                    v-model:value="inputformValue.phage"
-                                                    placeholder="Example: 1;27;56"
-                                                    type="textarea"
-                                                    :autosize="{
+                                                <n-input v-model:value="inputformValue.phage"
+                                                    placeholder="Example: 1;27;56" type="textarea" :autosize="{
                                                         minRows: 1,
                                                         maxRows: 2,
-                                                    }"
-                                                />
+                                                    }" />
                                             </el-form-item>
                                         </el-col>
                                     </el-row>
                                     <el-row justify="space-evenly">
                                         <el-col :span="16">
-                                            <el-form-item
-                                                label="Select Data Table"
-                                                class="is-required"
-                                            >
-                                                <n-radio-group
-                                                    v-model:value="inputformValue.datatable"
-                                                    name="datatable"
-                                                    size="large"
-                                                >
+                                            <el-form-item label="Select Data Table" class="is-required">
+                                                <n-radio-group v-model:value="inputformValue.datatable" name="datatable"
+                                                    size="large">
                                                     <n-radio-button value="antigen">
                                                         Antigen
                                                     </n-radio-button>
@@ -159,11 +118,8 @@
                             </div>
                         </div>
                     </div>
-                    <div
-                        class="rounded w-240 mt-5 rounded-2xl flex-col flex justify-center items-center outer-container"
-                        style="box-shadow: 0 0 64px #cfd5db"
-                        v-if="inputtype === 'paste'"
-                    >
+                    <div class="rounded w-240 mt-5 rounded-2xl flex-col flex justify-center items-center outer-container"
+                        style="box-shadow: 0 0 64px #cfd5db" v-if="inputtype === 'paste'">
                         <div class="text-lg mb-6 w-190">
                             Paste a fasta formatted protein/amino acid sequence.
                         </div>
@@ -171,14 +127,8 @@
                             <hr class="mb-5" />
                             <el-form-item label="Name" label-width="100px" class="is-required">
                                 <n-input-group>
-                                    <n-input
-                                        round
-                                        placeholder="Name"
-                                        type="textarea"
-                                        clearable
-                                        :rows="1"
-                                        v-model:value="inputGroup.name"
-                                    ></n-input>
+                                    <n-input round placeholder="Name" type="textarea" clearable :rows="1"
+                                        v-model:value="inputGroup.name"></n-input>
                                     <n-input-group-label @click="importFromDB(index)">
                                         Import data from DB
                                     </n-input-group-label>
@@ -188,43 +138,25 @@
                                 </n-input-group>
                             </el-form-item>
                             <el-form-item label="3'UTR" label-width="100px" class="is-required">
-                                <n-input
-                                    round
-                                    placeholder="3'UTR"
-                                    type="textarea"
-                                    clearable
-                                    v-model:value="inputGroup.utr3"
-                                    :autosize="{
+                                <n-input round placeholder="3'UTR" type="textarea" clearable
+                                    v-model:value="inputGroup.utr3" :autosize="{
                                         minRows: 1,
                                         maxRows: 3,
-                                    }"
-                                ></n-input>
+                                    }"></n-input>
                             </el-form-item>
                             <el-form-item label="CDS" label-width="100px" class="is-required">
-                                <n-input
-                                    round
-                                    placeholder="CDS"
-                                    type="textarea"
-                                    clearable
-                                    v-model:value="inputGroup.cds"
-                                    :autosize="{
+                                <n-input round placeholder="CDS" type="textarea" clearable
+                                    v-model:value="inputGroup.cds" :autosize="{
                                         minRows: 1,
                                         maxRows: 3,
-                                    }"
-                                ></n-input>
+                                    }"></n-input>
                             </el-form-item>
                             <el-form-item label="5'UTR" label-width="100px" class="is-required">
-                                <n-input
-                                    round
-                                    placeholder="5'UTR"
-                                    type="textarea"
-                                    clearable
-                                    v-model:value="inputGroup.utr5"
-                                    :autosize="{
+                                <n-input round placeholder="5'UTR" type="textarea" clearable
+                                    v-model:value="inputGroup.utr5" :autosize="{
                                         minRows: 1,
                                         maxRows: 3,
-                                    }"
-                                ></n-input>
+                                    }"></n-input>
                             </el-form-item>
                         </div>
                         <n-button-group>
@@ -243,13 +175,8 @@
                 </div>
                 <parameter @paramform_submitted="handleParamSubmitted" />
                 <div class="mt-10 flex flex-row justify-center">
-                    <el-button
-                        size="large"
-                        color="#34498E"
-                        :width="70"
-                        class="text-white hover:text-white focus:text-white active:text-white text-2xl"
-                        @click="submit"
-                    >
+                    <el-button size="large" color="#34498E" :width="70"
+                        class="text-white hover:text-white focus:text-white active:text-white text-2xl" @click="submit">
                         Submit
                     </el-button>
                 </div>
@@ -269,15 +196,9 @@
             </span>
         </template>
     </el-dialog>
-    <el-dialog
-        v-model="selectionDialogVisible"
-        title="Please select sequences as you analysis input"
-        width="75%"
-    >
-        <selectFromDB
-            @selectionDialogVisible="handleSelectionDialogVisible"
-            @inputBlocktoPass="handleInputBlocktoPass"
-        />
+    <el-dialog v-model="selectionDialogVisible" title="Please select sequences as you analysis input" width="75%">
+        <selectFromDB @selectionDialogVisible="handleSelectionDialogVisible"
+            @inputBlocktoPass="handleInputBlocktoPass" />
     </el-dialog>
 </template>
 <script setup lang="ts">
@@ -293,7 +214,15 @@ import selectFromDB from './select_window.vue'
 import { useUserIdGenerator } from '@/utils/userIdGenerator'
 import { encrypt } from '@/utils/crypto'
 import { windowErrorMessage, windowSuccessMessage } from '@/utils/windowFunctions'
+
+import { useLinearDesign2PredictionTaskSunmissionStore } from '@/store/mrna'
+
+const taskSubmissionStore = useLinearDesign2PredictionTaskSunmissionStore()
+
+
 const inputBlocks = ref([{ name: '', utr3: '', cds: '', utr5: '' }]) // Initialize with one input block
+inputBlocks.value[0]['cds'] = taskSubmissionStore.cdsSequence
+
 const inputBlocktoPass = ref({ utr3: '', cds: '', utr5: '' })
 
 const paramform = ref([])
