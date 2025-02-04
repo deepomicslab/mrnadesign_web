@@ -49,7 +49,7 @@
                         type="primary"
                         class="text-lg"
                     >
-                        See Example FASTA sequence
+                        See Example CDS Protein Sequence
                     </n-button>
                 </div>
                 <div class="ml-25 mt-5 flex flex-row mb-5">

@@ -4,7 +4,9 @@
             <div class="flex flex-col outer-container">
                 <div class="font-600 ml-20 mt-16 flex flex-row border-b-2 w-9/10 pb-5">
                     <div class="text-4xl text-[#253959]">
-                        Linear Design (CDS plus 3'UTR and 5'UTR)
+                        Linear Design
+                        <br />
+                        (CDS plus 3'UTR and 5'UTR)
                     </div>
                     <el-button
                         round
@@ -41,8 +43,22 @@
                     <p class="text-[#EE7E7D] mx-2">VIEW DEMO RESULT</p>
                     to see the precomputed demo results immediately.
                 </div>
+                <div class="text-lg font-500 ml-20 mt-3 w-9/10 flex flex-row">
+                    <el-icon class="text-lg mt-1 mr-2 text-[#34498E]">
+                        <InfoFilled />
+                    </el-icon>
+                    This task requires inputting three parts: CDS protein sequence, the 3' UTR, and
+                    the 5' UTR RNA sequences.
+                    <br />
+                    Users are allowed to input multiple sequence records, each of which must have an
+                    unique sequence name. If you choose to upload files, please name them as cds,
+                    utr3 and utr5, with the extension .fasta or .fa.
+                </div>
                 <div class="font-600 text-3xl ml-20 mt-10">
                     1. Input Sequence
+                    <n-button text type="primary" class="text-lg" style="color: #001f3f">
+                        See Example&nbsp;
+                    </n-button>
                     <n-button
                         text
                         href="https://mrnadesign.deepomics.org/dataExample/mrna/lineardesign/sequence.fasta"
@@ -51,7 +67,36 @@
                         type="primary"
                         class="text-lg"
                     >
-                        See Example FATSA sequence
+                        CDS&nbsp;
+                    </n-button>
+                    <n-button text type="primary" class="text-lg" style="color: #001f3f">
+                        Protein Sequence,&nbsp;
+                    </n-button>
+                    <n-button
+                        text
+                        href="https://mrnadesign.deepomics.org/dataExample/mrna/lineardesign/utr3.fasta"
+                        tag="a"
+                        target="_blank"
+                        type="primary"
+                        class="text-lg"
+                    >
+                        3'UTR&nbsp;
+                    </n-button>
+                    <n-button text type="primary" class="text-lg" style="color: #001f3f">
+                        and&nbsp;
+                    </n-button>
+                    <n-button
+                        text
+                        href="https://mrnadesign.deepomics.org/dataExample/mrna/lineardesign/utr5.fasta"
+                        tag="a"
+                        target="_blank"
+                        type="primary"
+                        class="text-lg"
+                    >
+                        5'UTR&nbsp;
+                    </n-button>
+                    <n-button text type="primary" class="text-lg" style="color: #001f3f">
+                        RNA Sequences
                     </n-button>
                 </div>
                 <div class="ml-25 mt-5 flex flex-row mb-5">
@@ -71,8 +116,6 @@
                         style="box-shadow: 0 0 64px #cfd5db"
                         v-if="inputtype === 'upload'"
                     >
-                        <!-- @remove="remove" -->
-                        <!-- show-remove-button -->
                         <n-upload
                             multiple
                             :max="3"
