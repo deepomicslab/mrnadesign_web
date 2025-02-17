@@ -17,14 +17,14 @@
                 </div>
             </div>
 
-            <div class="flex flex-row justify-between mt-6 ml-8 w-350">
+            <div class="flex flex-row justify-between mt-6 ml-0 w-350">
                 <div v-loading="loading" class="mb-20">
                     <n-data-table
                         :columns="columns"
                         :data="rnadataList"
                         :row-key="rowKey"
                         :scroll-x="1000"
-                        :max-height="200"
+                        :max-height="400"
                         @update:sorter="handleSorterChange"
                     />
                 </div>
@@ -109,6 +109,13 @@
             </div>
         </div>
     </div>
+    <el-dialog
+        v-model="dialogVisible"
+        title="Platform will recommend similar protein sequences from DB"
+        width="70%"
+    >
+        <scoretable :score_subtask_name="score_subtask_name" :taskid="taskid"></scoretable>
+    </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -128,10 +135,13 @@ import heatmap from './heatmap.vue'
 import primaryMainRegion from './primary_mainregion.vue'
 import primaryuORF from './primary_uORF.vue'
 import primaryResSite from './primary_res.vue'
+import scoretable from './score_table.vue'
 
 const sorter_dict = ref('')
 const activeTab = ref('primary')
 const protein_subtask_name = ref('')
+const score_subtask_name = ref('')
+const dialogVisible = ref(false)
 
 const cur_time = ref()
 
@@ -155,7 +165,6 @@ const taskid = computed(() => {
 })
 
 type RowData = {
-    id: number
     seq_name: string
     sequence: string
     structure: string
@@ -165,11 +174,15 @@ type RowData = {
 const loading = ref(false)
 const rnadata = ref()
 const rowKey = (row: RowData) => {
-    return row.id
+    return row.seq_name
 }
 
 const openView = (row: any) => {
     protein_subtask_name.value = row.task_name
+}
+const openRecommend = (row: any) => {
+    dialogVisible.value = true
+    score_subtask_name.value = row.task_name
 }
 
 onBeforeMount(async () => {
@@ -222,24 +235,10 @@ const renderTooltip = (trigger: any, content: any) => {
 }
 
 const columnWidth = {
-    id: 70,
     task_name: 100,
     actions: 100,
 }
 const createColumns = (): DataTableColumns<RowData> => [
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'ID' }), 'ID')
-        },
-        key: 'id',
-        align: 'center',
-        fixed: 'left',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.id,
-        sorter: true,
-    },
     {
         title() {
             return renderTooltip(h('div', null, { default: () => 'Subtask Name' }), 'Subtask Name')
@@ -278,6 +277,36 @@ const createColumns = (): DataTableColumns<RowData> => [
                             onClick: () => openView(row),
                         },
                         { default: () => 'view' }
+                    ),
+                ]
+            )
+        },
+    },
+    {
+        title: 'Protein Recommend',
+        key: 'actions',
+        align: 'center',
+        width: columnWidth.actions,
+        fixed: 'right',
+        render(row: any) {
+            return h(
+                'div',
+                {
+                    style: {
+                        display: 'center', // flex
+                        justifyContent: 'space-between',
+                    },
+                },
+                [
+                    h(
+                        NButton,
+                        {
+                            strong: true,
+                            size: 'small',
+                            type: 'info',
+                            onClick: () => openRecommend(row),
+                        },
+                        { default: () => 'recommend' }
                     ),
                 ]
             )

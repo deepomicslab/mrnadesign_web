@@ -175,6 +175,20 @@ export const tsnadb2NeoantigenTissueRefOptions = [
     { value: 'Uterus', label: 'Uterus' },
 ]
 
+export const predictionScoreTableSrcTableRefOptions = [
+    { value: 'antigen', label: 'antigen' },
+    { value: 'tantigen', label: 'tantigen' },
+    { value: 'tsnadb_neoantigen', label: 'tsnadb_neoantigen' },
+    { value: 'tsnadb_validated', label: 'tsnadb_validated' },
+]
+
+export const predictionScoreTableSrcFieldRefOptions = [
+    { value: 'sequence', label: 'sequence' },
+    { value: 'antigen_sequence', label: 'antigen_sequence' },
+    { value: 'peptide', label: 'peptide' },
+    { value: 'mutant_peptide', label: 'mutant_peptide' },
+]
+
 export const datasetsOptions = [
     {
         value: 'Genbank',
