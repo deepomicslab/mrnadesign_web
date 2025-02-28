@@ -152,6 +152,10 @@ const menuOptions: MenuOption[] = [
                 label: 'Sequence Align',
                 key: '/analysis/sequence_align',
             },
+            {
+                label: 'Antigen Screening',
+                key: '/analysis/antigen_screening',
+            },
 
             // {
             //     label: () =>

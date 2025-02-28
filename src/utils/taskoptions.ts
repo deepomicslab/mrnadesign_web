@@ -15,6 +15,10 @@ export const analysisTypeOptions = [
         value: 'Sequence Align',
         label: 'Sequence Align',
     },
+    {
+        value: 'Antigen Screening',
+        label: 'Antigen Screening',
+    },
 ]
 
 export const taskStatusOptions = [

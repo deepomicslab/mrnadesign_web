@@ -250,6 +250,7 @@
                             <p><a href="/analysis/prediction">Prediction</a></p>
                             <p><a href="/analysis/safety">Safety</a></p>
                             <p><a href="/analysis/sequence_align">Sequence Align</a></p>
+                            <p><a href="/analysis/antigen_screening">Antigen Screening</a></p>
                         </div>
                         <div class="flex flex-col mb-3">
                             <p class="text-xl mb-10"><a href="/workspace">Workspace</a></p>

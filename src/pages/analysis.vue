@@ -197,6 +197,19 @@ const menuOptions: MenuOption[] = [
             ),
         key: '/analysis/sequence_align',
     },
+    {
+        label: () =>
+            h(
+                RouterLink,
+                {
+                    to: {
+                        path: '/analysis/antigen_screening',
+                    },
+                },
+                { default: () => 'Antigen Screening' }
+            ),
+        key: '/analysis/antigen_screening',
+    },
 ]
 const router = useRouter()
 const changeMenu = (_: string, option: MenuOption) => {
