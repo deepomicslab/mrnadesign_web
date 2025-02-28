@@ -1,13 +1,14 @@
 <template>
     <div class="flex flex-row justify-between">
         <el-menu
-            :default-active="dataset"
             class="el-menu-demo h-14 mt-2 w-100/100"
             mode="horizontal"
             @select="handleSelectSet"
         >
             <el-menu-item index="tantigen" class="text-lg">Tantigen</el-menu-item>
             <el-menu-item index="three_utr" class="text-lg">3'UTR</el-menu-item>
+            <el-menu-item index="utrdb_three" class="text-lg">UTRdb 2.0 3'UTR</el-menu-item>
+            <el-menu-item index="utrdb_five" class="text-lg">UTRdb 2.0 5'UTR</el-menu-item>
         </el-menu>
     </div>
     <div class="h-220 flex flex-col py-10 px-30">
@@ -79,6 +80,7 @@ const pagevalue = ref(1)
 const pageSize = ref(10)
 
 const sorter_dict = ref('')
+const parameters = ref([{ key: '', value: '' }])
 
 const tableData = ref()
 
@@ -156,6 +158,16 @@ type TantigenRowData = {
 type ThreeUTRRowData = {
     id: number
     pattern: string
+}
+
+type UTRdbThreeRowData = {
+    id: number
+    seq_3: string
+}
+
+type UTRdbFiveRowData = {
+    id: number
+    seq_5: string
 }
 
 const rowKey = (row: { id: any }) => {
@@ -344,11 +356,89 @@ const createThreeUTRColumns = (): DataTableColumns<ThreeUTRRowData> => [
     },
 ]
 
+const createUTRdbThreeColumns = (): DataTableColumns<UTRdbThreeRowData> => [
+    {
+        title() {
+            return renderTooltip(h('div', null, { default: () => 'ID' }), 'ID')
+        },
+        key: 'id',
+        align: 'center',
+        fixed: 'left',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: column_width.id,
+        sorter: true,
+    },
+    {
+        title() {
+            return renderTooltip(h('div', null, { default: () => "3'UTR" }), 'seq_3')
+        },
+        key: 'sequence',
+        align: 'center',
+        sorter: 'default',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: column_width.seq_3,
+    },
+    {
+        title: () => renderTooltip(h('div', null, ''), ''),
+        key: 'id',
+        align: 'center',
+        width: column_width.tick,
+        render(row: any) {
+            return render_button(dataset.value, row, 'seq_3', 'sequence')
+        },
+    },
+]
+
+const createUTRdbFiveColumns = (): DataTableColumns<UTRdbFiveRowData> => [
+    {
+        title() {
+            return renderTooltip(h('div', null, { default: () => 'ID' }), 'ID')
+        },
+        key: 'id',
+        align: 'center',
+        fixed: 'left',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: column_width.id,
+        sorter: true,
+    },
+    {
+        title() {
+            return renderTooltip(h('div', null, { default: () => "5'UTR" }), 'seq_5')
+        },
+        key: 'sequence',
+        align: 'center',
+        sorter: 'default',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: column_width.seq_5,
+    },
+    {
+        title: () => renderTooltip(h('div', null, ''), ''),
+        key: 'id',
+        align: 'center',
+        width: column_width.tick,
+        render(row: any) {
+            return render_button(dataset.value, row, 'seq_5', 'sequence')
+        },
+    },
+]
+
 const updateColumns = () => {
     if (dataset.value === 'tantigen') {
         columns.value = createTantigenColumns()
     } else if (dataset.value === 'three_utr') {
         columns.value = createThreeUTRColumns()
+    } else if (dataset.value === 'utrdb_three') {
+        columns.value = createUTRdbThreeColumns()
+    } else if (dataset.value === 'utrdb_five') {
+        columns.value = createUTRdbFiveColumns()
     }
 }
 
@@ -368,9 +458,27 @@ onBeforeMount(async () => {
     loading.value = false
 })
 
+const apply_dataset = (value: string) => {
+    parameters.value.length = 0
+    if (value === 'tantigen') {
+        dataset.value = 'tantigen'
+        url.value = '/tantigen/'
+    } else if (value === 'three_utr') {
+        dataset.value = 'three_utr'
+        url.value = '/three_utr/'
+    } else if (value === 'utrdb_three' || value === 'utrdb_five') {
+        url.value = '/utrdb/'
+        dataset.value = value
+        if (value === 'utrdb_three') {
+            parameters.value.push({ key: 'utr_type', value: 'three_prime_utr' })
+        } else {
+            parameters.value.push({ key: 'utr_type', value: 'five_prime_utr' })
+        }
+    }
+}
+
 const handleSelectSet = async (value: any) => {
-    dataset.value = value
-    url.value = `/${value}/`
+    apply_dataset(value)
 
     loading.value = true
     const response = await axios.get(url.value, {
@@ -379,6 +487,7 @@ const handleSelectSet = async (value: any) => {
         params: {
             page: pagevalue.value,
             pagesize: pageSize.value,
+            parameters: JSON.stringify(parameters.value),
         },
     })
     const { data } = response
@@ -395,6 +504,7 @@ const axios_get_response = async (page_offset: number) => {
             page: pagevalue.value + page_offset,
             pagesize: pageSize.value,
             sorter: sorter_dict.value,
+            parameters: JSON.stringify(parameters.value),
         },
     })
     const { data } = response
