@@ -1,7 +1,7 @@
 <template>
     <div class="h-320 flex flex-col py-10 px-30">
         <div class="flex flex-row ml-1 my-7">
-            <div class="text-4xl font-600">AU-rich Element of 3'UTR</div>
+            <div class="text-4xl font-600">3'UTR Information</div>
             <el-button round color="#34498E" class="ml-5 mt-2" @click="godatahelper">
                 Database Helper
             </el-button>
@@ -31,12 +31,13 @@
         <div v-loading="loading" class="h-300 mb-2">
             <n-data-table
                 :columns="columns"
-                :data="threeUTRList"
+                :data="MainList"
                 :row-key="rowKey"
                 :scroll-x="1900"
                 :max-height="1000"
                 @update:checked-row-keys="handleCheck"
                 @update:sorter="handleSorterChange"
+                @update:filters="handleFilterChange"
             />
         </div>
         <div>
@@ -84,7 +85,9 @@ import { NButton, NTooltip } from 'naive-ui'
 import { Search, RefreshRight } from '@element-plus/icons-vue'
 import { ChevronBack, ChevronForward } from '@vicons/ionicons5'
 import axios from 'axios'
+
 import _ from 'lodash'
+import { utrdbUTRTypeRefOptions } from '@/utils/filteroption'
 
 const router = useRouter()
 const loading = ref(false)
@@ -103,29 +106,25 @@ const renderTooltip = (trigger: any, content: any) => {
 }
 
 const sorter_dict = ref('')
+const filter_dict = ref('')
 
 type RowData = {
     ID: number
-    gene_name: string
-    ensembl_gene_id: string
-    ensembl_transcript_id: string
-    description: string
-    start_position: int
-    end_position: int
-    pattern: string
-    cluster: int
-    chromosome: string
-    aliases: string
+    utr_type: string
+    transcript_id: string
+    gene_id: string
+    chr_start_end_strand: string
+    sequence: string
 }
 
 const pagevalue = ref(1)
 const pageSize = ref(20)
 
-const threeUTRdata = ref()
+const Maindata = ref()
 
 onBeforeMount(async () => {
     loading.value = true
-    const response = await axios.get(`/three_utr/`, {
+    const response = await axios.get(`/utrdb/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
@@ -134,92 +133,114 @@ onBeforeMount(async () => {
         },
     })
     const { data } = response
-    threeUTRdata.value = data
+    Maindata.value = data
     loading.value = false
 })
 
-const threeUTRList = computed(() => {
-    return threeUTRdata.value?.results
+const MainList = computed(() => {
+    return Maindata.value?.results
 })
 
-const count = computed(() => threeUTRdata.value?.count)
+const count = computed(() => Maindata.value?.count)
 
 const nextPage = async () => {
     loading.value = true
-    const response = await axios.get(`/three_utr/`, {
+    const response = await axios.get(`/utrdb/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
             page: pagevalue.value + 1,
             pagesize: pageSize.value,
             sorter: sorter_dict.value,
+            filter: filter_dict.value,
         },
     })
     const { data } = response
-    threeUTRdata.value = data
+    Maindata.value = data
     loading.value = false
 }
 const prevPage = async () => {
     loading.value = true
-    const response = await axios.get(`/three_utr/`, {
+    const response = await axios.get(`/utrdb/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
             page: pagevalue.value - 1,
             pagesize: pageSize.value,
             sorter: sorter_dict.value,
+            filter: filter_dict.value,
         },
     })
     const { data } = response
-    threeUTRdata.value = data
+    Maindata.value = data
     loading.value = false
 }
 
 const pagechange = async () => {
     loading.value = true
-    const response = await axios.get(`/three_utr/`, {
+    const response = await axios.get(`/utrdb/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
             page: pagevalue.value,
             pagesize: pageSize.value,
             sorter: sorter_dict.value,
+            filter: filter_dict.value,
         },
     })
     const { data } = response
-    threeUTRdata.value = data
+    Maindata.value = data
     loading.value = false
 }
 const pagesizechange = async () => {
     loading.value = true
-    const response = await axios.get(`/three_utr/`, {
+    const response = await axios.get(`/utrdb/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
             page: pagevalue.value,
             pagesize: pageSize.value,
             sorter: sorter_dict.value,
+            filter: filter_dict.value,
         },
     })
     const { data } = response
-    threeUTRdata.value = data
+    Maindata.value = data
     loading.value = false
 }
 
 const handleSorterChange = async sorter => {
     loading.value = true
     sorter_dict.value = sorter
-    const response = await axios.get(`/three_utr/`, {
+    const response = await axios.get(`/utrdb/`, {
         baseURL: '/api',
         timeout: 100000,
         params: {
             page: pagevalue.value,
             pagesize: pageSize.value,
             sorter: sorter_dict.value,
+            filter: filter_dict.value,
         },
     })
     const { data } = response
-    threeUTRdata.value = data
+    Maindata.value = data
+    loading.value = false
+}
+const handleFilterChange = async filter => {
+    loading.value = true
+    filter_dict.value = filter
+    const response = await axios.get(`/utrdb/`, {
+        baseURL: '/api',
+        timeout: 100000,
+        params: {
+            page: pagevalue.value,
+            pagesize: pageSize.value,
+            sorter: sorter_dict.value,
+            filter: filter_dict.value,
+        },
+    })
+    const { data } = response
+    Maindata.value = data
     loading.value = false
 }
 
@@ -231,31 +252,26 @@ const searchinput = ref('')
 
 const templatedata = ref()
 const filtersearch = () => {
-    templatedata.value = threeUTRdata.value.results
+    templatedata.value = Maindata.value.results
 
-    threeUTRdata.value.results = _.filter(threeUTRdata.value.results, obj => {
+    Maindata.value.results = _.filter(Maindata.value.results, obj => {
         return JSON.stringify(obj).includes(searchinput.value)
     })
 }
 const resetsearch = () => {
     searchinput.value = ''
     if (templatedata.value) {
-        threeUTRdata.value.results = templatedata.value
+        Maindata.value.results = templatedata.value
     }
 }
 
 const columnWidth = {
     id: 100,
-    gene_name: 100,
-    ensembl_gene_id: 150,
-    ensembl_transcript_id: 150,
-    description: 200,
-    start_position: 100,
-    end_position: 100,
-    pattern: 100,
-    cluster: 100,
-    chromosome: 100,
-    aliases: 200,
+    utr_type: 100,
+    transcript_id: 100,
+    gene_id: 100,
+    chr_start_end_strand: 200,
+    sequence: 500,
 }
 
 const createColumns = (): DataTableColumns<RowData> => [
@@ -277,120 +293,75 @@ const createColumns = (): DataTableColumns<RowData> => [
     },
     {
         title() {
-            return renderTooltip(h('div', null, { default: () => 'Gene Name' }), 'Gene Name')
+            return renderTooltip(h('div', null, { default: () => 'UTR Type' }), 'UTR Type')
         },
-        key: 'gene_name',
+        key: 'utr_type',
         align: 'center',
         fixed: 'left',
         ellipsis: {
             tooltip: true,
         },
-        width: columnWidth.gene_name,
+        width: columnWidth.utr_type,
+        filter: true,
+        filterOptions: utrdbUTRTypeRefOptions,
+    },
+    {
+        title() {
+            return renderTooltip(
+                h('div', null, { default: () => 'Transcript ID' }),
+                'Transcript ID'
+            )
+        },
+        key: 'transcript_id',
+        align: 'center',
+        fixed: 'left',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: columnWidth.transcript_id,
+        sorter: true,
+    },
+    {
+        title() {
+            return renderTooltip(h('div', null, { default: () => 'Gene ID' }), 'Gene ID')
+        },
+        key: 'gene_id',
+        align: 'center',
+        fixed: 'left',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: columnWidth.gene_id,
         sorter: true,
     },
     {
         title() {
             return renderTooltip(
-                h('div', null, { default: () => 'Ensembl Gene ID' }),
-                'Ensembl Gene ID'
+                h('div', null, { default: () => 'Chr Start End Strand' }),
+                'Chr Start End Strand'
             )
         },
-        key: 'ensembl_gene_id',
+        key: 'chr_start_end_strand',
         align: 'center',
+        fixed: 'left',
         ellipsis: {
             tooltip: true,
         },
-        width: columnWidth.ensembl_gene_id,
+        width: columnWidth.chr_start_end_strand,
         sorter: true,
     },
     {
         title() {
-            return renderTooltip(
-                h('div', null, { default: () => 'Ensembl Transcript ID' }),
-                'Ensembl Transcript ID'
-            )
+            return renderTooltip(h('div', null, { default: () => 'Sequence' }), 'Sequence')
         },
-        key: 'ensembl_transcript_id',
+        key: 'sequence',
         align: 'center',
+        fixed: 'left',
         ellipsis: {
             tooltip: true,
         },
-        width: columnWidth.ensembl_transcript_id,
+        width: columnWidth.sequence,
         sorter: true,
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'Description' }), 'Description')
-        },
-        key: 'description',
-        align: 'center',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.description,
-    },
-    {
-        title() {
-            return renderTooltip(
-                h('div', null, { default: () => 'Start Position' }),
-                'Start Position'
-            )
-        },
-        key: 'start_position',
-        align: 'center',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.start_position,
-        sorter: true,
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'End Position' }), 'End Position')
-        },
-        key: 'end_position',
-        align: 'center',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.end_position,
-        sorter: true,
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'Pattern' }), 'Pattern')
-        },
-        key: 'pattern',
-        align: 'center',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.pattern,
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'Cluster' }), 'Cluster')
-        },
-        key: 'cluster',
-        align: 'center',
-        width: columnWidth.cluster,
-        sorter: true,
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'Chromosome' }), 'Chromosome')
-        },
-        key: 'chromosome',
-        align: 'center',
-        width: columnWidth.chromosome,
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'Aliases' }), 'Aliases')
-        },
-        key: 'aliases',
-        align: 'center',
-        width: columnWidth.aliases,
     },
 ]
 const columns = createColumns()
@@ -398,17 +369,18 @@ const columns = createColumns()
 const handleSelectSet = async (key: any) => {
     dataset.value = key
     loading.value = true
-    const response = await axios.get(`/three_utr/`, {
+    const response = await axios.get(`/utrdb/`, {
         baseURL: '/api',
         timeout: 100000,
         params: {
             page: pagevalue.value,
             pagesize: pageSize.value,
             sorter: sorter_dict.value,
+            filter: filter_dict.value,
         },
     })
     const { data } = response
-    threeUTRdata.value = data
+    Maindata.value = data
     loading.value = false
 }
 const godatahelper = () => {

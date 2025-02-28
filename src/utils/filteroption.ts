@@ -189,6 +189,11 @@ export const predictionScoreTableSrcFieldRefOptions = [
     { value: 'mutant_peptide', label: 'mutant_peptide' },
 ]
 
+export const utrdbUTRTypeRefOptions = [
+    { value: 'five_prime_utr', label: 'five_prime_utr' },
+    { value: 'three_prime_utr', label: 'three_prime_utr' },
+]
+
 export const datasetsOptions = [
     {
         value: 'Genbank',

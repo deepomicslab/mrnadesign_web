@@ -115,6 +115,10 @@ const menuOptions: MenuOption[] = [
                 label: 'REBASE',
                 key: '/database/rebase',
             },
+            {
+                label: 'UTRdb 2.0',
+                key: '/database/utrdb',
+            },
             // {
             //     label: 'Sequence Filter',
             //     key: '/database/filter',

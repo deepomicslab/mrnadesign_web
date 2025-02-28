@@ -241,6 +241,7 @@
                             <p><a href="/database/gtrnadb">GtRNAdb</a></p>
                             <p><a href="/database/tsnadb2/validated">TSNAdb v2.0</a></p>
                             <p><a href="/database/rebase">REBASE</a></p>
+                            <p><a href="/database/utrdb">UTRdb 2.0</a></p>
                             <!-- <p><a href="/database/filter">Sequence Filter</a></p> -->
                         </div>
 
@@ -263,7 +264,7 @@
                         </div>
                     </div>
                     <el-divider />
-                    <div>2024 &copy; City University of Hong Kong. All rights reserved.</div>
+                    <div>2025 &copy; City University of Hong Kong. All rights reserved.</div>
                 </el-footer>
             </div>
         </el-scrollbar>
