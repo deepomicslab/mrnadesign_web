@@ -1,6 +1,8 @@
 import { resolve } from 'path'
 import { defineConfig, loadEnv } from 'vite'
 
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
+import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill'
 import { createVitePlugins } from './plugins'
 import { wrapEnv } from './plugins/utils'
 
@@ -12,9 +14,26 @@ export default defineConfig(({ mode }) => {
         resolve: {
             alias: {
                 '@': resolve(__dirname, 'src'),
+                buffer: 'rollup-plugin-node-polyfills/polyfills/buffer-es6',
+                process: 'rollup-plugin-node-polyfills/polyfills/process-es6',
+                stream: 'rollup-plugin-node-polyfills/polyfills/stream',
+                util: 'rollup-plugin-node-polyfills/polyfills/util',
+                events: 'rollup-plugin-node-polyfills/polyfills/events',
+            },
+            fallback: {
+                buffer: require.resolve('buffer/'),
             },
         },
-        plugins: createVitePlugins(env),
+
+        // plugins: createVitePlugins(env),
+        plugins: [
+            ...createVitePlugins(env),
+            NodeGlobalsPolyfillPlugin({
+                buffer: true,
+            }),
+            NodeModulesPolyfillPlugin(),
+        ],
+
         build: {
             minify: 'terser',
             terserOptions: {
@@ -25,6 +44,7 @@ export default defineConfig(({ mode }) => {
                 },
             },
         },
+
         // 开发服务器选项
         server: {
             host: env.VITE_HOST ?? 'localhost',

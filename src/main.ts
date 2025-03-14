@@ -5,6 +5,10 @@ import { createApp } from 'vue'
 import App from './App.vue'
 const app = createApp(App)
 
+// These changes should resolve the "Buffer is not defined" error in your Vite project.
+import { Buffer } from 'buffer'
+window.Buffer = Buffer
+
 // 文件路由和布局系统
 import { createRouter, createWebHistory } from 'vue-router'
 import { setupLayouts } from 'virtual:generated-layouts'

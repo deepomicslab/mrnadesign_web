@@ -1,7 +1,7 @@
 <template>
     <div class="h-320 flex flex-col py-10 px-30">
         <div class="flex flex-row ml-1 my-7">
-            <div class="text-4xl font-600">UTRdb v2.0</div>
+            <div class="text-4xl font-600">Gene Information</div>
             <el-button round color="#34498E" class="ml-5 mt-2" @click="godatahelper">
                 Database Helper
             </el-button>
@@ -19,13 +19,8 @@
             </div>
         </div>
         <div>
-            <el-menu
-                :default-active="dataset"
-                class="el-menu-demo"
-                mode="horizontal"
-                @select="handleSelectSet"
-            >
-                <el-menu-item index="phage_protein_RefSeq">3' UTR</el-menu-item>
+            <el-menu :default-active="dataset" class="el-menu-demo" mode="horizontal">
+                <el-menu-item index="">Main</el-menu-item>
             </el-menu>
         </div>
         <div v-loading="loading" class="h-300 mb-2">
@@ -33,7 +28,7 @@
                 :columns="columns"
                 :data="MainList"
                 :row-key="rowKey"
-                :scroll-x="1900"
+                :scroll-x="1500"
                 :max-height="1000"
                 @update:checked-row-keys="handleCheck"
                 @update:sorter="handleSorterChange"
@@ -85,9 +80,11 @@ import { NButton, NTooltip } from 'naive-ui'
 import { Search, RefreshRight } from '@element-plus/icons-vue'
 import { ChevronBack, ChevronForward } from '@vicons/ionicons5'
 import axios from 'axios'
-
 import _ from 'lodash'
-import { utrdbUTRTypeRefOptions } from '@/utils/filteroption'
+import {
+    isoformdbGeneStrandRefOptions,
+    isoformdbGeneGenetypeRefOptions,
+} from '@/utils/filteroption'
 
 const router = useRouter()
 const loading = ref(false)
@@ -109,12 +106,14 @@ const sorter_dict = ref('')
 const filter_dict = ref('')
 
 type RowData = {
-    ID: number
-    utr_type: string
-    transcript_id: string
+    id: number
     gene_id: string
-    chr_start_end_strand: string
-    sequence: string
+    gene_name: string
+    chromosome: string
+    start_pos: number
+    end_pos: number
+    strand: string
+    gene_type: string
 }
 
 const pagevalue = ref(1)
@@ -124,7 +123,7 @@ const Maindata = ref()
 
 onBeforeMount(async () => {
     loading.value = true
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/genes/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
@@ -145,7 +144,7 @@ const count = computed(() => Maindata.value?.count)
 
 const nextPage = async () => {
     loading.value = true
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/genes/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
@@ -161,7 +160,7 @@ const nextPage = async () => {
 }
 const prevPage = async () => {
     loading.value = true
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/genes/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
@@ -178,7 +177,7 @@ const prevPage = async () => {
 
 const pagechange = async () => {
     loading.value = true
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/genes/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
@@ -194,7 +193,7 @@ const pagechange = async () => {
 }
 const pagesizechange = async () => {
     loading.value = true
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/genes/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
@@ -212,7 +211,7 @@ const pagesizechange = async () => {
 const handleSorterChange = async sorter => {
     loading.value = true
     sorter_dict.value = sorter
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/genes/`, {
         baseURL: '/api',
         timeout: 100000,
         params: {
@@ -229,7 +228,7 @@ const handleSorterChange = async sorter => {
 const handleFilterChange = async filter => {
     loading.value = true
     filter_dict.value = filter
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/genes/`, {
         baseURL: '/api',
         timeout: 100000,
         params: {
@@ -267,58 +266,16 @@ const resetsearch = () => {
 
 const columnWidth = {
     id: 100,
-    utr_type: 100,
-    transcript_id: 100,
     gene_id: 100,
-    chr_start_end_strand: 200,
-    sequence: 500,
+    gene_name: 100,
+    chromosome: 100,
+    start_pos: 100,
+    end_pos: 100,
+    strand: 100,
+    gene_type: 100,
 }
 
 const createColumns = (): DataTableColumns<RowData> => [
-    {
-        type: 'selection',
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'ID' }), 'ID')
-        },
-        key: 'id',
-        align: 'center',
-        fixed: 'left',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.id,
-        sorter: true,
-    },
-    {
-        title() {
-            return renderTooltip(h('div', null, { default: () => 'UTR Type' }), 'UTR Type')
-        },
-        key: 'utr_type',
-        align: 'center',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.utr_type,
-        filter: true,
-        filterOptions: utrdbUTRTypeRefOptions,
-    },
-    {
-        title() {
-            return renderTooltip(
-                h('div', null, { default: () => 'Transcript ID' }),
-                'Transcript ID'
-            )
-        },
-        key: 'transcript_id',
-        align: 'center',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.transcript_id,
-        sorter: true,
-    },
     {
         title() {
             return renderTooltip(h('div', null, { default: () => 'Gene ID' }), 'Gene ID')
@@ -333,51 +290,84 @@ const createColumns = (): DataTableColumns<RowData> => [
     },
     {
         title() {
-            return renderTooltip(
-                h('div', null, { default: () => 'Chr Start End Strand' }),
-                'Chr Start End Strand'
-            )
+            return renderTooltip(h('div', null, { default: () => 'Gene Name' }), 'Gene Name')
         },
-        key: 'chr_start_end_strand',
+        key: 'gene_name',
         align: 'center',
         ellipsis: {
             tooltip: true,
         },
-        width: columnWidth.chr_start_end_strand,
+        width: columnWidth.gene_name,
         sorter: true,
     },
     {
         title() {
-            return renderTooltip(h('div', null, { default: () => 'Sequence' }), 'Sequence')
+            return renderTooltip(h('div', null, { default: () => 'Chromosome' }), 'Chromosome')
         },
-        key: 'sequence',
+        key: 'chromosome',
         align: 'center',
         ellipsis: {
             tooltip: true,
         },
-        width: columnWidth.sequence,
+        width: columnWidth.chromosome,
         sorter: true,
+    },
+    {
+        title() {
+            return renderTooltip(
+                h('div', null, { default: () => 'Start Position' }),
+                'Start Position'
+            )
+        },
+        key: 'start_pos',
+        align: 'center',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: columnWidth.start_pos,
+        sorter: true,
+    },
+    {
+        title() {
+            return renderTooltip(h('div', null, { default: () => 'End Position' }), 'End Position')
+        },
+        key: 'end_pos',
+        align: 'center',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: columnWidth.end_pos,
+        sorter: true,
+    },
+    {
+        title() {
+            return renderTooltip(h('div', null, { default: () => 'Strandness' }), 'Strandness')
+        },
+        key: 'strand',
+        align: 'center',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: columnWidth.strand,
+        filter: true,
+        filterOptions: isoformdbGeneStrandRefOptions,
+    },
+    {
+        title() {
+            return renderTooltip(h('div', null, { default: () => 'Gene Type' }), 'Gene Type')
+        },
+        key: 'gene_type',
+        align: 'center',
+        ellipsis: {
+            tooltip: true,
+        },
+        width: columnWidth.gene_type,
+        filter: true,
+        filterOptions: isoformdbGeneGenetypeRefOptions,
     },
 ]
 const columns = createColumns()
 
-const handleSelectSet = async (key: any) => {
-    dataset.value = key
-    loading.value = true
-    const response = await axios.get(`/utrdb/`, {
-        baseURL: '/api',
-        timeout: 100000,
-        params: {
-            page: pagevalue.value,
-            pagesize: pageSize.value,
-            sorter: sorter_dict.value,
-            filter: filter_dict.value,
-        },
-    })
-    const { data } = response
-    Maindata.value = data
-    loading.value = false
-}
 const godatahelper = () => {
     router.push({
         path: '/tutorial',

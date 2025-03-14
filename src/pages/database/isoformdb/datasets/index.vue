@@ -1,7 +1,7 @@
 <template>
     <div class="h-320 flex flex-col py-10 px-30">
         <div class="flex flex-row ml-1 my-7">
-            <div class="text-4xl font-600">UTRdb v2.0</div>
+            <div class="text-4xl font-600">Dataset Information</div>
             <el-button round color="#34498E" class="ml-5 mt-2" @click="godatahelper">
                 Database Helper
             </el-button>
@@ -19,13 +19,8 @@
             </div>
         </div>
         <div>
-            <el-menu
-                :default-active="dataset"
-                class="el-menu-demo"
-                mode="horizontal"
-                @select="handleSelectSet"
-            >
-                <el-menu-item index="phage_protein_RefSeq">3' UTR</el-menu-item>
+            <el-menu :default-active="dataset" class="el-menu-demo" mode="horizontal">
+                <el-menu-item index="">Main</el-menu-item>
             </el-menu>
         </div>
         <div v-loading="loading" class="h-300 mb-2">
@@ -33,7 +28,7 @@
                 :columns="columns"
                 :data="MainList"
                 :row-key="rowKey"
-                :scroll-x="1900"
+                :scroll-x="1200"
                 :max-height="1000"
                 @update:checked-row-keys="handleCheck"
                 @update:sorter="handleSorterChange"
@@ -87,7 +82,6 @@ import { ChevronBack, ChevronForward } from '@vicons/ionicons5'
 import axios from 'axios'
 
 import _ from 'lodash'
-import { utrdbUTRTypeRefOptions } from '@/utils/filteroption'
 
 const router = useRouter()
 const loading = ref(false)
@@ -109,12 +103,12 @@ const sorter_dict = ref('')
 const filter_dict = ref('')
 
 type RowData = {
-    ID: number
-    utr_type: string
-    transcript_id: string
-    gene_id: string
-    chr_start_end_strand: string
-    sequence: string
+    id: number
+    name: string
+    database: string
+    data_type: string
+    submission_date: string
+    last_update_date: string
 }
 
 const pagevalue = ref(1)
@@ -124,7 +118,7 @@ const Maindata = ref()
 
 onBeforeMount(async () => {
     loading.value = true
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/datasets/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
@@ -145,7 +139,7 @@ const count = computed(() => Maindata.value?.count)
 
 const nextPage = async () => {
     loading.value = true
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/datasets/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
@@ -161,7 +155,7 @@ const nextPage = async () => {
 }
 const prevPage = async () => {
     loading.value = true
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/datasets/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
@@ -178,7 +172,7 @@ const prevPage = async () => {
 
 const pagechange = async () => {
     loading.value = true
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/datasets/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
@@ -194,7 +188,7 @@ const pagechange = async () => {
 }
 const pagesizechange = async () => {
     loading.value = true
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/datasets/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
@@ -212,7 +206,7 @@ const pagesizechange = async () => {
 const handleSorterChange = async sorter => {
     loading.value = true
     sorter_dict.value = sorter
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/datasets/`, {
         baseURL: '/api',
         timeout: 100000,
         params: {
@@ -229,7 +223,7 @@ const handleSorterChange = async sorter => {
 const handleFilterChange = async filter => {
     loading.value = true
     filter_dict.value = filter
-    const response = await axios.get(`/utrdb/`, {
+    const response = await axios.get(`/isoformdb/datasets/`, {
         baseURL: '/api',
         timeout: 100000,
         params: {
@@ -265,119 +259,120 @@ const resetsearch = () => {
     }
 }
 
+// const detail = (row: any) => {
+//     router.push({ path: '/database/isoformdb/datasets/detail', query: { id: row.id } })
+// }
+
 const columnWidth = {
     id: 100,
-    utr_type: 100,
-    transcript_id: 100,
-    gene_id: 100,
-    chr_start_end_strand: 200,
-    sequence: 500,
+    name: 100,
+    database: 100,
+    data_type: 100,
+    submission_date: 100,
+    last_update_date: 100,
+    actions: 100,
 }
 
 const createColumns = (): DataTableColumns<RowData> => [
     {
-        type: 'selection',
-    },
-    {
         title() {
-            return renderTooltip(h('div', null, { default: () => 'ID' }), 'ID')
+            return renderTooltip(h('div', null, { default: () => 'Name' }), 'Name')
         },
-        key: 'id',
+        key: 'name',
         align: 'center',
-        fixed: 'left',
         ellipsis: {
             tooltip: true,
         },
-        width: columnWidth.id,
+        width: columnWidth.name,
         sorter: true,
     },
     {
         title() {
-            return renderTooltip(h('div', null, { default: () => 'UTR Type' }), 'UTR Type')
+            return renderTooltip(h('div', null, { default: () => 'Database' }), 'Database')
         },
-        key: 'utr_type',
+        key: 'database',
         align: 'center',
         ellipsis: {
             tooltip: true,
         },
-        width: columnWidth.utr_type,
-        filter: true,
-        filterOptions: utrdbUTRTypeRefOptions,
-    },
-    {
-        title() {
-            return renderTooltip(
-                h('div', null, { default: () => 'Transcript ID' }),
-                'Transcript ID'
-            )
-        },
-        key: 'transcript_id',
-        align: 'center',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.transcript_id,
+        width: columnWidth.database,
         sorter: true,
     },
     {
         title() {
-            return renderTooltip(h('div', null, { default: () => 'Gene ID' }), 'Gene ID')
+            return renderTooltip(h('div', null, { default: () => 'Data Type' }), 'Data Type')
         },
-        key: 'gene_id',
+        key: 'data_type',
         align: 'center',
         ellipsis: {
             tooltip: true,
         },
-        width: columnWidth.gene_id,
+        width: columnWidth.data_type,
         sorter: true,
     },
     {
         title() {
             return renderTooltip(
-                h('div', null, { default: () => 'Chr Start End Strand' }),
-                'Chr Start End Strand'
+                h('div', null, { default: () => 'Submission Date' }),
+                'Submission Date'
             )
         },
-        key: 'chr_start_end_strand',
+        key: 'submission_date',
         align: 'center',
         ellipsis: {
             tooltip: true,
         },
-        width: columnWidth.chr_start_end_strand,
+        width: columnWidth.submission_date,
         sorter: true,
     },
     {
         title() {
-            return renderTooltip(h('div', null, { default: () => 'Sequence' }), 'Sequence')
+            return renderTooltip(
+                h('div', null, { default: () => 'Last Update Date' }),
+                'Last Update Date'
+            )
         },
-        key: 'sequence',
+        key: 'last_update_date',
         align: 'center',
         ellipsis: {
             tooltip: true,
         },
-        width: columnWidth.sequence,
+        width: columnWidth.last_update_date,
         sorter: true,
     },
+    // {
+    //     title: 'Action',
+    //     key: 'actions',
+    //     align: 'center',
+    //     width: columnWidth.actions,
+    //     fixed: 'right',
+    //     render(row: any) {
+    //         return h(
+    //             'div',
+    //             {
+    //                 style: {
+    //                     display: 'center',
+    //                     justifyContent: 'space-between',
+    //                 },
+    //             },
+    //             [
+    //                 h(
+    //                     NButton,
+    //                     {
+    //                         strong: true,
+    //                         size: 'small',
+    //                         type: 'info',
+    //                         onClick: () => detail(row),
+    //                     },
+    //                     { default: () => 'Detail' }
+    //                 ),
+    //             ]
+    //         )
+    //     },
+    // },
 ]
 const columns = createColumns()
 
-const handleSelectSet = async (key: any) => {
-    dataset.value = key
-    loading.value = true
-    const response = await axios.get(`/utrdb/`, {
-        baseURL: '/api',
-        timeout: 100000,
-        params: {
-            page: pagevalue.value,
-            pagesize: pageSize.value,
-            sorter: sorter_dict.value,
-            filter: filter_dict.value,
-        },
-    })
-    const { data } = response
-    Maindata.value = data
-    loading.value = false
-}
 const godatahelper = () => {
     router.push({
         path: '/tutorial',
