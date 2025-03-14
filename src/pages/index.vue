@@ -215,8 +215,9 @@
                         </el-scrollbar>
                     </div>
                 </div>
+
                 <el-footer
-                    class="px-20 h-70 bg-[#253959] flex flex-col justify-center items-start text-white text-sm"
+                    class="px-20 h-90 bg-[#253959] flex flex-col justify-center items-start text-white text-sm"
                 >
                     <div class="px-10 w-full flex flex-row justify-between leading-relaxed">
                         <div class="flex flex-col">
@@ -242,6 +243,7 @@
                             <p><a href="/database/tsnadb2/validated">TSNAdb v2.0</a></p>
                             <p><a href="/database/rebase">REBASE</a></p>
                             <p><a href="/database/utrdb">UTRdb 2.0</a></p>
+                            <p><a href="/database/isoformdb/isoforms">IsoformDB</a></p>
                             <!-- <p><a href="/database/filter">Sequence Filter</a></p> -->
                         </div>
 
