@@ -386,29 +386,6 @@ export const qualityOptions = [
     },
 ]
 
-export const clusterOptions = [
-    {
-        value: 'Cluster_1',
-        label: 'Cluster 1',
-    },
-    {
-        value: 'Cluster_10',
-        label: 'Cluster 10',
-    },
-    {
-        value: 'Cluster_100',
-        label: 'Cluster 100',
-    },
-    {
-        value: 'Cluster_1000',
-        label: 'Cluster 1000',
-    },
-    {
-        value: 'Cluster_1001',
-        label: 'Cluster 1001',
-    },
-]
-
 export const subclusterOptions = [
     {
         value: 'Subluster_1',

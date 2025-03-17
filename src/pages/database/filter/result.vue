@@ -31,16 +31,6 @@
                     </template>
                 </el-dropdown>
             </div>
-
-            <!-- <div class="flex flex-row">
-                <div class="mt-2 text-base">Search:</div>
-                <el-input class="w-50 ml-3" size="small">
-                    <template #append>
-                        <el-button :icon="Search" />
-                    </template>
-                </el-input>
-                <el-button class="mt-1 ml-2" :icon="RefreshRight" circle />
-            </div> -->
         </div>
         <div v-if="false">
             <el-menu
@@ -144,7 +134,6 @@ const pagevalue = ref(1)
 const pageSize = ref(30)
 const datasets = ref('all')
 const loading = ref(false)
-// const phagedata = useRequest(() => phageService.getPhageList(pagevalue.value, pageSize.value)).data
 const submitdata = new FormData()
 submitdata.append('filterdata', queryStore.filterdata)
 
@@ -260,7 +249,6 @@ const downloadrequest = async () => {
             window.open(`/api/phage/fasta/?phageids=${checkedRowKeysRef.value}`, '_blank')
         }
         if (checkList.value.includes('Download GFF3 Data')) {
-            console.log('88888')
             window.open(`/api/phage/gff/?phageids=${checkedRowKeysRef.value}`, '_blank')
         }
         if (checkList.value.includes('Download GBK Data')) {

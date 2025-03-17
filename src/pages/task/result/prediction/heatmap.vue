@@ -97,12 +97,10 @@ const chooseColor = (d: unknown, flag: number) => {
     let idx = 0
     let color = ''
     if (flag == 1) {
-        // idx = parameterclass.value.indexOf(d.id)
         idx = d.id - 1
         color = colormap1[idx]
         return color
     }
-    // idx = parameterclass.value.indexOf(d.id)
     idx = d.id - 1
     color = colormap1[idx]
     return color
@@ -145,11 +143,8 @@ function wrap(text, width) {
 }
 
 // Labels of columns
-// const protein_class = proteinType
 // append the svg object to the body of the page
 const process_svg = () => {
-    // }
-    // onMounted(() => {
     d3.select('#Viz_area').selectAll('*').remove()
     const svg = d3
         .select('#Viz_area')

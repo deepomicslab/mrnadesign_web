@@ -9,7 +9,6 @@
             <div class="mt-25">
                 <el-form status-icon label-width="auto" label-position="right">
                     <el-row justify="space-around">
-                        <!-- <el-col :span="0.5" :offset="2"></el-col> -->
                         <el-col :span="9">
                             <el-form-item label="Host Phylum">
                                 <el-tooltip
@@ -38,7 +37,6 @@
                                 </el-select>
                             </el-form-item>
                         </el-col>
-                        <!-- <el-col :span="0.5" :offset="2"></el-col> -->
                         <el-col :span="9">
                             <el-form-item label="Datasets">
                                 <el-tooltip effect="dark" content="Dataset" placement="top">
@@ -62,7 +60,6 @@
                         </el-col>
                     </el-row>
                     <el-row class="mt-4" justify="space-around">
-                        <!-- <el-col :span="0.5" :offset="2"></el-col> -->
                         <el-col :span="9">
                             <el-form-item label="Cluster">
                                 <el-tooltip
@@ -72,25 +69,9 @@
                                 >
                                     <el-icon class="info-icon"><InfoFilled /></el-icon>
                                 </el-tooltip>
-                                <!-- <el-select
-                                    v-model="filterform.cluster"
-                                    placeholder="Select cluster"
-                                    class="w-60 left"
-                                    clearable
-                                    filterable
-                                    allow-create
-                                >
-                                    <el-option
-                                        v-for="option in clusterOptions"
-                                        :key="option.value"
-                                        :label="option.label"
-                                        :value="option.value"
-                                    ></el-option>
-                                </el-select> -->
                                 <el-input v-model="filterform.cluster" class="w-60" />
                             </el-form-item>
                         </el-col>
-                        <!-- <el-col :span="0.5" :offset="2"></el-col> -->
                         <el-col :span="9">
                             <el-form-item label="Subcluster">
                                 <el-tooltip
@@ -100,32 +81,11 @@
                                 >
                                     <el-icon class="info-icon"><InfoFilled /></el-icon>
                                 </el-tooltip>
-                                <!-- <el-select
-                                    v-model="filterform.subcluster"
-                                    placeholder="Select Subcluster"
-                                    class="w-60"
-                                    clearable
-                                    filterable
-                                    allow-create
-                                >
-                                    <el-option
-                                        v-for="option in subclusterOptions"
-                                        :key="option.value"
-                                        :label="option.label"
-                                        :value="option.value"
-                                    ></el-option>
-                                </el-select> -->
                                 <el-input v-model="filterform.subcluster" class="w-60" />
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-row class="mt-4" justify="space-around">
-                        <!-- <el-col :span="9.5">
-                            <el-form-item label="Name Contain">
-                                <el-input v-model="filterform.Contain" class="w-60" />
-                            </el-form-item>
-                        </el-col> -->
-                        <!-- <el-col :span="0.5" :offset="2"></el-col> -->
                         <el-col :span="9">
                             <el-form-item label="Taxonomy">
                                 <el-tooltip effect="dark" content="Taxonomy" placement="top">
@@ -146,7 +106,6 @@
                                 </el-select>
                             </el-form-item>
                         </el-col>
-                        <!-- <el-col :span="0.5" :offset="2"></el-col> -->
                         <el-col :span="9">
                             <el-form-item label="Sequence Quality">
                                 <el-tooltip
@@ -173,7 +132,6 @@
                         </el-col>
                     </el-row>
                     <el-row class="mt-4" justify="space-around">
-                        <!-- <el-col :span="0.5" :offset="2"></el-col> -->
                         <el-col :span="9">
                             <el-form-item label="Length">
                                 <el-tooltip effect="dark" content="Length" placement="top">
@@ -197,7 +155,6 @@
                                 <div class="ml-4">kb</div>
                             </el-form-item>
                         </el-col>
-                        <!-- <el-col :span="0.5" :offset="2"></el-col> -->
                         <el-col :span="9">
                             <el-form-item label="Annotation Ref">
                                 <el-tooltip effect="dark" content="Annotation Ref" placement="top">
@@ -221,7 +178,6 @@
                     </el-row>
 
                     <el-row class="mt-4">
-                        <!-- <el-col :span="0.5" :offset="2"></el-col> -->
                         <el-col :span="12">
                             <el-form-item label="LifeStyle" class="ml-17">
                                 <el-tooltip effect="dark" content="LifeStyle" placement="top">
@@ -234,7 +190,6 @@
                                 </el-radio-group>
                             </el-form-item>
                         </el-col>
-                        <!-- <el-col :span="0.5" :offset="2"></el-col> -->
                         <el-col :span="12">
                             <el-form-item label="GC Content" class="ml-17">
                                 <el-tooltip effect="dark" content="GC Content" placement="top">
@@ -290,8 +245,6 @@ import {
     annotationRefOptions,
     datasetsOptions,
     qualityOptions,
-    clusterOptions,
-    subclusterOptions,
     hostTypeOptions,
     taxonomyOptions,
 } from '@/utils/filteroption'
@@ -403,9 +356,4 @@ const resetFilterForm = () => {
 .info-icon {
     margin-right: 32px;
 }
-/* .left {
-    position: absolute;
-    left: 200px;
-    display: inline-block;
-} */
 </style>

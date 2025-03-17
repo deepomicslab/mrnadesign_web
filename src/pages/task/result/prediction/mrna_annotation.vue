@@ -80,7 +80,6 @@
 /* eslint-disable camelcase */
 
 // @ts-nocheck
-// import { CloudDownload as down, InformationCircle as info } from '@vicons/ionicons5'
 import { InformationCircle as info } from '@vicons/ionicons5'
 import { Document, Operation } from '@element-plus/icons-vue'
 import * as d3 from 'd3'
@@ -94,16 +93,9 @@ const props = defineProps<{
 }>()
 const { taskid, protein_subtask_name } = toRefs(props)
 
-// import { InformationCircle as info } from '@vicons/ionicons5'
-// import { TypeDict, proteinType, countGC } from '@/utils/annotation'
-// import { usePhageStore } from '@/store/phage'
-// import { usemrnaStore } from '@/store/mrna'
 const isShowDetail = ref(false)
 const isShowSelect = ref(true)
 const selectData = ref(null)
-// const loading = ref(false)
-// const annotationData = sequencemarker
-// const id= ref(1),
 
 const showDetail = () => {
     isShowDetail.value = true
@@ -113,7 +105,6 @@ const loadchart = ref(true)
 // For layout
 const width = ref(1200)
 const height = ref(800)
-// const marginTop = ref(20)
 const marginLeft = ref(40)
 const lineHeight = ref(180)
 // for draw arrow

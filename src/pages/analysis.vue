@@ -221,7 +221,6 @@ const activeKey = ref<string>(route.path)
 watch(
     () => route.path,
     () => {
-        console.log(route.path)
         activeKey.value = route.path
     }
 )
