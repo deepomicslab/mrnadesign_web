@@ -3,16 +3,6 @@
         <div class="w-300 mt-18 ml-10">
             <div class="flex flex-row w-350 border-b-2 border-gray-300">
                 <div class="text-4xl font-500 mb-8">Isoform Information</div>
-                <div class="mt-1.5 ml-10">
-                    <el-button class="ml-5" @click="download">
-                        <template #icon>
-                            <n-icon>
-                                <di />
-                            </n-icon>
-                        </template>
-                        Download Isoform Data
-                    </el-button>
-                </div>
             </div>
             <el-descriptions
                 class="w-350 text-xl mt-8"
@@ -103,49 +93,16 @@
                 </el-descriptions-item>
             </el-descriptions>
         </div>
-        <!--   Here is the div tag for genome browser   -->
-        <div class="w-330 mt-15 ml-10" v-loading="loadBrowser">
-            <div class="flex flex-row w-350 border-b-2 border-gray-300">
-                <div class="text-4xl font-500 mb-8">ViolinPlot</div>
-            </div>
-            <div>
-                <Violinplot />
-            </div>
-        </div>
     </div>
-
-    <!--  the following code is used to download isoform information -->
-    <el-dialog
-        v-model="downloadphagedialogVisible"
-        title="Select download data type"
-        width="30%"
-        align-center
-    >
-        <div>
-            <el-checkbox-group v-model="checkList" :max="1">
-                <el-checkbox label="Download FASTA Data" />
-                <el-checkbox label="Download GFF3 Data" />
-                <el-checkbox label="Download Meta Data" />
-            </el-checkbox-group>
-        </div>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="downloadphagedialogVisible = false">Cancel</el-button>
-                <el-button type="primary" @click="downloadrequest">Download</el-button>
-            </span>
-        </template>
-    </el-dialog>
 </template>
 
 <script setup lang="ts">
 // @ts-nocheck
 /* eslint-disable camelcase */
-import { CloudDownloadOutline as di } from '@vicons/ionicons5'
 //
 import axios from 'axios'
 import { NTag } from 'naive-ui'
 import { useIsoformStore } from '@/store/isoform'
-import Violinplot from '../../../../components/ViolinPlot.vue'
 
 const isoformStore = useIsoformStore()
 const loaddata = ref(false)
@@ -167,37 +124,6 @@ const isoformdata = ref({
     create_time: '',
     update_time: '',
 })
-
-const downloadphagedialogVisible = ref(false)
-
-const downloadtype = ref('')
-const checkList = ref([] as any[])
-const checkedRowKeysRef = ref<DataTableRowKey[]>([])
-
-const downloadrequest = async () => {
-    if (checkList.value.length === 0) {
-        window.$message.warning('Please select download data type', {
-            closable: true,
-            duration: 5000,
-        })
-    } else {
-        if (checkList.value.includes('Download Meta Data')) {
-            window.open(`/api/phage/meta/?phageid=${checkedRowKeysRef.value[0]}`, '_blank')
-        }
-        if (checkList.value.includes('Download FASTA Data')) {
-            window.open(`/api/phage/fasta/?phageid=${checkedRowKeysRef.value[0]}`, '_blank')
-        }
-        if (checkList.value.includes('Download GFF3 Data')) {
-            window.open(`/api/phage/gff/?phageid=${checkedRowKeysRef.value[0]}`, '_blank')
-        }
-    }
-}
-
-const download = () => {
-    downloadtype.value = 'single'
-    downloadphagedialogVisible.value = true
-    checkedRowKeysRef.value = [isoformid.value]
-}
 
 onBeforeMount(async () => {
     loaddata.value = true
