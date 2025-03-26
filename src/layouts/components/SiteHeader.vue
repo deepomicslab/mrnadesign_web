@@ -139,6 +139,24 @@ const menuOptions: MenuOption[] = [
                     },
                 ],
             },
+            {
+                label: 'Codon Pair',
+                key: '/database/codon_pair/',
+                children: [
+                    {
+                        label: 'Counts',
+                        key: '/database/codon_pair/counts',
+                    },
+                    {
+                        label: 'Frequency',
+                        key: '/database/codon_pair/frequency',
+                    },
+                    {
+                        label: 'Fraction',
+                        key: '/database/codon_pair/fraction',
+                    },
+                ],
+            },
             // {
             //     label: 'Sequence Filter',
             //     key: '/database/filter',

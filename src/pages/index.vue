@@ -244,6 +244,7 @@
                             <p><a href="/database/rebase">REBASE</a></p>
                             <p><a href="/database/utrdb">UTRdb 2.0</a></p>
                             <p><a href="/database/isoformdb/isoforms">IsoformDB</a></p>
+                            <p><a href="/database/codon_pair/fraction">Codon Pair</a></p>
                             <!-- <p><a href="/database/filter">Sequence Filter</a></p> -->
                         </div>
 

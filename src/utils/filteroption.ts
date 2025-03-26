@@ -300,6 +300,233 @@ export const isoformdbGeneGenetypeRefOptions = [
     { value: 'ncRNA', label: 'ncRNA' },
 ]
 
+export const codonpairTissueOptions = [
+    {
+        label: 'ALL',
+        value: 'ALL',
+    },
+    {
+        label: 'Brain - Spinal cord (cervical c-1)',
+        value: 'Brain - Spinal cord (cervical c-1)',
+    },
+    {
+        label: 'Nerve - Tibial',
+        value: 'Nerve - Tibial',
+    },
+    {
+        label: 'Muscle - Skeletal',
+        value: 'Muscle - Skeletal',
+    },
+    {
+        label: 'Lung',
+        value: 'Lung',
+    },
+    {
+        label: 'Small Intestine - Terminal Ileum',
+        value: 'Small Intestine - Terminal Ileum',
+    },
+    {
+        label: 'Adipose - Visceral (Omentum)',
+        value: 'Adipose - Visceral (Omentum)',
+    },
+    {
+        label: 'Brain - Hippocampus',
+        value: 'Brain - Hippocampus',
+    },
+    {
+        label: 'Kidney - Cortex',
+        value: 'Kidney - Cortex',
+    },
+    {
+        label: 'Artery - Aorta',
+        value: 'Artery - Aorta',
+    },
+    {
+        label: 'Liver',
+        value: 'Liver',
+    },
+    {
+        label: 'Brain - Cerebellar Hemisphere',
+        value: 'Brain - Cerebellar Hemisphere',
+    },
+    {
+        label: 'Uterus',
+        value: 'Uterus',
+    },
+    {
+        label: 'Kidney - Medulla',
+        value: 'Kidney - Medulla',
+    },
+    {
+        label: 'Brain - Hypothalamus',
+        value: 'Brain - Hypothalamus',
+    },
+    {
+        label: 'Thyroid',
+        value: 'Thyroid',
+    },
+    {
+        label: 'Bladder',
+        value: 'Bladder',
+    },
+    {
+        label: 'Brain - Cerebellum',
+        value: 'Brain - Cerebellum',
+    },
+    {
+        label: 'Colon - Sigmoid',
+        value: 'Colon - Sigmoid',
+    },
+    {
+        label: 'Ovary',
+        value: 'Ovary',
+    },
+    {
+        label: 'Esophagus - Muscularis',
+        value: 'Esophagus - Muscularis',
+    },
+    {
+        label: 'Heart - Left Ventricle',
+        value: 'Heart - Left Ventricle',
+    },
+    {
+        label: 'Brain - Substantia nigra',
+        value: 'Brain - Substantia nigra',
+    },
+    {
+        label: 'Genomic',
+        value: 'Genomic',
+    },
+    {
+        label: 'Testis',
+        value: 'Testis',
+    },
+    {
+        label: 'Stomach',
+        value: 'Stomach',
+    },
+    {
+        label: 'Brain - Nucleus accumbens (basal ganglia)',
+        value: 'Brain - Nucleus accumbens (basal ganglia)',
+    },
+    {
+        label: 'Brain - Frontal Cortex (BA9)',
+        value: 'Brain - Frontal Cortex (BA9)',
+    },
+    {
+        label: 'Minor Salivary Gland',
+        value: 'Minor Salivary Gland',
+    },
+    {
+        label: 'Esophagus - Mucosa',
+        value: 'Esophagus - Mucosa',
+    },
+    {
+        label: 'Esophagus - Gastroesophageal Junction',
+        value: 'Esophagus - Gastroesophageal Junction',
+    },
+    {
+        label: 'Cervix - Endocervix',
+        value: 'Cervix - Endocervix',
+    },
+    {
+        label: 'Skin - Not Sun Exposed (Suprapubic)',
+        value: 'Skin - Not Sun Exposed (Suprapubic)',
+    },
+    {
+        label: 'Brain - Cortex',
+        value: 'Brain - Cortex',
+    },
+    {
+        label: 'Cells - EBV-transformed lymphocytes',
+        value: 'Cells - EBV-transformed lymphocytes',
+    },
+    {
+        label: 'Artery - Coronary',
+        value: 'Artery - Coronary',
+    },
+    {
+        label: 'Pancreas',
+        value: 'Pancreas',
+    },
+    {
+        label: 'Cervix - Ectocervix',
+        value: 'Cervix - Ectocervix',
+    },
+    {
+        label: 'Artery - Tibial',
+        value: 'Artery - Tibial',
+    },
+    {
+        label: 'Adrenal Gland',
+        value: 'Adrenal Gland',
+    },
+    {
+        label: 'Colon - Transverse',
+        value: 'Colon - Transverse',
+    },
+    {
+        label: 'Brain - Anterior cingulate cortex (BA24)',
+        value: 'Brain - Anterior cingulate cortex (BA24)',
+    },
+    {
+        label: 'Adipose - Subcutaneous',
+        value: 'Adipose - Subcutaneous',
+    },
+    {
+        label: 'Vagina',
+        value: 'Vagina',
+    },
+    {
+        label: 'Spleen',
+        value: 'Spleen',
+    },
+    {
+        label: 'Cells - Cultured fibroblasts',
+        value: 'Cells - Cultured fibroblasts',
+    },
+    {
+        label: 'Breast - Mammary Tissue',
+        value: 'Breast - Mammary Tissue',
+    },
+    {
+        label: 'Brain - Caudate (basal ganglia)',
+        value: 'Brain - Caudate (basal ganglia)',
+    },
+    {
+        label: 'Heart - Atrial Appendage',
+        value: 'Heart - Atrial Appendage',
+    },
+    {
+        label: 'Fallopian Tube',
+        value: 'Fallopian Tube',
+    },
+    {
+        label: 'Brain - Putamen (basal ganglia)',
+        value: 'Brain - Putamen (basal ganglia)',
+    },
+    {
+        label: 'Prostate',
+        value: 'Prostate',
+    },
+    {
+        label: 'Skin - Sun Exposed (Lower leg)',
+        value: 'Skin - Sun Exposed (Lower leg)',
+    },
+    {
+        label: 'Brain - Amygdala',
+        value: 'Brain - Amygdala',
+    },
+    {
+        label: 'Whole Blood',
+        value: 'Whole Blood',
+    },
+    {
+        label: 'Pituitary',
+        value: 'Pituitary',
+    },
+]
+
 export const datasetsOptions = [
     {
         value: 'Genbank',
