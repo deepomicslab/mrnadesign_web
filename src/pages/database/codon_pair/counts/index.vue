@@ -1,5 +1,5 @@
 <template>
-    <mainpage :calculation_type="`fraction`"></mainpage>
+    <mainpage :calculation_type="`counts`"></mainpage>
 </template>
 
 <script setup lang="ts">

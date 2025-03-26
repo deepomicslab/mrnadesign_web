@@ -1,7 +1,11 @@
 <template>
     <div class="flex flex-col pt-10 px-30">
         <div class="flex flex-row ml-1 my-7">
-            <div class="text-4xl font-600">Codon Pair Fraction Details</div>
+            <div class="text-4xl font-600">
+                Codon Pair
+                <span class="capitalize">{{ calculation_type }}</span>
+                Details
+            </div>
             <el-button round color="#34498E" class="ml-5 mt-2" @click="godatahelper">
                 Database Helper
             </el-button>
@@ -24,11 +28,11 @@
                 <tr>
                     <td>
                         <div class="datatable-small">
-                            <datatable :tissue="tissue" />
+                            <datatable :calculation_type="calculation_type" :tissue="tissue" />
                         </div>
                     </td>
                     <td>
-                        <div><heatmap :tissue="tissue" /></div>
+                        <div><heatmap :calculation_type="calculation_type" :tissue="tissue" /></div>
                     </td>
                 </tr>
             </tbody>
@@ -45,17 +49,19 @@ import heatmap from './heatmap.vue'
 import { codonpairTissueOptions } from '@/utils/filteroption'
 import { CodonpairDictReversed } from '@/utils/type'
 
-const tissue = ref<keyof typeof CodonpairDictReversed>('Genomic')
+const route = useRoute()
+const calculation_type = computed(() => route.query?.calculation_type as number)
+const tissue = ref<keyof typeof CodonpairDictReversed>('Lung')
 
 const downloadlink = ref(
-    `https://mrnaapi.deepomics.org/codon_pair/fraction/download/?calculation_type=fraction&&tissue=${
-        CodonpairDictReversed[tissue.value]
-    }`
+    `https://mrnaapi.deepomics.org/codon_pair/download/?calculation_type=${
+        calculation_type.value
+    }&&tissue=${CodonpairDictReversed[tissue.value]}`
 )
 watch(tissue, () => {
-    downloadlink.value = `https://mrnaapi.deepomics.org/codon_pair/fraction/download/?calculation_type=fraction&&tissue=${
-        CodonpairDictReversed[tissue.value]
-    }`
+    downloadlink.value = `https://mrnaapi.deepomics.org/codon_pair/download/?calculation_type=${
+        calculation_type.value
+    }&&tissue=${CodonpairDictReversed[tissue.value]}`
 })
 const router = useRouter()
 const godatahelper = () => {

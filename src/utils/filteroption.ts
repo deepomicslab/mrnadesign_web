@@ -301,10 +301,10 @@ export const isoformdbGeneGenetypeRefOptions = [
 ]
 
 export const codonpairTissueOptions = [
-    {
-        label: 'ALL',
-        value: 'ALL',
-    },
+    // {
+    //     label: 'ALL',
+    //     value: 'ALL',
+    // },
     {
         label: 'Brain - Spinal cord (cervical c-1)',
         value: 'Brain - Spinal cord (cervical c-1)',

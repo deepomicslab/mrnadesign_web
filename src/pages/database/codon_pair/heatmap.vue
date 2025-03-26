@@ -10,9 +10,10 @@ import axios from 'axios'
 import { CodonpairDictReversed } from '@/utils/type'
 
 const props = defineProps<{
+    calculation_type: string
     tissue: keyof typeof CodonpairDictReversed
 }>()
-const { tissue } = toRefs(props)
+const { calculation_type, tissue } = toRefs(props)
 
 const echartDom = ref<HTMLElement | null>(null)
 
@@ -81,7 +82,7 @@ const heatmapOption = {
     },
     series: [
         {
-            name: 'fraction',
+            name: calculation_type.value,
             type: 'heatmap',
             data: Maindata.value,
             emphasis: {
@@ -97,11 +98,11 @@ const heatmapOption = {
 }
 
 const main_get_response = async () => {
-    const response = await axios.get(`/codon_pair/fraction/heatmap/`, {
+    const response = await axios.get(`/codon_pair/heatmap/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
-            calculation_type: 'fraction',
+            calculation_type: calculation_type.value,
             tissue: CodonpairDictReversed[tissue.value],
         },
     })

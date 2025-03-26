@@ -58,9 +58,10 @@ import { CodonpairDictReversed } from '@/utils/type'
 const loading = ref(false)
 
 const props = defineProps<{
+    calculation_type: string
     tissue: keyof typeof CodonpairDictReversed
 }>()
-const { tissue } = toRefs(props)
+const { calculation_type, tissue } = toRefs(props)
 
 const checkedRowKeysRef = ref<DataTableRowKey[]>([])
 function handleCheck(rowKeys: DataTableRowKey[]) {
@@ -128,7 +129,7 @@ const createColumns = (): DataTableColumns<RowData> => [
 
 const main_get_response = async () => {
     loading.value = true
-    const response = await axios.get(`/codon_pair/fraction/`, {
+    const response = await axios.get(`/codon_pair/`, {
         baseURL: '/api',
         timeout: 10000,
         params: {
@@ -136,7 +137,7 @@ const main_get_response = async () => {
             pagesize: pageSize.value,
             sorter: sorter_dict.value,
             tissue: CodonpairDictReversed[tissue.value],
-            calculation_type: 'fraction',
+            calculation_type: calculation_type.value,
         },
     })
     const { data } = response
