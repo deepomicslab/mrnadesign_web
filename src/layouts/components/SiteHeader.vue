@@ -198,6 +198,10 @@ const menuOptions: MenuOption[] = [
                 label: 'Antigen Screening',
                 key: '/analysis/antigen_screening',
             },
+            {
+                label: 'TSA',
+                key: '/analysis/tsa',
+            },
         ],
     },
     { label: 'Workspace', key: '/workspace', icon: renderIcon(WorkspaceIcon) },

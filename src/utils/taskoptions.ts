@@ -19,6 +19,10 @@ export const analysisTypeOptions = [
         value: 'Antigen Screening',
         label: 'Antigen Screening',
     },
+    {
+        value: 'TSA',
+        label: 'TSA',
+    },
 ]
 
 export const taskStatusOptions = [
@@ -103,5 +107,118 @@ export const allergencityModelOptions = [
     {
         value: 'HybridModel',
         label: 'HybridModel',
+    },
+]
+
+export const tsaRmatsAstypeOptions = [
+    {
+        value: 'A3S',
+        label: 'A3S',
+    },
+    {
+        value: 'A5S',
+        label: 'A5S',
+    },
+    {
+        value: 'MXE',
+        label: 'MXE',
+    },
+    {
+        value: 'RI',
+        label: 'RI',
+    },
+    {
+        value: 'SE',
+        label: 'SE',
+    },
+]
+
+export const tsaSampleOptions = [
+    {
+        value: 'HGSC1',
+        label: 'HGSC1',
+    },
+    {
+        value: 'HGSC2',
+        label: 'HGSC2',
+    },
+    {
+        value: 'HGSC3',
+        label: 'HGSC3',
+    },
+    {
+        value: 'HGSC4',
+        label: 'HGSC4',
+    },
+    {
+        value: 'HGSC5',
+        label: 'HGSC5',
+    },
+    {
+        value: 'HGSC6',
+        label: 'HGSC6',
+    },
+    {
+        value: 'OV606',
+        label: 'OV606',
+    },
+    {
+        value: 'OV633',
+        label: 'OV633',
+    },
+    {
+        value: 'OV642',
+        label: 'OV642',
+    },
+    {
+        value: 'MEL1',
+        label: 'MEL1',
+    },
+    {
+        value: 'MEL2',
+        label: 'MEL2',
+    },
+    {
+        value: 'MEL3',
+        label: 'MEL3',
+    },
+    {
+        value: 'MEL15',
+        label: 'MEL15',
+    },
+    {
+        value: 'GBM7',
+        label: 'GBM7',
+    },
+]
+
+export const tsaMutationTypeOptions = [
+    {
+        value: 'control',
+        label: 'control',
+    },
+    {
+        value: 'rna_edit',
+        label: 'rna_edit',
+    },
+    {
+        value: 'indel',
+        label: 'indel',
+    },
+    {
+        value: 'snp',
+        label: 'snp',
+    },
+    {
+        value: 'fusion',
+        label: 'fusion',
+    },
+    {
+        value: 'rmats',
+        label: 'rmats',
+    },
+    {
+        value: 'spe',
+        label: 'spe',
     },
 ]

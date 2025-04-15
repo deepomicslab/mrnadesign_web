@@ -210,6 +210,19 @@ const menuOptions: MenuOption[] = [
             ),
         key: '/analysis/antigen_screening',
     },
+    {
+        label: () =>
+            h(
+                RouterLink,
+                {
+                    to: {
+                        path: '/analysis/tsa',
+                    },
+                },
+                { default: () => 'TSA' }
+            ),
+        key: '/analysis/tsa',
+    },
 ]
 const router = useRouter()
 const changeMenu = (_: string, option: MenuOption) => {

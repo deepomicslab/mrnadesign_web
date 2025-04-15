@@ -58,7 +58,6 @@
                     <div class="ml-5">
                         <n-radio-group v-model:value="inputtype">
                             <n-radio-button value="upload">UPLOAD FILE</n-radio-button>
-                            <!-- <n-radio-button value="enter">ENTER ANTIGEN/TANTIGEN ID</n-radio-button> -->
                             <n-radio-button value="paste">PASTE SEQUENCE</n-radio-button>
                         </n-radio-group>
                     </div>
@@ -103,61 +102,6 @@
                                 </div>
                             </n-upload-dragger>
                         </n-upload>
-                    </div>
-
-                    <div
-                        class="rounded w-200 h-60 mt-5 rounded-2xl flex-col flex justify-center items-center"
-                        style="box-shadow: 0 0 64px #cfd5db"
-                        v-if="inputtype === 'enter'"
-                    >
-                        <div class="text-lg flex flex-row mt-20">
-                            Enter the
-                            <p class="text-red-400 mx-2">Antigen/Tantigen IDs</p>
-                            that already exist in the database, separated by
-                            <p class="text-red-400 mx-2 font-900">' ; '</p>
-                        </div>
-                        <div class="flex flex-row justify-center">
-                            <div class="rounded w-200 h-40 mt-10 rounded-xl">
-                                <el-form status-icon label-width="auto" label-position="right">
-                                    <el-row justify="space-evenly">
-                                        <el-col :span="16">
-                                            <el-form-item label="ID" class="is-required">
-                                                <n-input
-                                                    v-model:value="inputformValue.phage"
-                                                    placeholder="Example: 1;27;56"
-                                                    type="textarea"
-                                                    :autosize="{
-                                                        minRows: 1,
-                                                        maxRows: 2,
-                                                    }"
-                                                />
-                                            </el-form-item>
-                                        </el-col>
-                                    </el-row>
-                                    <el-row justify="space-evenly">
-                                        <el-col :span="16">
-                                            <el-form-item
-                                                label="Select Data Table"
-                                                class="is-required"
-                                            >
-                                                <n-radio-group
-                                                    v-model:value="inputformValue.datatable"
-                                                    name="datatable"
-                                                    size="large"
-                                                >
-                                                    <n-radio-button value="antigen">
-                                                        Antigen
-                                                    </n-radio-button>
-                                                    <n-radio-button value="tantigen">
-                                                        Tantigen
-                                                    </n-radio-button>
-                                                </n-radio-group>
-                                            </el-form-item>
-                                        </el-col>
-                                    </el-row>
-                                </el-form>
-                            </div>
-                        </div>
                     </div>
                     <div
                         class="rounded w-240 mt-5 rounded-2xl flex-col flex justify-center items-center outer-container"
