@@ -4,19 +4,7 @@
             <el-form status-icon label-width="auto" label-position="right">
                 <el-row justify="space-evenly">
                     <el-form-item label="Sample" class="is-required">
-                        <el-select
-                            v-model="paramform.sample"
-                            placeholder="Please Select"
-                            class="w-60"
-                            clearable
-                        >
-                            <el-option
-                                v-for="option in tsaSampleOptions"
-                                :key="option.value"
-                                :label="option.label"
-                                :value="option.value"
-                            ></el-option>
-                        </el-select>
+                        <el-input v-model="paramform.sample" class="w-60" />
                     </el-form-item>
                 </el-row>
                 <el-row justify="space-evenly">
@@ -39,37 +27,12 @@
                 </el-row>
                 <el-row justify="space-evenly">
                     <el-form-item label="HLA Types" class="is-required">
-                        <el-select
-                            v-model="paramform.hla_type"
-                            placeholder="Please Select"
-                            class="w-60"
-                            clearable
-                            multiple
-                        >
-                            <el-option
-                                v-for="option in tsaHLATyoeOptions"
-                                :key="option"
-                                :label="option"
-                                :value="option"
-                            ></el-option>
-                        </el-select>
+                        <el-input v-model="paramform.hla_type" class="w-60" />
                     </el-form-item>
                 </el-row>
                 <el-row justify="space-evenly" v-if="paramform.mutation_type.includes('rmats')">
                     <el-form-item label="AS Type for Mutation Type rmats" class="is-required">
-                        <el-select
-                            v-model="paramform.rmats_as_type"
-                            placeholder="Please Select"
-                            class="w-60"
-                            clearable
-                        >
-                            <el-option
-                                v-for="option in tsaRmatsAstypeOptions"
-                                :key="option.value"
-                                :label="option.label"
-                                :value="option.value"
-                            ></el-option>
-                        </el-select>
+                        <el-input v-model="paramform.rmats_as_type" class="w-60" />
                     </el-form-item>
                 </el-row>
                 <el-row justify="space-evenly" v-if="paramform.mutation_type.includes('spe')">
@@ -93,12 +56,8 @@
 /* eslint-disable camelcase */
 
 import { ref, defineEmits } from 'vue'
-import axios from 'axios'
-import {
-    tsaRmatsAstypeOptions,
-    tsaSampleOptions,
-    tsaMutationTypeOptions,
-} from '@/utils/taskoptions'
+// import axios from 'axios'
+import { tsaMutationTypeOptions } from '@/utils/taskoptions'
 
 const emit = defineEmits(['paramform_submitted'])
 
@@ -133,37 +92,10 @@ const resetFilterForm = () => {
     }
 }
 
-const tsaHLATyoeOptions = ref([])
-const get_response = async () => {
-    const response = await axios.get(`/analyze/tsa/hla_types`, {
-        baseURL: '/api',
-        timeout: 10000,
-        params: {
-            sample: paramform.value.sample,
-        },
-    })
-    const { data } = response
-    tsaHLATyoeOptions.value.length = 0
-    tsaHLATyoeOptions.value = data.hla_types
-    paramform.value.hla_type.length = 0
-    paramform.value.hla_type.push(...tsaHLATyoeOptions.value)
-}
-
-onBeforeMount(async () => {
-    get_response()
-})
-
 onBeforeMount(() => {
     emit('paramform_submitted', paramform.value)
 })
 
-watch(
-    () => paramform.value.sample,
-    () => {
-        get_response()
-        console.log('paramform', paramform.value.hla_type)
-    }
-)
 watch(
     paramform,
     () => {

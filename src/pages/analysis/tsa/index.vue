@@ -52,10 +52,10 @@
                             v-model:file-list="fileList"
                             directory-dnd
                             :default-upload="false"
-                            accept=".tsv"
-                            @update:file-list="handleFileListChange"
-                            @remove="remove"
+                            @on-before-upload="beforeUpload"
+                            @on-remove="remove"
                             show-remove-button
+                            show-file-list
                         >
                             <n-upload-dragger>
                                 <div class="flex flex-col justify-center items-center">
@@ -70,13 +70,7 @@
                                         class="text-base mt-3 mb-3 text-opacity-100"
                                         style="color: #f07167"
                                     >
-                                        TSV file size should be less than 10MB
-                                    </p>
-                                    <p
-                                        class="text-base mb-3 text-opacity-100"
-                                        style="color: #f07167"
-                                    >
-                                        Supported formats: .tsv
+                                        Uploaded file size should be less than 10MB
                                     </p>
                                 </div>
                             </n-upload-dragger>
@@ -89,7 +83,14 @@
                 </div>
 
                 <div class="font-600 text-3xl ml-20 mt-10 mb-10">2.Apply Parameters</div>
-                <parameter @paramform_submitted="handleParamSubmitted" />
+                <parameter_upload
+                    v-if="inputtype === 'upload'"
+                    @paramform_submitted="handleParamSubmitted"
+                />
+                <parameter_demo
+                    v-if="inputtype === 'demo'"
+                    @paramform_submitted="handleParamSubmitted"
+                />
                 <div class="mt-10 flex flex-row justify-center">
                     <el-button
                         size="large"
@@ -113,7 +114,8 @@
 import type { UploadFileInfo } from 'naive-ui'
 import { InfoFilled } from '@element-plus/icons-vue'
 import axios from 'axios'
-import parameter from './parameter.vue'
+import parameter_demo from './parameter_demo.vue'
+import parameter_upload from './parameter_upload.vue'
 import { useUserIdGenerator } from '@/utils/userIdGenerator'
 import { encrypt } from '@/utils/crypto'
 import { windowErrorMessage, windowSuccessMessage } from '@/utils/windowFunctions'
@@ -122,8 +124,8 @@ const analysistype = ref('tsa')
 const paramform = ref([])
 
 const fileList = ref<UploadFileInfo[]>([])
-const submitfile = ref<File>()
-const inputtype = ref('demo')
+const submitfile = ref<File[]>([])
+const inputtype = ref('demo') // upload
 
 const userid = ref('')
 const loading = ref(false)
@@ -132,28 +134,27 @@ const handleParamSubmitted = (value: any) => {
     paramform.value = value
 }
 
-const handleFileListChange = (data: UploadFileInfo[]) => {
-    if (data[0].name.match(/(.tsv)$/g) === null) {
-        windowErrorMessage('Uploaded file must be in TSV format.')
-        data.pop()
-    } else if (data[0].file?.size === 0 || data[0].file?.size === undefined) {
-        windowErrorMessage('Uploaded file cannot be empty.')
-        data.pop()
-    } else if (data[0].file.size / 1024 / 1024 > 10) {
-        windowErrorMessage('Uploaded file cannot exceed 10MB.')
-        data.pop()
-    } else if (data.length > 1) {
-        windowErrorMessage('Cannot upload more than one files.')
-        data.pop()
-    } else if (data.length === 1) {
-        submitfile.value = data[0].file
-        fileList.value.length = 0
-        fileList.value.push(data[0])
+const beforeUpload = ({ file }: { file: UploadFileInfo }) => {
+    if (!file.file || file.file.size === 0) {
+        windowErrorMessage('File is empty.')
+        return false
     }
+    if (file.file && file.file.size / 1024 / 1024 > 10) {
+        windowErrorMessage(`File is too large. Maximum size: 10MB`)
+        return false
+    }
+    fileList.value.push(file)
+    submitfile.value.push(file.file as File)
+    // Return false to prevent the default upload behavior. We're handling the file display ourselves
+    return true
 }
-const remove = () => {
-    submitfile.value = undefined
-    fileList.value.pop()
+const remove = ({ file }: { file: Required<UploadFileInfo> }) => {
+    const index = fileList.value.findIndex(item => item.id === file.id)
+    if (index !== -1) {
+        fileList.value.splice(index, 1)
+        submitfile.value.splice(index, 1)
+    }
+    return true
 }
 const router = useRouter()
 
@@ -194,7 +195,9 @@ const submit = async () => {
         submitdata.append('userid', userid.value)
         submitdata.append('inputtype', inputtype.value)
         submitdata.append('parameters', JSON.stringify(paramform.value))
-        submitdata.append('submitfile', submitfile.value as File)
+        submitfile.value.forEach(file => {
+            submitdata.append(file.name, file as File)
+        })
         const response = await axios.post(`/analyze/${analysistype.value}/`, submitdata, {
             baseURL: '/api',
             timeout: 10000,
