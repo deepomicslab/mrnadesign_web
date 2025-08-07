@@ -202,6 +202,10 @@ const menuOptions: MenuOption[] = [
                 label: 'TSA',
                 key: '/analysis/tsa',
             },
+            {
+                label: 'TCRanno',
+                key: '/analysis/tcranno',
+            },
         ],
     },
     { label: 'Workspace', key: '/workspace', icon: renderIcon(WorkspaceIcon) },

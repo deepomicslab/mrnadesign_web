@@ -223,6 +223,19 @@ const menuOptions: MenuOption[] = [
             ),
         key: '/analysis/tsa',
     },
+    {
+        label: () =>
+            h(
+                RouterLink,
+                {
+                    to: {
+                        path: '/analysis/tcranno',
+                    },
+                },
+                { default: () => 'TCRanno' }
+            ),
+        key: '/analysis/tcranno',
+    },
 ]
 const router = useRouter()
 const changeMenu = (_: string, option: MenuOption) => {

@@ -23,6 +23,10 @@ export const analysisTypeOptions = [
         value: 'TSA',
         label: 'TSA',
     },
+    {
+        value: 'TCRanno',
+        label: 'TCRanno',
+    },
 ]
 
 export const taskStatusOptions = [
@@ -220,5 +224,62 @@ export const tsaMutationTypeOptions = [
     {
         value: 'spe',
         label: 'spe',
+    },
+]
+
+export const tcrannoDatabaseOptions = [
+    {
+        value: 'IEDB',
+        label: 'IEDB',
+    },
+    {
+        value: 'DB_FULL',
+        label: 'DB_FULL',
+    },
+]
+
+export const tcrannoFrequencyColOptions = [
+    // put frequency at the 2nd column
+    {
+        value: 'frequency',
+        label: 'frequency',
+    },
+    // put count at the 2nd column
+    {
+        value: 'count',
+        label: 'count',
+    },
+    {
+        value: 'none',
+        label: 'none',
+    },
+]
+
+export const tcrannoAnnoTypeOptions = [
+    {
+        value: 'all',
+        label: 'all',
+    },
+    {
+        value: 'tcr2ept',
+        label: 'tcr2ept',
+    },
+    {
+        value: 'tcr2ag',
+        label: 'tcr2ag',
+    },
+    {
+        value: 'tcr2org',
+        label: 'tcr2org',
+    },
+]
+export const tcrannoAnalysisTypeOptions = [
+    {
+        value: 'qual_quant',
+        label: 'qualitative and quantitative',
+    },
+    {
+        value: 'qual',
+        label: 'qualitative',
     },
 ]
