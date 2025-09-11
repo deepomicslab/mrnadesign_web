@@ -157,6 +157,20 @@ const menuOptions: MenuOption[] = [
                     },
                 ],
             },
+            {
+                label: 'TranscriptHub',
+                key: '/database/transcripthub/',
+                children: [
+                    {
+                        label: 'Assembly',
+                        key: '/database/transcripthub/assembly',
+                    },
+                    {
+                        label: 'Annotation',
+                        key: '/database/transcripthub/annotation',
+                    },
+                ],
+            },
             // {
             //     label: 'Sequence Filter',
             //     key: '/database/filter',
