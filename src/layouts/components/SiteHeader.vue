@@ -171,6 +171,10 @@ const menuOptions: MenuOption[] = [
                     },
                 ],
             },
+            {
+                label: 'TCR Alpha-Beta Chain Pairing',
+                key: '/database/tcrabpairing',
+            },
             // {
             //     label: 'Sequence Filter',
             //     key: '/database/filter',
@@ -219,6 +223,10 @@ const menuOptions: MenuOption[] = [
             {
                 label: 'TCRanno',
                 key: '/analysis/tcranno',
+            },
+            {
+                label: 'TCR Alpha-Beta Chain Pairing',
+                key: '/analysis/tcrabpairing',
             },
         ],
     },

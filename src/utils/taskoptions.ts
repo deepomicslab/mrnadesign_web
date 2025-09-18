@@ -27,6 +27,10 @@ export const analysisTypeOptions = [
         value: 'TCRanno',
         label: 'TCRanno',
     },
+    {
+        value: 'TCR Alpha-Beta Chain Pairing',
+        label: 'TCR Alpha-Beta Chain Pairing',
+    },
 ]
 
 export const taskStatusOptions = [

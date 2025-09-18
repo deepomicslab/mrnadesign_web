@@ -3,7 +3,7 @@
         <el-scrollbar class="w-full" ref="scrollbarRef" v-load="loading">
             <div class="flex flex-col outer-container">
                 <div class="font-600 ml-20 mt-16 flex flex-row border-b-2 w-9/10 pb-5">
-                    <div class="text-4xl text-[#253959]">Prediction</div>
+                    <div class="text-4xl text-[#253959]">TCR Alpha-Beta Chain Pairing</div>
                     <el-button
                         round
                         size="large"
@@ -40,16 +40,16 @@
                     to see the precomputed demo results immediately.
                 </div>
                 <div class="font-600 text-3xl ml-20 mt-10">
-                    1. Input Sequence
+                    Input Sequence
                     <n-button
                         text
-                        href="https://mrnadesign.deepomics.org/dataExample/mrna/prediction/task0001_input_seq.tsv"
+                        href="https://mrnadesign.deepomics.org/dataExample/mrna/prediction/task0001_input_seq.csv"
                         tag="a"
                         target="_blank"
                         type="primary"
                         class="text-lg"
                     >
-                        See Example TSV sequence
+                        See Example CSV sequence
                     </n-button>
                 </div>
                 <div class="ml-25 mt-5 flex flex-row mb-5">
@@ -73,7 +73,7 @@
                             v-model:file-list="fileList"
                             directory-dnd
                             :default-upload="false"
-                            accept=".tsv"
+                            accept=".csv"
                             @update:file-list="handleFileListChange"
                             @remove="remove"
                             show-remove-button
@@ -91,13 +91,13 @@
                                         class="text-base mt-3 mb-3 text-opacity-100"
                                         style="color: #f07167"
                                     >
-                                        TSV file size should be less than 10MB
+                                        CSV file size should be less than 10MB
                                     </p>
                                     <p
                                         class="text-base mb-3 text-opacity-100"
                                         style="color: #f07167"
                                     >
-                                        Supported formats: .tsv
+                                        Supported formats: .csv
                                     </p>
                                 </div>
                             </n-upload-dragger>
@@ -109,7 +109,7 @@
                         v-if="inputtype === 'paste'"
                     >
                         <div class="text-lg mb-6 w-190">
-                            Paste a fasta formatted protein/amino acid sequence.
+                            Paste a gene element sequence, or import data from DB.
                         </div>
                         <div v-for="(inputGroup, index) in inputBlocks" :key="index" class="w-190">
                             <hr class="mb-5" />
@@ -123,52 +123,55 @@
                                         :rows="1"
                                         v-model:value="inputGroup.name"
                                     ></n-input>
-                                    <n-input-group-label @click="importFromDB(index)">
-                                        Import data from DB
-                                    </n-input-group-label>
                                     <n-input-group-label @click="deleteInputBlock(index)">
                                         Delete this entry
                                     </n-input-group-label>
                                 </n-input-group>
                             </el-form-item>
-                            <el-form-item label="3'UTR" label-width="100px" class="is-required">
-                                <n-input
-                                    round
-                                    placeholder="3'UTR"
-                                    type="textarea"
-                                    clearable
-                                    v-model:value="inputGroup.utr3"
-                                    :autosize="{
-                                        minRows: 1,
-                                        maxRows: 3,
-                                    }"
-                                ></n-input>
+                            <el-form-item label="Select" label-width="100px" class="is-required">
+                                <n-input-group class="w-full">
+                                    <n-dropdown
+                                        trigger="hover"
+                                        :options="tcrabpairingChainRefOptions"
+                                        @select="
+                                            (key, option) => handleInputChain(key, option, index)
+                                        "
+                                    >
+                                        <n-button>
+                                            {{ inputGroup.chain || 'Select Chain' }}
+                                        </n-button>
+                                    </n-dropdown>
+                                    <n-dropdown
+                                        trigger="hover"
+                                        :options="tcrabpairingGeneElementRefOptions"
+                                        @select="
+                                            (key, option) =>
+                                                handleInputGeneElement(key, option, index)
+                                        "
+                                    >
+                                        <n-button>
+                                            {{ inputGroup.element || 'Select Gene Element' }}
+                                        </n-button>
+                                    </n-dropdown>
+                                    <n-input-group-label @click="importFromDB(index)">
+                                        Import data from DB
+                                    </n-input-group-label>
+                                </n-input-group>
                             </el-form-item>
-                            <el-form-item label="CDS" label-width="100px" class="is-required">
-                                <n-input
-                                    round
-                                    placeholder="CDS"
-                                    type="textarea"
-                                    clearable
-                                    v-model:value="inputGroup.cds"
-                                    :autosize="{
-                                        minRows: 1,
-                                        maxRows: 3,
-                                    }"
-                                ></n-input>
-                            </el-form-item>
-                            <el-form-item label="5'UTR" label-width="100px" class="is-required">
-                                <n-input
-                                    round
-                                    placeholder="5'UTR"
-                                    type="textarea"
-                                    clearable
-                                    v-model:value="inputGroup.utr5"
-                                    :autosize="{
-                                        minRows: 1,
-                                        maxRows: 3,
-                                    }"
-                                ></n-input>
+                            <el-form-item label="Input" label-width="100px" class="is-required">
+                                <n-input-group>
+                                    <n-input
+                                        round
+                                        placeholder="gene element sequence"
+                                        type="textarea"
+                                        clearable
+                                        v-model:value="inputGroup.seq"
+                                        :autosize="{
+                                            minRows: 1,
+                                            maxRows: 3,
+                                        }"
+                                    ></n-input>
+                                </n-input-group>
                             </el-form-item>
                         </div>
                         <n-button-group>
@@ -182,10 +185,6 @@
                     </div>
                 </div>
 
-                <div class="font-600 text-3xl ml-20 mt-10 mb-10">
-                    2.Apply Modules & Specify Parameters
-                </div>
-                <parameter @paramform_submitted="handleParamSubmitted" />
                 <div class="mt-10 flex flex-row justify-center">
                     <el-button
                         size="large"
@@ -200,25 +199,14 @@
             </div>
         </el-scrollbar>
     </div>
-    <el-dialog v-model="dialogVisible" title="Please select the demo result to view" width="30%">
-        <el-checkbox-group v-model="demotask" :max="1">
-            <el-checkbox label="Task 0001" />
-            <el-checkbox label="Task 0002" />
-            <el-checkbox label="Task 0003" />
-        </el-checkbox-group>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="dialogVisible = false">Cancel</el-button>
-                <el-button @click="opendemo">Confirm</el-button>
-            </span>
-        </template>
-    </el-dialog>
     <el-dialog
         v-model="selectionDialogVisible"
         title="Please select sequences as you analysis input"
         width="75%"
     >
         <selectFromDB
+            :chain="passchain"
+            :element="passelement"
             @selectionDialogVisible="handleSelectionDialogVisible"
             @inputBlocktoPass="handleInputBlocktoPass"
         />
@@ -232,15 +220,13 @@
 import type { UploadFileInfo } from 'naive-ui'
 import { InfoFilled } from '@element-plus/icons-vue'
 import axios from 'axios'
-import parameter from './parameter.vue'
 import selectFromDB from './select_window.vue'
 import { useUserIdGenerator } from '@/utils/userIdGenerator'
 import { encrypt } from '@/utils/crypto'
 import { windowErrorMessage, windowSuccessMessage } from '@/utils/windowFunctions'
-const inputBlocks = ref([{ name: '', utr3: '', cds: '', utr5: '' }]) // Initialize with one input block
-const inputBlocktoPass = ref({ utr3: '', cds: '', utr5: '' })
-
-const paramform = ref([])
+import { tcrabpairingChainRefOptions, tcrabpairingGeneElementRefOptions } from '@/utils/selectionoptions'
+const inputBlocks = ref([{ name: '', chain: '', element: '', seq: '' }]) // Initialize with one input block
+const inputBlocktoPass = ref({ chain: '', element: '', seq: '' })
 
 const fileList = ref<UploadFileInfo[]>([])
 const submitfile = ref<File>()
@@ -249,17 +235,36 @@ const inputtype = ref('paste')
 const userid = ref('')
 const loading = ref(false)
 
-const dialogVisible = ref(false)
 const selectionDialogVisible = ref(false)
-const demotask = ref([] as any[])
+
+const passchain = ref('')
+const passelement = ref('')
 
 const importID = ref(0)
 
+const handleInputChain = (key: string, option: any, index: number) => {
+    inputBlocks.value[index].chain = option.label
+}
+const handleInputGeneElement = (key: string, option: any, index: number) => {
+    inputBlocks.value[index].element = option.label
+}
+
 const addInputBlock = () => {
-    inputBlocks.value.push({ name: '', utr3: '', cds: '', utr5: '' }) // Add a new input block
+    inputBlocks.value.push({ name: '', chain: '', element: '', seq: '' }) // Add a new input block
 }
 const importFromDB = (index: number) => {
+    console.log('=====================================', index, inputBlocks.value[index].chain)
+    if (inputBlocks.value[index].chain === '') {
+        windowErrorMessage('Please select chain first')
+        return
+    }
+    if (inputBlocks.value[index].element === '') {
+        windowErrorMessage('Please select gene element first')
+        return
+    }
     importID.value = index
+    passchain.value = inputBlocks.value[index].chain
+    passelement.value = inputBlocks.value[index].element
     selectionDialogVisible.value = true
 }
 const deleteInputBlock = (index: number) => {
@@ -268,44 +273,31 @@ const deleteInputBlock = (index: number) => {
 const fillSequence = () => {
     inputBlocks.value.length = 0
     inputBlocks.value.push({
-        name: 'SEQ000000',
-        utr3: 'CUAAUGCCAUGAUCCAGGUGACAUGUAGAAGCUUGGAUCAGAUGCUGCACUUUGCGUUCGAUGUGGGAGCGUGCUUUCCACGACGGUGACACGCUUCCCUGGAUUGGCAGCCAGACUGCCUUCCGGGUCACUGCC',
-        cds: 'AUGCCCAUGCCCAUCGGCAGCAAGGAGAGGCCCACCUUCUUCGAGAUCUUCAAGACCAGGUGCAACAAGGCCGACCUGGGCCCCAUCAGCCUGAACUGA',
-        utr5: 'AUUGAUUUU',
+        name: 'seq1',
+        chain: 'Alpha',
+        element: 'V Gene',
+        seq: 'TRAV1-1',
     })
     inputBlocks.value.push({
-        name: 'SEQ000001',
-        utr3: 'CUAAUGCCAUGAUCCAACAUGUGGAAGCUUGGAUCAGAUGCUGCACCCUGGAUUGGCUGCC',
-        cds: 'AUGCCCAUGCCCAUCGGCAGCAAGGAGAGGCCCACCUUCUUCGAGAUCUUCAAGACCAGGUGCAACAAGGCCGACCUGGGCCCCAUCAGCCUGAACUGA',
-        utr5: 'AUUGAUUGGGGUAAUAAAGGGU',
+        name: 'seq1',
+        chain: 'Beta',
+        element: 'CDR3',
+        seq: 'CAVNTGGFKTIF',
     })
 }
 
-const handleParamSubmitted = (value: any) => {
-    paramform.value = value
-}
 const handleSelectionDialogVisible = (value: any) => {
     selectionDialogVisible.value = value
 }
 const handleInputBlocktoPass = (value: any) => {
     inputBlocktoPass.value = value
-    if (inputBlocktoPass.value.utr3 != '') {
-        inputBlocks.value[importID.value].utr3 = inputBlocktoPass.value.utr3
-        inputBlocktoPass.value.utr3 = ''
-    }
-    if (inputBlocktoPass.value.cds != '') {
-        inputBlocks.value[importID.value].cds = inputBlocktoPass.value.cds
-        inputBlocktoPass.value.cds = ''
-    }
-    if (inputBlocktoPass.value.utr5 != '') {
-        inputBlocks.value[importID.value].utr5 = inputBlocktoPass.value.utr5
-        inputBlocktoPass.value.utr5 = ''
-    }
+    inputBlocks.value[importID.value].seq = inputBlocktoPass.value.seq
+    console.log('------------>', inputBlocktoPass.value)
 }
 
 const handleFileListChange = (data: UploadFileInfo[]) => {
-    if (data[0].name.match(/(.tsv)$/g) === null) {
-        windowErrorMessage('Uploaded file must be in TSV format.')
+    if (data[0].name.match(/(.csv)$/g) === null) {
+        windowErrorMessage('Uploaded file must be in CSV format.')
         data.pop()
     } else if (data[0].file?.size === 0 || data[0].file?.size === undefined) {
         windowErrorMessage('Uploaded file cannot be empty.')
@@ -328,19 +320,9 @@ const remove = () => {
 const router = useRouter()
 
 const godemo = () => {
-    dialogVisible.value = true
-}
-const opendemo = () => {
-    let thistaskid = ''
-    if (demotask.value[0] === 'Task 0001') {
-        thistaskid = '-95'
-    } else if (demotask.value[0] === 'Task 0002') {
-        thistaskid = '-94'
-    } else if (demotask.value[0] === 'Task 0003') {
-        thistaskid = '-93'
-    }
+    let thistaskid = '-30'
     router.push({
-        path: '/task/result/prediction',
+        path: '/task/result/tcrabpairing',
         query: {
             taskid: encrypt(
                 thistaskid,
@@ -352,10 +334,6 @@ const opendemo = () => {
 
 const checkPasteInput = () => {
     // error code: 0 for true, 1 for requiring input, 2 for requiring letters
-    const isOnlyLetters = (str: string) => {
-        const regex = /^[A-Za-z]+$/
-        return regex.test(str)
-    }
     const isOnlyLettersAndDigits = (str: string) => {
         const regex = /^[A-Za-z0-9]+$/
         return regex.test(str)
@@ -368,17 +346,18 @@ const checkPasteInput = () => {
         const block = inputBlocks.value[i]
         if (
             block.name.length === 0 ||
-            block.utr3.length === 0 ||
-            block.cds.length === 0 ||
-            block.utr5.length === 0
+            block.seq.length === 0
         ) {
             return 1
         }
         if (!isOnlyLettersAndDigits(block.name)) {
             return 2
         }
-        if (!isOnlyLetters(block.utr3) && !isOnlyLetters(block.cds) && !isOnlyLetters(block.utr5)) {
-            return 2
+        if (block.chain === '') {
+            return 3
+        }
+        if (block.element === '') {
+            return 4
         }
     }
     return 0
@@ -402,24 +381,33 @@ const submit = async () => {
         if (paster_input_code === 0) {
             submitdata.append('seq', JSON.stringify(inputBlocks.value))
             precheck.value = true
-        } else if (paster_input_code === 1) {
-            windowErrorMessage('Please input sequence')
+        } else {
             precheck.value = false
-        } else if (paster_input_code === 2) {
-            windowErrorMessage(
-                'Only letters and digits are allowed in the name; Only letters are allowed in the sequences'
-            )
-            precheck.value = false
+            switch (paster_input_code) {
+                case 1:
+                    windowErrorMessage('Please input sequence')
+                    break
+                case 2:
+                    windowErrorMessage('Only letters and digits are allowed in the name')
+                    break
+                case 3:
+                    windowErrorMessage('Please select chain for all input blocks')
+                    break
+                case 4:
+                    windowErrorMessage('Please select gene element for all input blocks')
+                    break
+                default:
+                    windowErrorMessage('Unknown error occurred in pasted sequence')
+            }
         }
     }
 
     if (precheck.value) {
-        submitdata.append('analysistype', 'Prediction')
+        submitdata.append('analysistype', 'TCR Alpha-Beta Chain Pairing')
         submitdata.append('userid', userid.value)
         submitdata.append('inputtype', inputtype.value)
-        submitdata.append('parameters', JSON.stringify(paramform.value))
         submitdata.append('submitfile', submitfile.value as File)
-        const response = await axios.post(`/analyze/prediction/`, submitdata, {
+        const response = await axios.post(`/analyze/tcrabpairing/`, submitdata, {
             baseURL: '/api',
             timeout: 10000,
         })
@@ -442,12 +430,12 @@ const submitdemo = async () => {
     const precheck = ref(true)
 
     if (precheck.value) {
-        submitdata.append('analysistype', 'Prediction')
+        submitdata.append('analysistype', 'TCR Alpha-Beta Chain Pairing')
         submitdata.append('userid', userid.value)
         submitdata.append('inputtype', 'rundemo')
         submitdata.append('codonusage', 'human')
         submitdata.append('lambda', '0')
-        const response = await axios.post(`/analyze/prediction/`, submitdata, {
+        const response = await axios.post(`/analyze/tcrabpairing/`, submitdata, {
             baseURL: '/api',
             timeout: 10000,
         })

@@ -236,6 +236,19 @@ const menuOptions: MenuOption[] = [
             ),
         key: '/analysis/tcranno',
     },
+    {
+        label: () =>
+            h(
+                RouterLink,
+                {
+                    to: {
+                        path: '/analysis/tcrabpairing',
+                    },
+                },
+                { default: () => 'TCR Alpha-Beta Chain Pairing' }
+            ),
+        key: '/analysis/tcrabpairing',
+    },
 ]
 const router = useRouter()
 const changeMenu = (_: string, option: MenuOption) => {

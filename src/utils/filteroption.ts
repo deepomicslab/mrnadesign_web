@@ -771,3 +771,10 @@ export const transcripthubSourceRefOptions = [
     { value: 'AGAT', label: 'AGAT' },
     { value: 'transdecoder', label: 'transdecoder' },
 ]
+
+export const tcrabpairingSourceRefOptions = [
+    {
+        value: 'GSM6063507_230093_primary_focus_filtered_contig_annotations',
+        label: 'GSM6063507_230093_primary_focus_filtered_contig_annotations',
+    },
+]
