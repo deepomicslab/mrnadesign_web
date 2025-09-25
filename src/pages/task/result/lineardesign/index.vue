@@ -1,6 +1,7 @@
 <template>
     <component_cds_only v-if="lineardesignanalysistype == 'cds_only'" />
     <component_cds_plus_35utr v-if="lineardesignanalysistype == 'cds_plus_35utr'" />
+    <conmponent_fix_codon v-if="lineardesignanalysistype == 'fix_codon'" />
 </template>
 
 <script setup lang="ts">
@@ -11,6 +12,7 @@ import axios from 'axios'
 import { decrypt } from '@/utils/crypto'
 import component_cds_only from './cds_only.vue'
 import component_cds_plus_35utr from './cds_plus_35utr.vue'
+import conmponent_fix_codon from './fix_codon.vue'
 
 const route = useRoute()
 const taskid = computed(() => {

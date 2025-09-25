@@ -198,6 +198,10 @@ const menuOptions: MenuOption[] = [
                         label: "CDS plus 3'UTR and 5'UTR",
                         key: '/analysis/linear_design/cds_plus_35utr',
                     },
+                    {
+                        label: 'Fix Codon',
+                        key: '/analysis/linear_design/fix_codon',
+                    },
                 ],
             },
             {
