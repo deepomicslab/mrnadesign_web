@@ -157,17 +157,18 @@
                     </div>
 
                     <div
-                        class="rounded w-240 mt-5 rounded-2xl flex-col flex justify-center items-center outer-container"
+                        class="rounded w-full max-w-6xl mt-5 rounded-2xl flex-col flex justify-center items-center outer-container px-4"
                         style="box-shadow: 0 0 64px #cfd5db"
                         v-if="inputtype === 'paste'"
                     >
-                        <div vclass="w-150">
-                            <div class="text-lg mb-6 w-190">
+                        <div class="w-full px-4">
+                            <div class="text-lg mb-6 w-full">
                                 Paste your amino acid sequence in the box below.
                                 <br />
                                 Or import data from our database, or use the sample input.
                             </div>
                             <hr class="mb-5" />
+
                             <el-form-item label="Name" label-width="100px" class="is-required">
                                 <n-input-group>
                                     <n-input
@@ -183,6 +184,7 @@
                                     </n-input-group-label>
                                 </n-input-group>
                             </el-form-item>
+
                             <el-form-item label="CDS" label-width="100px" class="is-required">
                                 <n-input-group>
                                     <n-input
@@ -201,77 +203,63 @@
                                     </n-input-group-label>
                                 </n-input-group>
                             </el-form-item>
+
                             <hr class="mb-5" />
-                            <div class="text-lg mb-6 w-190">
+
+                            <div class="text-lg mb-6 w-full">
                                 Once you've entered your sequence, select which codons you'd like to
                                 optimize.
                                 <br />
                                 Please note: Any changes to the sequence will clear your current
                                 codon selections.
                             </div>
-                            <el-form-item label="Fix codon" label-width="100px" class="is-required">
-                                <n-space vertical>
-                                    <n-space vertical>
-                                        <n-slider
-                                            v-model:value="sliderValue"
-                                            range
-                                            :step="1"
-                                            :min="0"
-                                            :max="yourArray.length - 1"
-                                        />
-                                        <n-space style="align-items: center">
-                                            <n-input-number
-                                                v-model:value="sliderValue[0]"
-                                                size="small"
-                                                :min="0"
-                                                :max="yourArray.length - 1"
-                                            />
-                                            <n-input-number
-                                                v-model:value="sliderValue[1]"
-                                                size="small"
-                                                :min="0"
-                                                :max="yourArray.length - 1"
-                                            />
-                                        </n-space>
-                                    </n-space>
+
+                            <el-form-item label="Fix Codon" class="mb-6 is-required">
+                                <div class="sequence-window-container">
                                     <div
-                                        v-for="(chunk, index) in chunkedArray"
-                                        :key="index"
-                                        style="
-                                            display: flex;
-                                            flex-wrap: wrap;
-                                            gap: 8px;
-                                            margin-bottom: 8px;
-                                            justify-content: center;
-                                        "
+                                        class="sequence-window"
+                                        ref="sequenceWindow"
+                                        :style="{ height: dynamicWindowHeight }"
+                                        @scroll="handleSequenceScroll"
+                                        @mouseup="handleMouseUp"
+                                        @mouseleave="handleMouseLeave"
+                                        :class="{ 'drag-selecting': isDragging }"
                                     >
-                                        <n-button
-                                            v-for="item in chunk"
-                                            :key="item.index"
-                                            :type="
-                                                selectedIndices.includes(item.index)
-                                                    ? 'primary'
-                                                    : 'default'
-                                            "
-                                            size="small"
-                                            @click="handleButtonClick(item.index, item.value)"
-                                        >
-                                            {{ item.value }}
-                                        </n-button>
+                                        <div class="sequence-grid">
+                                            <n-button
+                                                v-for="(item, index) in yourArray"
+                                                :key="index"
+                                                :type="
+                                                    selectedIndices.includes(index)
+                                                        ? 'primary'
+                                                        : 'default'
+                                                "
+                                                size="small"
+                                                class="sequence-button"
+                                                @mousedown="handleMouseDown(index, item, $event)"
+                                                @mouseenter="handleMouseEnter(index)"
+                                                @click="handleButtonClick(index, item)"
+                                            >
+                                                {{ item }}
+                                            </n-button>
+                                        </div>
                                     </div>
-                                </n-space>
+                                </div>
                             </el-form-item>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex flex-row justify-center" v-if="codonBlocks.length > 0">
+                <div
+                    class="flex flex-row justify-center"
+                    v-if="codonBlocks.length > 0 && inputtype === 'paste'"
+                >
                     <div
-                        class="rounded w-240 mt-5 rounded-2xl flex-col flex justify-center items-center outer-container py-4 px-158"
+                        class="rounded w-full max-w-6xl mt-5 rounded-2xl flex-col flex justify-center items-center outer-container py-4 px-4"
                         style="box-shadow: 0 0 64px #cfd5db; min-height: 80px"
                     >
-                        <div vclass="w-150">
-                            <div class="text-lg mb-6 w-190">
+                        <div class="w-full px-4">
+                            <div class="text-lg mb-6 w-full">
                                 <div class="mb-5">
                                     Fix the codons of the selected amino acids below.
                                 </div>
@@ -298,16 +286,15 @@
                                             {{ block.aminoacid }}
                                         </span>
                                         <div class="flex-1">
-                                            <n-input-group>
-                                                <n-input
-                                                    round
-                                                    placeholder="Codon"
-                                                    type="textarea"
-                                                    clearable
-                                                    :rows="1"
-                                                    v-model:value="block.codon"
-                                                ></n-input>
-                                            </n-input-group>
+                                            <n-select
+                                                v-model:value="block.codon"
+                                                :options="getCodonOptions(block.aminoacid as keyof typeof codonSelectionOptions)"
+                                                placeholder="Select codon"
+                                                clearable
+                                                filterable
+                                                value-field="key"
+                                                label-field="label"
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -389,21 +376,48 @@
         />
     </el-dialog>
 </template>
+
 <script setup lang="ts">
 /* eslint-disable camelcase */
 
 import type { UploadFileInfo } from 'naive-ui'
+import { ref, computed, watch, onBeforeMount, onMounted, onUnmounted } from 'vue'
 import { InfoFilled } from '@element-plus/icons-vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 import selectFromDB from './select_window_cds_only.vue' // fix_codon mode use cds_only window
 import { useUserIdGenerator } from '@/utils/userIdGenerator'
 import { encrypt } from '@/utils/crypto'
 import { windowErrorMessage, windowSuccessMessage } from '@/utils/windowFunctions'
 import { codonUsageOptions } from '@/utils/taskoptions'
+import { codonSelectionOptions } from '@/utils/selectionoptions'
 
+// Basic refs
+const sequenceWindow = ref(null)
 const inputBlocks = ref({ name: '', cds: '' })
 const inputBlocktoPass = ref({ cds: '' })
+const fileListFasta = ref<UploadFileInfo[]>([])
+const fileListCsv = ref<UploadFileInfo[]>([])
+const submitfilefasta = ref<File[]>([])
+const submitfilecsv = ref<File[]>([])
+const inputtype = ref('paste')
+const userid = ref('')
+const loading = ref(false)
+const selectionDialogVisible = ref(false)
+const selectedIndices = ref<number[]>([])
+const yourArray = ref([] as string[])
+const importID = ref(0)
 
+// Drag selection state
+const isDragging = ref(false)
+const dragStartIndex = ref(-1)
+const lastDragIndex = ref(-1)
+const dragStartTime = ref(0)
+const draggedIndices = ref<Set<number>>(new Set())
+const initialSelectionState = ref<Map<number, boolean>>(new Map())
+const dragThreshold = 150 // milliseconds
+
+// Codon blocks interface and refs
 interface CodonBlock {
     index: number
     aminoacid: string
@@ -411,6 +425,14 @@ interface CodonBlock {
 }
 
 const codonBlocks = ref<CodonBlock[]>([])
+
+// Parameters
+const paramform = ref({
+    codonusage: '',
+    lambda: 0.0,
+})
+
+// Computed properties
 const chunkedCodonBlocks = computed(() => {
     const chunks = []
     for (let i = 0; i < codonBlocks.value.length; i += 3) {
@@ -419,92 +441,169 @@ const chunkedCodonBlocks = computed(() => {
     return chunks
 })
 
-const fileListFasta = ref<UploadFileInfo[]>([])
-const fileListCsv = ref<UploadFileInfo[]>([])
-const submitfilefasta = ref<File[]>([])
-const submitfilecsv = ref<File[]>([])
-const inputtype = ref('upload')
+const dynamicWindowHeight = computed(() => {
+    const sequenceLength = yourArray.value.length
+    if (sequenceLength === 0) return '100px'
 
-const userid = ref('')
-const loading = ref(false)
+    const aminoAcidsPerRow = 28
+    const buttonHeight = 32
+    const padding = 32
 
-const selectionDialogVisible = ref(false)
+    const numberOfRows = Math.ceil(sequenceLength / aminoAcidsPerRow)
+    const calculatedHeight = numberOfRows * buttonHeight + padding
 
-const sliderValue = ref([1, 5])
-const selectedIndices = ref<number[]>([])
+    const minHeight = 80
+    const maxHeight = 300
 
-const yourArray = ref([] as string[])
-watch(
-    () => inputBlocks.value.cds,
-    (newVal: string) => {
-        const aminoAcids = newVal.split('')
-        yourArray.value = aminoAcids
+    const finalHeight = Math.max(minHeight, Math.min(calculatedHeight, maxHeight))
 
-        selectedIndices.value.length = 0
-        codonBlocks.value.length = 0
-    }
-)
-
-const filteredArray = computed(() => {
-    return yourArray.value
-        .map((value, index) => ({ value, index }))
-        .slice(sliderValue.value[0], sliderValue.value[1] + 1)
+    return `${finalHeight}px`
 })
 
-const chunkedArray = computed(() => {
-    const chunks = []
-    for (let i = 0; i < filteredArray.value.length; i += 20) {
-        chunks.push(filteredArray.value.slice(i, i + 20))
-    }
-    return chunks
-})
-
-const importID = ref(0)
-
-const importFromDB = (index: number) => {
-    importID.value = index
-    selectionDialogVisible.value = true
+// Utility functions
+const resetDragState = () => {
+    isDragging.value = false
+    dragStartIndex.value = -1
+    lastDragIndex.value = -1
+    dragStartTime.value = 0
+    draggedIndices.value.clear()
+    initialSelectionState.value.clear()
 }
-const fillSequence = async () => {
-    inputBlocks.value = {
-        name: 'seq',
-        cds: 'MSYYLNYYGGLGYGYDCKYSY*',
-    }
-    // eslint-disable-next-line no-promise-executor-return
-    await new Promise(resolve => setTimeout(resolve, 200)) // watch inputBlocks 的时候，会清除 codonBlocks 和 selectedIndices，等待 0.2 秒，等 watch 跑完 再更新 codonBlocks 和 selectedIndices
-    codonBlocks.value.length = 0
-    codonBlocks.value.push({ index: 2, aminoacid: 'S', codon: 'UCA' }) // this 0-index is required by the linear design software which will be passed to the backend as parameters
-    codonBlocks.value.push({ index: 5, aminoacid: 'L', codon: 'CUA' })
-    selectedIndices.value.push(1) // this is normally 0-index
-    selectedIndices.value.push(4)
+
+const getCodonOptions = (aminoacid: keyof typeof codonSelectionOptions) => {
+    return codonSelectionOptions[aminoacid] || []
 }
-const handleButtonClick = (index: number, value: string) => {
-    console.log(index, value)
+
+// Direct toggle function that doesn't check drag state
+const toggleSelectionDirect = (index: number, value: string) => {
     const selectedIndex = selectedIndices.value.indexOf(index)
-    // select
     if (selectedIndex > -1) {
+        // Deselect
         selectedIndices.value.splice(selectedIndex, 1)
         codonBlocks.value = codonBlocks.value.filter(block => block.index !== index + 1)
-    }
-    // deselect
-    else {
+    } else {
+        // Select
         selectedIndices.value.push(index) // 0-index
         codonBlocks.value.push({ index: index + 1, aminoacid: value, codon: '' }) // 1-index
         codonBlocks.value.sort((a, b) => a.index - b.index)
     }
 }
 
-const handleSelectionDialogVisible = (value: any) => {
-    selectionDialogVisible.value = value
-}
-const handleInputBlocktoPass = (value: any) => {
-    inputBlocktoPass.value = value
-    if (inputBlocktoPass.value.cds !== '') {
-        inputBlocks.value.cds = inputBlocktoPass.value.cds
-        inputBlocktoPass.value.cds = ''
+// Fill gaps between two indices during drag
+const fillDragGaps = (fromIndex: number, toIndex: number) => {
+    const start = Math.min(fromIndex, toIndex)
+    const end = Math.max(fromIndex, toIndex)
+
+    for (let i = start; i <= end; i += 1) {
+        if (!draggedIndices.value.has(i)) {
+            draggedIndices.value.add(i)
+
+            // Determine if this should be selected or deselected based on drag start state
+            const wasInitiallySelected =
+                initialSelectionState.value.get(dragStartIndex.value) || false
+            const shouldSelect = !wasInitiallySelected // Toggle behavior
+
+            const currentlySelected = selectedIndices.value.includes(i)
+
+            if (shouldSelect && !currentlySelected) {
+                // Select this index
+                selectedIndices.value.push(i)
+                codonBlocks.value.push({
+                    index: i + 1,
+                    aminoacid: yourArray.value[i],
+                    codon: '',
+                })
+                codonBlocks.value.sort((a, b) => a.index - b.index)
+            } else if (!shouldSelect && currentlySelected) {
+                // Deselect this index
+                const selectedIdx = selectedIndices.value.indexOf(i)
+                if (selectedIdx > -1) {
+                    selectedIndices.value.splice(selectedIdx, 1)
+                }
+                codonBlocks.value = codonBlocks.value.filter(block => block.index !== i + 1)
+            }
+        }
     }
 }
 
+// Event handlers
+const handleMouseDown = (index: number, value: string, event: MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    dragStartTime.value = Date.now()
+
+    // Don't immediately set isDragging to true
+    dragStartIndex.value = index
+    lastDragIndex.value = index
+    draggedIndices.value.clear()
+    draggedIndices.value.add(index)
+    initialSelectionState.value.clear()
+
+    // Store initial selection state for all items
+    for (let i = 0; i < yourArray.value.length; i += 1) {
+        initialSelectionState.value.set(i, selectedIndices.value.includes(i))
+    }
+}
+
+const handleMouseEnter = (index: number) => {
+    // Only start dragging if mouse has been down long enough or moved to a different box
+    if (
+        dragStartIndex.value !== -1 &&
+        (index !== dragStartIndex.value || Date.now() - dragStartTime.value > dragThreshold)
+    ) {
+        if (!isDragging.value) {
+            isDragging.value = true
+            // Apply the initial toggle to the start index when we start dragging
+            toggleSelectionDirect(dragStartIndex.value, yourArray.value[dragStartIndex.value])
+        }
+
+        // Fill gaps between last processed index and current index
+        if (lastDragIndex.value !== -1) {
+            fillDragGaps(lastDragIndex.value, index)
+        }
+        lastDragIndex.value = index
+    }
+}
+
+const handleMouseUp = () => {
+    if (isDragging.value) {
+        resetDragState()
+    } else {
+        // Just reset the drag start tracking for normal clicks
+        dragStartIndex.value = -1
+        dragStartTime.value = 0
+    }
+}
+
+const handleMouseLeave = () => {
+    if (isDragging.value) {
+        resetDragState()
+    }
+}
+
+const handleButtonClick = (index: number, value: string) => {
+    // Only handle click if not dragging
+    if (!isDragging.value) {
+        toggleSelectionDirect(index, value)
+    }
+}
+
+const handleGlobalMouseUp = () => {
+    if (isDragging.value) {
+        resetDragState()
+    } else if (dragStartIndex.value !== -1) {
+        // Clean up drag start state for normal clicks
+        dragStartIndex.value = -1
+        dragStartTime.value = 0
+    }
+}
+
+const handleSequenceScroll = () => {
+    // Scroll handling logic if needed
+}
+
+// File handling functions
 const checkfile = (data: UploadFileInfo, type: string) => {
     if (type === 'fasta') {
         if (data.name.match(/(.fasta)$/g) === null && data.name.match(/(.fa)$/g) === null) {
@@ -537,6 +636,7 @@ const handleFileListChangeFasta = (data: UploadFileInfo[]) => {
         }
     }
 }
+
 const handleFileListChangeCsv = (data: UploadFileInfo[]) => {
     if (data.length > 0) {
         const f = data[0]
@@ -546,22 +646,41 @@ const handleFileListChangeCsv = (data: UploadFileInfo[]) => {
     }
 }
 
-const router = useRouter()
-
-const godemo = () => {
-    router.push({
-        path: '/task/result/lineardesign',
-        query: {
-            taskid: encrypt(
-                '-97',
-                'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2'
-            ),
-        },
-    })
+// Dialog and input functions
+const importFromDB = (index: number) => {
+    importID.value = index
+    selectionDialogVisible.value = true
 }
 
+const fillSequence = async () => {
+    inputBlocks.value = {
+        name: 'seq',
+        cds: 'MSYYLNYYGGLGYGYDCKYSY*',
+    }
+    await new Promise(resolve => {
+        setTimeout(resolve, 200)
+    })
+    codonBlocks.value.length = 0
+    codonBlocks.value.push({ index: 2, aminoacid: 'S', codon: 'UCG' })
+    codonBlocks.value.push({ index: 5, aminoacid: 'L', codon: 'UUA' })
+    selectedIndices.value.push(1)
+    selectedIndices.value.push(4)
+}
+
+const handleSelectionDialogVisible = (value: any) => {
+    selectionDialogVisible.value = value
+}
+
+const handleInputBlocktoPass = (value: any) => {
+    inputBlocktoPass.value = value
+    if (inputBlocktoPass.value.cds !== '') {
+        inputBlocks.value.cds = inputBlocktoPass.value.cds
+        inputBlocktoPass.value.cds = ''
+    }
+}
+
+// Validation functions
 const checkPasteInput = () => {
-    // error code: 0 for true, 1 for error
     const isOnlyLetters = (str: string) => {
         const regex = /^[A-Za-z]+$/
         return regex.test(str)
@@ -587,8 +706,8 @@ const checkPasteInput = () => {
         return 2
     }
     for (let i = 0; i < codonBlocks.value.length; i += 1) {
-        if (codonBlocks.value[i].codon.length === 0) {
-            windowErrorMessage('Please fill in all the codons you want to fix.')
+        if (!codonBlocks.value[i].codon || codonBlocks.value[i].codon.length === 0) {
+            windowErrorMessage('Please select a codon for all selected amino acids.')
             return 3
         }
         if (!isOnlyLetters(codonBlocks.value[i].codon)) {
@@ -603,15 +722,30 @@ const checkPasteInput = () => {
     return 0
 }
 
-const paramform = ref({
-    codonusage: '',
-    lambda: 0.0,
-})
+// Form and submission functions
 const resetFilterForm = () => {
     paramform.value = {
         codonusage: '',
         lambda: 0.0,
     }
+}
+
+const router = useRouter()
+
+const godemo = () => {
+    router.push({
+        path: '/task/result/lineardesign',
+        query: {
+            taskid: encrypt(
+                '-97',
+                'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2'
+            ),
+        },
+    })
+}
+
+const gosubmithelper = () => {
+    router.push({ path: '/tutorial', query: { type: 'analysis' } })
 }
 
 const submit = async () => {
@@ -672,6 +806,7 @@ const submit = async () => {
     }
     loading.value = false
 }
+
 const submitdemo = async () => {
     loading.value = true
     const submitdata = new FormData()
@@ -703,15 +838,34 @@ const submitdemo = async () => {
     }
     loading.value = false
 }
+
+// Watchers
+watch(
+    () => inputBlocks.value.cds,
+    (newVal: string) => {
+        const aminoAcids = newVal.split('')
+        yourArray.value = aminoAcids
+
+        selectedIndices.value.length = 0
+        codonBlocks.value.length = 0
+        resetDragState()
+    }
+)
+
+// Lifecycle hooks
+onMounted(() => {
+    document.addEventListener('mouseup', handleGlobalMouseUp)
+})
+
+onUnmounted(() => {
+    document.removeEventListener('mouseup', handleGlobalMouseUp)
+})
+
 onBeforeMount(() => {
     const { userId, getUserIdFromCookie } = useUserIdGenerator()
     getUserIdFromCookie()
     userid.value = userId.value as string
 })
-
-const gosubmithelper = () => {
-    router.push({ path: '/tutorial', query: { type: 'analysis' } })
-}
 </script>
 
 <style lang="scss" scoped>
@@ -732,5 +886,86 @@ const gosubmithelper = () => {
     color: #f4aaa9;
     margin-right: 2px;
 }
+
+.sequence-window-container {
+    width: 100%;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.sequence-window {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px;
+    background-color: #fafafa;
+    transition: height 0.3s ease;
+}
+
+.sequence-window.drag-selecting {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.sequence-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
+    gap: 0;
+    max-width: 100%;
+}
+
+.sequence-button {
+    min-width: 20px;
+    width: 20px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 12px;
+    padding: 0;
+    border-radius: 0;
+    margin: 0;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.drag-selecting .sequence-button {
+    cursor: crosshair;
+}
+
+.sequence-button:not(:last-child) {
+    border-right: none;
+}
+
+.sequence-button:first-child {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.sequence-button:last-child {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.sequence-window::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sequence-window::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.sequence-window::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.sequence-window::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
 </style>
-a
