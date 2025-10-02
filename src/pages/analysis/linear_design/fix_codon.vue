@@ -225,7 +225,7 @@
                                         @mouseleave="handleMouseLeave"
                                         :class="{ 'drag-selecting': isDragging }"
                                     >
-                                        <div class="sequence-grid">
+                                        <div class="sequence-grid" :style="sequenceGridStyle">
                                             <n-button
                                                 v-for="(item, index) in yourArray"
                                                 :key="index"
@@ -236,6 +236,7 @@
                                                 "
                                                 size="small"
                                                 class="sequence-button"
+                                                :style="sequenceButtonStyle"
                                                 @mousedown="handleMouseDown(index, item, $event)"
                                                 @mouseenter="handleMouseEnter(index)"
                                                 @click="handleButtonClick(index, item)"
@@ -417,6 +418,12 @@ const draggedIndices = ref<Set<number>>(new Set())
 const initialSelectionState = ref<Map<number, boolean>>(new Map())
 const dragThreshold = 150 // milliseconds
 
+// Adaptive width constants
+const containerWidth = 800 // Approximate container width in pixels
+const minBoxWidth = 20 // Minimum box width
+const maxBoxWidth = 80 // Maximum box width to prevent boxes from being too large
+const fillThreshold = 0.75 // If boxes fill less than 75% of the row, increase width
+
 // Codon blocks interface and refs
 interface CodonBlock {
     index: number
@@ -441,15 +448,55 @@ const chunkedCodonBlocks = computed(() => {
     return chunks
 })
 
+// Adaptive box width calculation
+const adaptiveBoxWidth = computed(() => {
+    const sequenceLength = yourArray.value.length
+    if (sequenceLength === 0) return minBoxWidth
+
+    // Calculate how much space boxes would take with minimum width
+    const minWidthTotalSpace = sequenceLength * minBoxWidth
+    const fillRatio = minWidthTotalSpace / containerWidth
+
+    // If boxes don't fill enough of the row, increase width
+    if (fillRatio < fillThreshold) {
+        const calculatedWidth = Math.floor(containerWidth / sequenceLength)
+        return Math.min(Math.max(calculatedWidth, minBoxWidth), maxBoxWidth)
+    }
+
+    // Otherwise keep minimum width
+    return minBoxWidth
+})
+
+// Calculated boxes per row based on adaptive width
+const boxesPerRow = computed(() => {
+    return Math.floor(containerWidth / adaptiveBoxWidth.value)
+})
+
+// Dynamic styles for sequence grid and buttons
+const sequenceGridStyle = computed(() => {
+    return {
+        gridTemplateColumns: `repeat(${boxesPerRow.value}, ${adaptiveBoxWidth.value}px)`,
+        justifyContent: 'flex-start',
+        gap: '0px',
+    }
+})
+
+const sequenceButtonStyle = computed(() => {
+    return {
+        minWidth: `${adaptiveBoxWidth.value}px`,
+        width: `${adaptiveBoxWidth.value}px`,
+        height: '32px',
+    }
+})
+
 const dynamicWindowHeight = computed(() => {
     const sequenceLength = yourArray.value.length
     if (sequenceLength === 0) return '100px'
 
-    const aminoAcidsPerRow = 28
     const buttonHeight = 32
     const padding = 32
 
-    const numberOfRows = Math.ceil(sequenceLength / aminoAcidsPerRow)
+    const numberOfRows = Math.ceil(sequenceLength / boxesPerRow.value)
     const calculatedHeight = numberOfRows * buttonHeight + padding
 
     const minHeight = 80
@@ -657,7 +704,7 @@ const fillSequence = async () => {
         name: 'seq',
         cds: 'MSYYLNYYGGLGYGYDCKYSY*',
     }
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
         setTimeout(resolve, 200)
     })
     codonBlocks.value.length = 0
@@ -911,15 +958,11 @@ onBeforeMount(() => {
 
 .sequence-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
     gap: 0;
     max-width: 100%;
 }
 
 .sequence-button {
-    min-width: 20px;
-    width: 20px;
-    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
