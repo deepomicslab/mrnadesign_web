@@ -498,6 +498,11 @@ import { windowErrorMessage, windowSuccessMessage } from '@/utils/windowFunction
 import { codonUsageOptions } from '@/utils/taskoptions'
 import { codonSelectionOptions } from '@/utils/selectionoptions'
 
+import { useLinearDesign2LinearDesignFixCodonTaskSunmissionStore } from '@/store/mrna'
+
+const taskSubmission2LinearDesignFixCodonStore =
+    useLinearDesign2LinearDesignFixCodonTaskSunmissionStore()
+
 // Interfaces
 interface CodonBlock {
     index: number
@@ -974,17 +979,23 @@ const importFromDB = () => {
 
 const fillSequence = async () => {
     inputBlocks.value = {
-        name: 'seq',
-        cds: 'MSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSY*',
+        name: taskSubmission2LinearDesignFixCodonStore.seq_name,
+        cds: taskSubmission2LinearDesignFixCodonStore.seq,
     }
+    paramform.value.codonusage = taskSubmission2LinearDesignFixCodonStore.codonusage
+    paramform.value.lambda = Number(taskSubmission2LinearDesignFixCodonStore.lambda)
+
     await nextTick()
     selectedIndices.value.length = 0
-    selectedIndices.value = [1, 4]
     codonBlocks.value.length = 0
-    codonBlocks.value = [
-        { index: 2, aminoacid: 'S', codon: 'UCG' },
-        { index: 5, aminoacid: 'L', codon: 'UUA' },
-    ]
+    taskSubmission2LinearDesignFixCodonStore.conf.forEach(conf_item => {
+        codonBlocks.value.push({
+            index: conf_item.index,
+            aminoacid: conf_item.aa,
+            codon: conf_item.codon,
+        })
+        selectedIndices.value.push(conf_item.index - 1)
+    })
 }
 
 const handleSelectionDialogVisible = (value: boolean) => {
