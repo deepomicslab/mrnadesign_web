@@ -213,10 +213,14 @@
                             <el-form-item label="Fix Codon" class="mb-6 is-required">
                                 <div class="sequence-viewer-container">
                                     <!-- Controls Bar -->
-                                    <div class="controls-bar">
+                                    <div class="controls-bar" ref="controlsBar">
                                         <div class="sequence-info">
                                             <span class="sequence-name">
                                                 {{ inputBlocks.name || 'Sequence' }}
+                                            </span>
+                                            <span class="sequence-stats">
+                                                Length: {{ yourArray.length }} | Selected:
+                                                {{ selectedIndices.length }}
                                             </span>
                                         </div>
                                         <div class="zoom-controls">
@@ -225,7 +229,9 @@
                                                 @click="zoomOut"
                                                 :disabled="zoomLevel <= 0.5"
                                             >
-                                                <el-icon><ZoomOut /></el-icon>
+                                                <el-icon>
+                                                    <ZoomOut />
+                                                </el-icon>
                                             </el-button>
                                             <span class="zoom-level">
                                                 {{ Math.round(zoomLevel * 100) }}%
@@ -233,9 +239,11 @@
                                             <el-button
                                                 size="small"
                                                 @click="zoomIn"
-                                                :disabled="zoomLevel >= 3"
+                                                :disabled="zoomLevel >= 1.5"
                                             >
-                                                <el-icon><ZoomIn /></el-icon>
+                                                <el-icon>
+                                                    <ZoomIn />
+                                                </el-icon>
                                             </el-button>
                                             <el-button size="small" @click="resetZoom">
                                                 RESET
@@ -243,69 +251,88 @@
                                         </div>
                                     </div>
 
-                                    <!-- Progress Bar (Two-part vertical layout) -->
-                                    <div class="progress-bar-container">
-                                        <!-- Upper part: Info display -->
-                                        <div class="progress-info-section">
-                                            <span class="progress-info-text">
-                                                Length: {{ yourArray.length }} | Selected:
-                                                {{ selectedIndices.length }}
+                                    <!-- Range Numbers Above Progress Bar -->
+                                    <div
+                                        class="range-numbers-container"
+                                        v-if="shouldShowRangeBoxes"
+                                    >
+                                        <div
+                                            class="range-number range-number-left"
+                                            :style="leftRangeStyle"
+                                        >
+                                            {{ viewportStart + 1 }}
+                                        </div>
+                                        <div
+                                            class="range-number range-number-right"
+                                            :style="rightRangeStyle"
+                                        >
+                                            {{ viewportEnd }}
+                                        </div>
+                                    </div>
+
+                                    <!-- Trapezoid Fill -->
+                                    <div class="trapezoid-fill" :style="trapezoidStyle"></div>
+
+                                    <!-- Progress Bar -->
+                                    <div class="progress-position-section" ref="progressContainer">
+                                        <div class="position-indicators">
+                                            <div
+                                                v-for="(char, index) in yourArray"
+                                                :key="`progress-${index}`"
+                                                class="position-block"
+                                                :class="{
+                                                    selected: selectedIndices.includes(index),
+                                                }"
+                                                :style="getProgressBlockStyle(index)"
+                                            ></div>
+                                        </div>
+
+                                        <!-- Position indices -->
+                                        <div class="position-indices">
+                                            <span
+                                                v-for="(pos, index) in progressPositions"
+                                                :key="`progress-pos-${pos}`"
+                                                class="progress-position-label"
+                                                :style="getProgressPositionStyle(index)"
+                                                v-show="shouldShowProgressPosition(pos)"
+                                            >
+                                                {{ pos }}
                                             </span>
                                         </div>
 
-                                        <!-- Lower part: Position indicators with mask -->
+                                        <!-- Viewport mask with hover events and indicators inside -->
                                         <div
-                                            class="progress-position-section"
-                                            ref="progressContainer"
+                                            class="viewport-mask"
+                                            :style="viewportMaskStyle"
+                                            @mousedown="handleMaskBodyMouseDown"
+                                            @mouseenter="handleMaskMouseEnter"
+                                            @mouseleave="handleMaskMouseLeave"
+                                            @mousemove="handleMaskMouseMoveHover"
                                         >
-                                            <div class="position-indicators">
-                                                <div
-                                                    v-for="(char, index) in yourArray"
-                                                    :key="`progress-${index}`"
-                                                    class="position-block"
-                                                    :class="{
-                                                        selected: selectedIndices.includes(index),
-                                                    }"
-                                                    :style="getProgressBlockStyle(index)"
-                                                ></div>
-                                            </div>
-
-                                            <!-- Position indices -->
-                                            <div class="position-indices">
-                                                <span
-                                                    v-for="(pos, index) in progressPositions"
-                                                    :key="`progress-pos-${pos}`"
-                                                    class="progress-position-label"
-                                                    :style="getProgressPositionStyle(index)"
-                                                    v-show="shouldShowProgressPosition(pos)"
-                                                >
-                                                    {{ pos }}
-                                                </span>
-                                            </div>
-
-                                            <!-- Viewport mask without range display -->
+                                            <!-- Left side hover indicator inside mask -->
                                             <div
-                                                class="viewport-mask"
-                                                :style="viewportMaskStyle"
-                                                @mousedown="handleMaskBodyMouseDown"
+                                                v-if="maskHovered && maskHoverSide === 'left'"
+                                                class="mask-indicator mask-indicator-left"
                                             >
-                                                <div
-                                                    class="mask-handle mask-handle-left"
-                                                    @mousedown.stop="handleLeftHandleMouseDown"
-                                                ></div>
-                                                <div
-                                                    class="mask-handle mask-handle-right"
-                                                    @mousedown.stop="handleRightHandleMouseDown"
-                                                ></div>
+                                                &lt;&lt;&lt;
                                             </div>
 
-                                            <!-- Range display positioned at container level -->
+                                            <!-- Right side hover indicator inside mask -->
                                             <div
-                                                class="mask-range-display"
-                                                :style="maskRangeDisplayStyle"
+                                                v-if="maskHovered && maskHoverSide === 'right'"
+                                                class="mask-indicator mask-indicator-right"
                                             >
-                                                {{ maskRangeText }}
+                                                &gt;&gt;&gt;
                                             </div>
+
+                                            <div
+                                                class="mask-handle mask-handle-left"
+                                                @mousedown.stop="handleLeftHandleMouseDown"
+                                            ></div>
+                                            <div
+                                                class="mask-handle mask-handle-right"
+                                                @mousedown.stop="handleRightHandleMouseDown"
+                                            ></div>
                                         </div>
                                     </div>
 
@@ -367,6 +394,16 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- Projection Lines -->
+                                    <div
+                                        class="projection-line projection-line-left"
+                                        :style="leftLineStyle"
+                                    ></div>
+                                    <div
+                                        class="projection-line projection-line-right"
+                                        :style="rightLineStyle"
+                                    ></div>
                                 </div>
                             </el-form-item>
                         </div>
@@ -517,6 +554,7 @@ const router = useRouter()
 // Element refs
 const progressContainer = ref<HTMLElement | null>(null)
 const sequenceContainer = ref<HTMLElement | null>(null)
+const controlsBar = ref<HTMLElement | null>(null)
 
 // Basic reactive data
 const inputBlocks = ref({ name: '', cds: '' })
@@ -563,8 +601,13 @@ const maskDrag = ref({
 // Constants
 const CHAR_BASE_SIZE = 16
 const MIN_ZOOM = 0.5
-const MAX_ZOOM = 3.0
+const MAX_ZOOM = 1.5
 const DRAG_THRESHOLD = 3
+
+// Add to your reactive data
+const maskHovered = ref(false)
+const maskHoverSide = ref<'left' | 'right' | 'center'>('center') // Add this
+const maskMousePosition = ref({ x: 0, y: 0 }) // Add this
 
 // Utility functions
 const getCodonOptions = (aminoacid: keyof typeof codonSelectionOptions) => {
@@ -580,6 +623,10 @@ const actualContainerWidth = computed(() => {
 
 const maxVisibleChars = computed(() => {
     return Math.floor(actualContainerWidth.value / charWidth.value)
+})
+
+const controlsBarHeight = computed(() => {
+    return controlsBar.value?.offsetHeight || 40
 })
 
 // Ensure viewport end is properly calculated and bounded
@@ -620,16 +667,106 @@ const progressPositions = computed(() => {
     return Array.from({ length: yourArray.value.length }, (_, i) => i + 1)
 })
 
-const positionLabelInterval = computed(() => {
-    const { length } = yourArray.value
-    if (length <= 20) return 1
-    if (length <= 100) return 5
-    if (length <= 200) return 10
-    if (length <= 1000) return 50
-    return Math.ceil(length / 20)
-})
+// Add to your reactive data
+// const maskHovered = ref(false)
 
-// Viewport mask style
+// Update existing methods
+const handleMaskMouseEnter = () => {
+    maskHovered.value = true
+}
+
+const handleMaskMouseLeave = () => {
+    maskHovered.value = false
+    maskHoverSide.value = 'center' // Reset when leaving
+}
+
+// Add new method for tracking mouse movement on mask
+const handleMaskMouseMoveHover = (event: MouseEvent) => {
+    if (!progressContainer.value) return
+
+    const maskElement = event.currentTarget as HTMLElement
+    const rect = maskElement.getBoundingClientRect()
+    const relativeX = event.clientX - rect.left
+    const maskWidth = rect.width
+
+    // Store mouse position for indicator placement
+    maskMousePosition.value = {
+        x: event.clientX,
+        y: event.clientY,
+    }
+
+    // Determine which side of the mask we're on
+    const leftThreshold = maskWidth * 0.3 // Left 30%
+    const rightThreshold = maskWidth * 0.7 // Right 30%
+
+    if (relativeX < leftThreshold) {
+        maskHoverSide.value = 'left'
+    } else if (relativeX > rightThreshold) {
+        maskHoverSide.value = 'right'
+    } else {
+        maskHoverSide.value = 'center'
+    }
+}
+
+// // Computed style for left indicator
+// const leftIndicatorStyle = computed(() => {
+//     if (!maskHovered.value || maskHoverSide.value !== 'left') {
+//         return { display: 'none' }
+//     }
+
+//     if (!progressContainer.value || yourArray.value.length === 0) {
+//         return { display: 'none' }
+//     }
+
+//     const containerWidth = progressContainer.value.offsetWidth
+//     const totalLength = yourArray.value.length
+//     const startPercent = (viewportStart.value / totalLength) * 100
+//     const leftPosition = (startPercent / 100) * containerWidth
+
+//     return {
+//         position: 'absolute' as const,
+//         left: `${Math.max(5, leftPosition - 35)}px`, // Position to the left of mask
+//         top: `${controlsBarHeight.value + 30 + 12}px`, // Same level as mask
+//         color: '#666666',
+//         fontSize: '14px',
+//         fontWeight: 'bold',
+//         zIndex: 10002,
+//         pointerEvents: 'none' as const,
+//         userSelect: 'none' as const,
+//         fontFamily: 'monospace',
+//     }
+// })
+
+// // Computed style for right indicator
+// const rightIndicatorStyle = computed(() => {
+//     if (!maskHovered.value || maskHoverSide.value !== 'right') {
+//         return { display: 'none' }
+//     }
+
+//     if (!progressContainer.value || yourArray.value.length === 0) {
+//         return { display: 'none' }
+//     }
+
+//     const containerWidth = progressContainer.value.offsetWidth
+//     const totalLength = yourArray.value.length
+//     const endPercent = (viewportEnd.value / totalLength) * 100
+//     const rightPosition = (endPercent / 100) * containerWidth
+
+//     return {
+//         position: 'absolute' as const,
+//         left: `${Math.min(containerWidth - 35, rightPosition + 10)}px`, // Position to the right of mask
+//         top: `${controlsBarHeight.value + 30 + 12}px`, // Same level as mask
+//         color: '#666666',
+//         fontSize: '14px',
+//         fontWeight: 'bold',
+//         zIndex: 10002,
+//         pointerEvents: 'none' as const,
+//         userSelect: 'none' as const,
+//         fontFamily: 'monospace',
+//     }
+// })
+
+// Update the viewport mask style to include hover state
 const viewportMaskStyle = computed(() => {
     if (yourArray.value.length === 0) {
         return { left: '0%', width: '100%' }
@@ -643,15 +780,41 @@ const viewportMaskStyle = computed(() => {
     return {
         left: `${Math.max(0, startPercent)}%`,
         width: `${Math.max(1, widthPercent)}%`,
+        // Add custom CSS variables for handle colors
+        '--handle-color': maskHovered.value ? '#8c8c8c' : '#cfcfcf',
+        '--handle-opacity': maskHovered.value ? '0.5' : '0.0',
     }
 })
 
-const maskRangeText = computed(() => {
-    return `${viewportStart.value + 1}-${viewportEnd.value}`
+// Mask width and range display computeds
+const maskWidthPx = computed(() => {
+    if (!progressContainer.value || yourArray.value.length === 0) {
+        return 0
+    }
+
+    const containerWidth = progressContainer.value.offsetWidth
+    const totalLength = yourArray.value.length
+    const startPercent = (viewportStart.value / totalLength) * 100
+    const endPercent = (viewportEnd.value / totalLength) * 100
+    const maskWidthPercent = endPercent - startPercent
+    return (containerWidth * maskWidthPercent) / 100
 })
 
-// Range display positioning computed
-const maskRangeDisplayStyle = computed(() => {
+// Show range boxes when mask is visible
+const shouldShowRangeBoxes = computed(() => {
+    return yourArray.value.length > 0 && progressContainer.value
+})
+
+// Calculate if numbers would overlap
+const rangeNumbersOverlap = computed(() => {
+    const numberWidth = 25 // Approximate width of each number
+    const minSpacing = 15 // Minimum spacing between numbers
+    const requiredWidth = numberWidth * 2 + minSpacing
+    return maskWidthPx.value < requiredWidth
+})
+
+// Calculate positions for left range number - now above progress bar
+const leftRangeStyle = computed(() => {
     if (!progressContainer.value || yourArray.value.length === 0) {
         return { display: 'none' }
     }
@@ -659,36 +822,217 @@ const maskRangeDisplayStyle = computed(() => {
     const containerWidth = progressContainer.value.offsetWidth
     const totalLength = yourArray.value.length
     const startPercent = (viewportStart.value / totalLength) * 100
+    const maskLeftPx = (startPercent / 100) * containerWidth
+
+    let leftPosition = maskLeftPx
+
+    // Handle overlap case - adjust position
+    if (rangeNumbersOverlap.value) {
+        leftPosition = maskLeftPx - 20
+    }
+
+    // Ensure it doesn't go outside container
+    leftPosition = Math.max(5, Math.min(leftPosition, containerWidth - 50))
+
+    return {
+        left: `${leftPosition}px`,
+    }
+})
+
+// Calculate positions for right range number - now above progress bar
+const rightRangeStyle = computed(() => {
+    if (!progressContainer.value || yourArray.value.length === 0) {
+        return { display: 'none' }
+    }
+
+    const containerWidth = progressContainer.value.offsetWidth
+    const totalLength = yourArray.value.length
+    const endPercent = (viewportEnd.value / totalLength) * 100
+    const maskRightPx = (endPercent / 100) * containerWidth
+
+    let rightPosition = containerWidth - maskRightPx
+
+    // Handle overlap case - adjust position
+    if (rangeNumbersOverlap.value) {
+        rightPosition = containerWidth - maskRightPx - 20
+    }
+
+    // Ensure it doesn't go outside container
+    rightPosition = Math.max(5, Math.min(rightPosition, containerWidth - 25))
+
+    return {
+        right: `${rightPosition}px`,
+    }
+})
+
+// // Projection lines computed properties - updated for new layout
+// const leftLineStyle = computed(() => {
+//     if (!progressContainer.value || yourArray.value.length === 0) {
+//         return { display: 'none' }
+//     }
+
+//     const containerWidth = progressContainer.value.offsetWidth
+//     const totalLength = yourArray.value.length
+//     const startPercent = (viewportStart.value / totalLength) * 100
+
+//     const maskLeftPx = (startPercent / 100) * containerWidth
+
+//     const startX = maskLeftPx
+//     const startY = controlsBarHeight.value + 30 + 24 // Bottom of mask (including range numbers space)
+
+//     const sequenceLeftPx = 0
+//     const endY = controlsBarHeight.value + 30 + 24 + 8 + 20 + 16 // Top of sequence letters
+
+//     return {
+//         position: 'absolute' as const,
+//         left: '0',
+//         top: '0',
+//         width: '100%',
+//         height: '150px',
+//         pointerEvents: 'none' as const,
+//         zIndex: 10000,
+//         clipPath: `polygon(${startX}px ${startY}px, ${startX + 2}px ${startY}px, ${
+//             sequenceLeftPx + 2
+//         }px ${endY}px, ${sequenceLeftPx}px ${endY}px)`,
+//         backgroundColor: '#1890ff',
+//     }
+// })
+
+// const rightLineStyle = computed(() => {
+//     if (!progressContainer.value || yourArray.value.length === 0) {
+//         return { display: 'none' }
+//     }
+
+//     const containerWidth = progressContainer.value.offsetWidth
+//     const totalLength = yourArray.value.length
+//     const endPercent = (viewportEnd.value / totalLength) * 100
+
+//     const maskRightPx = (endPercent / 100) * containerWidth
+
+//     const startX = maskRightPx
+//     const startY = controlsBarHeight.value + 30 + 24 // Bottom of mask (including range numbers space)
+
+//     const visibleChars = viewportEnd.value - viewportStart.value
+//     const sequenceRightPx = visibleChars * charWidth.value
+//     const endY = controlsBarHeight.value + 30 + 24 + 8 + 20 + 16 // Top of sequence letters
+
+//     return {
+//         position: 'absolute' as const,
+//         left: '0',
+//         top: '0',
+//         width: '100%',
+//         height: '150px',
+//         pointerEvents: 'none' as const,
+//         zIndex: 10000,
+//         clipPath: `polygon(${startX}px ${startY}px, ${startX + 2}px ${startY}px, ${
+//             sequenceRightPx + 2
+//         }px ${endY}px, ${sequenceRightPx}px ${endY}px)`,
+//         backgroundColor: '#1890ff',
+//     }
+// })
+
+// Shared coordinate calculation function
+const getProjectionCoordinates = () => {
+    if (!progressContainer.value || yourArray.value.length === 0) {
+        return null
+    }
+
+    const containerWidth = progressContainer.value.offsetWidth
+    const totalLength = yourArray.value.length
+    const startPercent = (viewportStart.value / totalLength) * 100
     const endPercent = (viewportEnd.value / totalLength) * 100
 
-    // Calculate mask positions
-    const maskRightPercent = endPercent
-    const maskRightPx = (maskRightPercent / 100) * containerWidth
-    const maskLeftPercent = startPercent
-    const maskLeftPx = (maskLeftPercent / 100) * containerWidth
+    const maskLeftPx = (startPercent / 100) * containerWidth
+    const maskRightPx = (endPercent / 100) * containerWidth
+    const visibleChars = viewportEnd.value - viewportStart.value
+    const sequenceLeftPx = 0
+    const sequenceRightPx = visibleChars * charWidth.value
 
-    // Estimate the width of the range display (approximate)
-    const rangeDisplayWidth = 60 // rough estimate in pixels
+    const startY = controlsBarHeight.value + 30 + 24 - 5
+    const endY = controlsBarHeight.value + 30 + 24 + 8 + 20 + 16 - 5
 
-    // Check if there's enough space on the right
-    const spaceOnRight = containerWidth - maskRightPx
-    const shouldPositionLeft = spaceOnRight < rangeDisplayWidth + 10 // 10px buffer
-
-    if (shouldPositionLeft) {
-        // Position to the left of the mask
-        return {
-            position: 'absolute' as const,
-            top: '20px',
-            left: `${Math.max(0, maskLeftPx - rangeDisplayWidth - 8)}px`, // 8px offset from mask left edge
-            zIndex: '100',
-        }
+    return {
+        maskLeftPx,
+        maskRightPx,
+        sequenceLeftPx,
+        sequenceRightPx,
+        startY,
+        endY,
+        containerWidth,
     }
-    // Position to the right of the mask (original behavior)
+}
+
+// Updated projection line styles using shared coordinates
+const leftLineStyle = computed(() => {
+    const coords = getProjectionCoordinates()
+    if (!coords) return { display: 'none' }
+
+    const { maskLeftPx, sequenceLeftPx, startY, endY } = coords
+
     return {
         position: 'absolute' as const,
-        top: '20px',
-        left: `${maskRightPx + 8}px`, // 8px offset from mask right edge
-        zIndex: '100',
+        left: '0',
+        top: '0',
+        width: '100%',
+        height: '150px',
+        pointerEvents: 'none' as const,
+        zIndex: 10000,
+        clipPath: `polygon(${maskLeftPx}px ${startY}px, ${maskLeftPx + 2}px ${startY}px, ${
+            sequenceLeftPx + 2
+        }px ${endY}px, ${sequenceLeftPx}px ${endY}px)`,
+        backgroundColor: '#5ce0e7',
+        opacity: 0.1, // More opaque for better visibility
+    }
+})
+
+const rightLineStyle = computed(() => {
+    const coords = getProjectionCoordinates()
+    if (!coords) return { display: 'none' }
+
+    const { maskRightPx, sequenceRightPx, startY, endY } = coords
+
+    return {
+        position: 'absolute' as const,
+        left: '0',
+        top: '0',
+        width: '100%',
+        height: '150px',
+        pointerEvents: 'none' as const,
+        zIndex: 10000,
+        clipPath: `polygon(${maskRightPx}px ${startY}px, ${maskRightPx + 2}px ${startY}px, ${
+            sequenceRightPx + 2
+        }px ${endY}px, ${sequenceRightPx}px ${endY}px)`,
+        backgroundColor: '#5ce0e7',
+        opacity: 0.1, // More opaque for better visibility
+    }
+})
+
+const trapezoidStyle = computed(() => {
+    const coords = getProjectionCoordinates()
+    if (!coords) return { display: 'none' }
+
+    const {
+        maskLeftPx,
+        maskRightPx,
+        sequenceLeftPx,
+        sequenceRightPx,
+        startY,
+        endY,
+        containerWidth,
+    } = coords
+    const trapezoidHeight = endY - startY
+
+    return {
+        position: 'absolute' as const,
+        left: '0',
+        top: `${startY}px`,
+        width: `${Math.max(containerWidth, sequenceRightPx)}px`,
+        height: `${trapezoidHeight}px`,
+        backgroundColor: '#5ce0e7', // Even more visible blue
+        clipPath: `polygon(${maskLeftPx}px 0px, ${maskRightPx}px 0px, ${sequenceRightPx}px ${trapezoidHeight}px, ${sequenceLeftPx}px ${trapezoidHeight}px)`,
+        zIndex: 9999, // Just below projection lines but above everything else
+        pointerEvents: 'none' as const,
+        opacity: 0.1, // More opaque for better visibility
     }
 })
 
@@ -718,19 +1062,39 @@ const sequenceDisplayStyle = computed(() => ({
     fontSize: `${Math.max(12, CHAR_BASE_SIZE * zoomLevel.value)}px`,
 }))
 
+// Progress bar interval (twice as dense as current)
+const progressPositionInterval = computed(() => {
+    const { length } = yourArray.value
+    if (length <= 100) return 10 // Was ~20, now 10
+    if (length <= 500) return 25 // Was ~50, now 25
+    if (length <= 1000) return 50 // Was ~100, now 50
+    if (length <= 5000) return 100 // Was ~200, now 100
+    return 250 // Was ~500, now 250
+})
+
+// Sequence position interval (twice as dense as current, but still denser than progress)
+const sequencePositionInterval = computed(() => {
+    const { length } = yourArray.value
+    // if (length <= 100) return 5 // Half of progress bar interval (10)
+    if (length <= 500) return 5 // Less than progress bar interval (25)
+    if (length <= 1000) return 15 // Half of progress bar interval (50)
+    if (length <= 5000) return 30 // Half of progress bar interval (100)
+    return 100 // Less than progress bar interval (250)
+})
+
+// For progress bar - show position 1 and then at intervals
 const shouldShowProgressPosition = (pos: number) => {
-    return (pos - 1) % positionLabelInterval.value === 0
+    return pos === 1 || pos % progressPositionInterval.value === 0
 }
 
+// For sequence position labels - denser than progress bar
+const shouldShowSequencePosition = (pos: number) => {
+    return pos === 1 || pos % sequencePositionInterval.value === 0
+}
 const getSequencePositionStyle = (index: number) => ({
     left: `${index * charWidth.value}px`,
     width: `${charWidth.value}px`,
 })
-
-const shouldShowSequencePosition = (pos: number) => {
-    const step = Math.max(1, Math.floor(8 / zoomLevel.value))
-    return (pos - 1) % (step * 5) === 0
-}
 
 // Helper functions
 const isDragInRange = (index: number) => {
@@ -1034,8 +1398,8 @@ const importFromDB = () => {
 
 const fillSequence = async () => {
     inputBlocks.value = {
-        name: 'seq',
-        cds: 'MSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSY*',
+        name: 'myseq',
+        cds: 'MSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYSYMSYYLNYYGGLGYGYDCKYDCKYSYMSYYLNYYGGLGYGYDCKYSY*',
     }
     await nextTick()
     selectedIndices.value.length = 0
@@ -1276,19 +1640,30 @@ onUnmounted(() => {
 
 .sequence-viewer-container {
     width: 100%;
-    border: 1px solid #d9d9d9;
     border-radius: 6px;
-    overflow: hidden;
+    overflow: visible;
     background-color: #ffffff;
+    position: relative;
+    z-index: 1;
+    margin-top: 30px;
+    /* Added spacing to move entire viewer downward */
 }
 
 .controls-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 12px;
-    background: linear-gradient(135deg, #f0f2f5 0%, #e8e8e8 100%);
-    border-bottom: 1px solid #d9d9d9;
+    padding: 4px 8px;
+    background: transparent;
+    border: none;
+    position: relative;
+    z-index: 10;
+}
+
+.sequence-stats {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
 }
 
 .sequence-info {
@@ -1317,31 +1692,51 @@ onUnmounted(() => {
     font-weight: 500;
 }
 
+/* Range numbers container above progress bar */
+.range-numbers-container {
+    height: 20px;
+    /* Space for range numbers */
+    position: relative;
+    margin-bottom: 5px;
+    /* Small gap between range numbers and progress bar */
+}
+
+/* Trapezoid fill with very light blue */
+.trapezoid-fill {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.6;
+    /* Slight transparency for better visual integration */
+}
+
+/* Red range numbers positioned above progress bar */
+.range-number {
+    position: absolute;
+    top: 0;
+    font-size: 11px;
+    font-weight: bold;
+    color: #2496ff !important;
+    /* Red color */
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 10001 !important;
+    /* Higher than black progress indices */
+    font-family: 'Monaco', 'Menlo', monospace;
+    /* Removed background-color, padding, and border-radius */
+    min-width: 20px;
+    text-align: center;
+}
+
 .progress-bar-container {
     width: 100%;
-    border-bottom: 1px solid #d9d9d9;
-}
-
-.progress-info-section {
-    height: 25px;
-    background-color: #ffbb4d;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-bottom: 1px solid #e8e8e8;
-}
-
-.progress-info-text {
-    font-size: 12px;
-    font-weight: 600;
-    color: #333;
 }
 
 .progress-position-section {
-    height: 30px;
+    height: 24px;
     background-color: #ffffff;
     position: relative;
-    overflow: visible; /* Changed from hidden to visible */
+    overflow: visible;
+    z-index: 20;
 }
 
 .position-indicators {
@@ -1354,7 +1749,6 @@ onUnmounted(() => {
     background-color: #ffffff;
 }
 
-/* Updated selected color to #df5d5d */
 .position-block.selected {
     background-color: #df5d5d !important;
 }
@@ -1369,7 +1763,6 @@ onUnmounted(() => {
     z-index: 10;
 }
 
-/* Fixed progress position label styling - simple black text only */
 .progress-position-label {
     top: 0;
     height: 100%;
@@ -1378,10 +1771,9 @@ onUnmounted(() => {
     justify-content: center;
     font-size: 10px;
     font-weight: 600;
-    color: #000; /* Simple black text */
+    color: #000;
     font-family: 'Monaco', 'Menlo', monospace;
     pointer-events: none;
-    /* No background, no text-shadow - just clean black text */
     border-radius: 2px;
     min-width: 15px;
     max-width: 30px;
@@ -1392,38 +1784,50 @@ onUnmounted(() => {
     top: 0;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.2);
-    border-top: 2px solid #cfcfcf;
-    border-bottom: 2px solid #cfcfcf;
-    /* Removed left and right borders since handles provide those */
     cursor: move;
     min-width: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 20;
+    z-index: 30;
+    overflow: visible;
 }
 
-/* Range display positioned at container level and calculated dynamically */
-.mask-range-display {
-    font-size: 10px;
+/* Indicators inside the mask */
+.mask-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
     font-weight: bold;
-    color: #1890ff;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 2px 6px;
-    border-radius: 3px;
-    border: 1px solid #1890ff;
+    color: #ffffff;
     pointer-events: none;
-    white-space: nowrap;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    user-select: none;
+    font-family: monospace;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    z-index: 50;
+}
+
+.mask-indicator-left {
+    left: 8px;
+}
+
+.mask-indicator-right {
+    right: 8px;
 }
 
 .mask-handle {
     position: absolute;
     top: 0;
     height: 100%;
-    width: 4px; /* Reduced from 8px to 4px */
-    background-color: #cfcfcf;
+    width: 4px;
+    background-color: var(--handle-color, #cfcfcf);
+    opacity: var(--handle-opacity, 0);
+    /* Default to 0, controlled by hover */
     cursor: col-resize;
+    z-index: 40;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+    /* Smooth transitions */
 }
 
 .mask-handle-left {
@@ -1434,13 +1838,46 @@ onUnmounted(() => {
     right: 1px;
 }
 
+/* Hover indicator styles */
+.mask-hover-indicator {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    transition: opacity 0.2s ease;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 2px 6px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+}
+
+.mask-hover-left {
+    transform: translateX(-100%);
+    /* Position to the left */
+}
+
+.mask-hover-right {
+    transform: translateX(0%);
+    /* Position to the right */
+}
+
+/* Projection lines styles - HIGHEST Z-INDEX */
+.projection-line {
+    position: absolute;
+    pointer-events: none;
+    z-index: 10000 !important;
+}
+
 .sequence-window {
     width: 100%;
-    height: 80px;
+    height: 60px;
     background-color: #ffffff;
     overflow: hidden;
-    padding-top: 15px; /* Add space above index row */
+    padding-top: 20px;
+    margin-top: 8px;
     box-sizing: border-box;
+    position: relative;
+    z-index: 30;
 }
 
 .sequence-container {
@@ -1451,6 +1888,7 @@ onUnmounted(() => {
     position: relative;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    z-index: 31;
 }
 
 .sequence-container::-webkit-scrollbar {
@@ -1458,12 +1896,13 @@ onUnmounted(() => {
 }
 
 .sequence-position-labels {
-    height: 20px;
+    height: 16px;
     position: relative;
     background-color: #f8f8f8;
-    border-bottom: none; /* Remove border */
+    border-bottom: 1px solid #e8e8e8;
     margin: 0;
     padding: 0;
+    z-index: 32;
 }
 
 .sequence-position-label {
@@ -1477,27 +1916,31 @@ onUnmounted(() => {
     color: #8c8c8c;
     font-family: 'Monaco', 'Menlo', monospace;
     pointer-events: none;
+    z-index: 35;
 }
 
 .sequence-display {
-    height: 40px; /* Exact same height as sequence chars */
+    height: 32px;
     display: flex;
-    align-items: stretch; /* Make chars fill full height */
+    align-items: stretch;
     font-weight: 600;
     line-height: 1;
     user-select: none;
     margin: 0;
     padding: 0;
+    z-index: 33;
 }
 
 .sequence-char {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 100%; /* Fill the parent container completely */
+    height: 100%;
     cursor: pointer;
     transition: all 0.1s ease;
     letter-spacing: 0px;
+    position: relative;
+    z-index: 34;
 }
 
 .sequence-char:hover {
@@ -1542,7 +1985,6 @@ onUnmounted(() => {
     font-size: 14px;
 }
 
-/* Updated amino-letter to use Calibri */
 .amino-letter {
     font-family: 'Calibri', sans-serif;
     font-weight: bold;
@@ -1554,7 +1996,6 @@ onUnmounted(() => {
     width: 80px;
 }
 
-/* Calibri font for select components */
 .calibri-select :deep(.n-base-selection) {
     font-family: 'Calibri', sans-serif !important;
     min-height: 32px !important;
