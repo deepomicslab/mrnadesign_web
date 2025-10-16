@@ -266,6 +266,7 @@
                                                     :class="{
                                                         selected: selectedIndices.includes(index),
                                                     }"
+                                                    :style="getProgressBlockStyle(index)"
                                                 ></div>
                                             </div>
 
@@ -282,15 +283,12 @@
                                                 </span>
                                             </div>
 
-                                            <!-- Viewport mask with range display -->
+                                            <!-- Viewport mask without range display -->
                                             <div
                                                 class="viewport-mask"
                                                 :style="viewportMaskStyle"
                                                 @mousedown="handleMaskBodyMouseDown"
                                             >
-                                                <div class="mask-range-display">
-                                                    {{ maskRangeText }}
-                                                </div>
                                                 <div
                                                     class="mask-handle mask-handle-left"
                                                     @mousedown.stop="handleLeftHandleMouseDown"
@@ -299,6 +297,14 @@
                                                     class="mask-handle mask-handle-right"
                                                     @mousedown.stop="handleRightHandleMouseDown"
                                                 ></div>
+                                            </div>
+
+                                            <!-- Range display positioned at container level -->
+                                            <div
+                                                class="mask-range-display"
+                                                :style="maskRangeDisplayStyle"
+                                            >
+                                                {{ maskRangeText }}
                                             </div>
                                         </div>
                                     </div>
@@ -644,19 +650,73 @@ const maskRangeText = computed(() => {
     return `${viewportStart.value + 1}-${viewportEnd.value}`
 })
 
+// Range display positioning computed
+const maskRangeDisplayStyle = computed(() => {
+    if (!progressContainer.value || yourArray.value.length === 0) {
+        return { display: 'none' }
+    }
+
+    const containerWidth = progressContainer.value.offsetWidth
+    const totalLength = yourArray.value.length
+    const startPercent = (viewportStart.value / totalLength) * 100
+    const endPercent = (viewportEnd.value / totalLength) * 100
+
+    // Calculate mask positions
+    const maskRightPercent = endPercent
+    const maskRightPx = (maskRightPercent / 100) * containerWidth
+    const maskLeftPercent = startPercent
+    const maskLeftPx = (maskLeftPercent / 100) * containerWidth
+
+    // Estimate the width of the range display (approximate)
+    const rangeDisplayWidth = 60 // rough estimate in pixels
+
+    // Check if there's enough space on the right
+    const spaceOnRight = containerWidth - maskRightPx
+    const shouldPositionLeft = spaceOnRight < rangeDisplayWidth + 10 // 10px buffer
+
+    if (shouldPositionLeft) {
+        // Position to the left of the mask
+        return {
+            position: 'absolute' as const,
+            top: '20px',
+            left: `${Math.max(0, maskLeftPx - rangeDisplayWidth - 8)}px`, // 8px offset from mask left edge
+            zIndex: '100',
+        }
+    }
+    // Position to the right of the mask (original behavior)
+    return {
+        position: 'absolute' as const,
+        top: '20px',
+        left: `${maskRightPx + 8}px`, // 8px offset from mask right edge
+        zIndex: '100',
+    }
+})
+
+// Fixed: Use consistent positioning for both blocks and labels
+const getProgressBlockStyle = (index: number) => {
+    const blockWidth = actualContainerWidth.value / yourArray.value.length
+    return {
+        position: 'absolute' as const,
+        left: `${index * blockWidth}px`,
+        width: `${blockWidth}px`,
+        height: '100%',
+    }
+}
+
+const getProgressPositionStyle = (index: number) => {
+    const blockWidth = actualContainerWidth.value / yourArray.value.length
+    return {
+        position: 'absolute' as const,
+        left: `${index * blockWidth}px`,
+        width: `${blockWidth}px`,
+    }
+}
+
 // Style functions
 const sequenceDisplayStyle = computed(() => ({
     width: `${visibleSequence.value.length * charWidth.value}px`,
     fontSize: `${Math.max(12, CHAR_BASE_SIZE * zoomLevel.value)}px`,
 }))
-
-const getProgressPositionStyle = (index: number) => {
-    const blockWidth = actualContainerWidth.value / yourArray.value.length
-    return {
-        left: `${index * blockWidth}px`,
-        width: `${blockWidth}px`,
-    }
-}
 
 const shouldShowProgressPosition = (pos: number) => {
     return (pos - 1) % positionLabelInterval.value === 0
@@ -687,7 +747,7 @@ const getCharStyle = (index: number) => {
 
     return {
         width: `${charWidth.value}px`,
-        backgroundColor: isSelected || isDragSelected ? '#df5d5d' : '#fcc060',
+        backgroundColor: isSelected || isDragSelected ? '#df5d5d' : '#53dee6',
         color: '#000000',
         fontFamily: 'Calibri, sans-serif',
         fontWeight: isSelected || isDragSelected ? 'bold' : 'normal',
@@ -1281,20 +1341,16 @@ onUnmounted(() => {
     height: 30px;
     background-color: #ffffff;
     position: relative;
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to visible */
 }
 
 .position-indicators {
     width: 100%;
     height: 100%;
-    display: flex;
-    align-items: stretch;
+    position: relative;
 }
 
 .position-block {
-    flex: 1;
-    min-width: 1px;
-    height: 100%;
     background-color: #ffffff;
 }
 
@@ -1315,7 +1371,6 @@ onUnmounted(() => {
 
 /* Fixed progress position label styling - simple black text only */
 .progress-position-label {
-    position: absolute;
     top: 0;
     height: 100%;
     display: flex;
@@ -1337,7 +1392,9 @@ onUnmounted(() => {
     top: 0;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.2);
-    border: 2px solid #1890ff;
+    border-top: 2px solid #cfcfcf;
+    border-bottom: 2px solid #cfcfcf;
+    /* Removed left and right borders since handles provide those */
     cursor: move;
     min-width: 20px;
     display: flex;
@@ -1346,29 +1403,35 @@ onUnmounted(() => {
     z-index: 20;
 }
 
+/* Range display positioned at container level and calculated dynamically */
 .mask-range-display {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: bold;
-    color: #ffffff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    color: #1890ff;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #1890ff;
     pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .mask-handle {
     position: absolute;
     top: 0;
     height: 100%;
-    width: 8px;
-    background-color: #1890ff;
+    width: 4px; /* Reduced from 8px to 4px */
+    background-color: #cfcfcf;
     cursor: col-resize;
 }
 
 .mask-handle-left {
-    left: -4px;
+    left: 1px;
 }
 
 .mask-handle-right {
-    right: -4px;
+    right: 1px;
 }
 
 .sequence-window {
@@ -1376,6 +1439,8 @@ onUnmounted(() => {
     height: 80px;
     background-color: #ffffff;
     overflow: hidden;
+    padding-top: 15px; /* Add space above index row */
+    box-sizing: border-box;
 }
 
 .sequence-container {
@@ -1396,7 +1461,9 @@ onUnmounted(() => {
     height: 20px;
     position: relative;
     background-color: #f8f8f8;
-    border-bottom: 1px solid #e8e8e8;
+    border-bottom: none; /* Remove border */
+    margin: 0;
+    padding: 0;
 }
 
 .sequence-position-label {
@@ -1413,19 +1480,21 @@ onUnmounted(() => {
 }
 
 .sequence-display {
-    height: 59px;
+    height: 40px; /* Exact same height as sequence chars */
     display: flex;
-    align-items: center;
+    align-items: stretch; /* Make chars fill full height */
     font-weight: 600;
     line-height: 1;
     user-select: none;
+    margin: 0;
+    padding: 0;
 }
 
 .sequence-char {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 40px;
+    height: 100%; /* Fill the parent container completely */
     cursor: pointer;
     transition: all 0.1s ease;
     letter-spacing: 0px;
