@@ -61,7 +61,7 @@ const process_forna = async () => {
     ])
         .then(() => {
             // After loading scripts, initialize the RNA container
-            const container = new FornaContainer('#rna_ss', { applyForce: true })
+            const container = new FornaContainer('#rna_ss', { applyForce: false })
             const options = {
                 structure: data.structure,
                 sequence: data.sequence,

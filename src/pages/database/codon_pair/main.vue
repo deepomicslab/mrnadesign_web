@@ -143,6 +143,7 @@ const main_get_response = async (pagevalueoffset: number) => {
         },
     })
     const { data } = response
+    console.log(data)
     Maindata.value = data
     loading.value = false
 }

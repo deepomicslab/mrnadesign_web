@@ -242,7 +242,7 @@ const handleFilterChange = async filter => {
         },
     })
     const { data } = response
-    Maindata.value = data
+    Antigendata.value = data
     loading.value = false
 }
 
