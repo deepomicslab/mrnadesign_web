@@ -117,28 +117,28 @@ const menuOptions: MenuOption[] = [
                 label: 'UTRdb 2.0',
                 key: '/database/utrdb',
             },
-            {
-                label: 'Isoform DB',
-                key: '/database/isoformdb/',
-                children: [
-                    {
-                        label: 'Datasets',
-                        key: '/database/isoformdb/datasets',
-                    },
-                    {
-                        label: 'Samples',
-                        key: '/database/isoformdb/samples',
-                    },
-                    {
-                        label: 'Isoforms',
-                        key: '/database/isoformdb/isoforms',
-                    },
-                    {
-                        label: 'Genes',
-                        key: '/database/isoformdb/genes',
-                    },
-                ],
-            },
+            // {
+            //     label: 'Isoform DB',
+            //     key: '/database/isoformdb/',
+            //     children: [
+            //         {
+            //             label: 'Datasets',
+            //             key: '/database/isoformdb/datasets',
+            //         },
+            //         {
+            //             label: 'Samples',
+            //             key: '/database/isoformdb/samples',
+            //         },
+            //         {
+            //             label: 'Isoforms',
+            //             key: '/database/isoformdb/isoforms',
+            //         },
+            //         {
+            //             label: 'Genes',
+            //             key: '/database/isoformdb/genes',
+            //         },
+            //     ],
+            // },
             {
                 label: 'Codon Pair',
                 key: '/database/codon_pair/',
