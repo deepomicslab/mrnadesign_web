@@ -12,13 +12,19 @@
     </n-config-provider>
 </template>
 
-<script lang="ts">
-import { NConfigProvider, GlobalThemeOverrides } from 'naive-ui'
-</script>
 <script setup lang="ts">
+import { NConfigProvider, GlobalThemeOverrides } from 'naive-ui'
+import { onMounted } from 'vue'
 import hljs from 'highlight.js/lib/core'
 import markdown from 'highlight.js/lib/languages/markdown'
+import { useAuthStore } from '@/store/auth'
 import windi from '@/windi'
+
+const authStore = useAuthStore()
+
+onMounted(() => {
+    authStore.initializeAuth()
+})
 
 const themeOverrides: GlobalThemeOverrides = {
     common: {
@@ -52,25 +58,31 @@ hljs.registerLanguage('markdown', markdown)
     --n-close-size: 1rem !important;
     --n-padding: 20px 35px !important;
 }
+
 /*Cancel the expansion symbol in the lower right corner of the input box  */
 .n-input.n-input--textarea.n-input--resizable .n-input-wrapper {
     resize: none;
 }
+
 /*upload component height  changes with the height of the outside div  */
 .n-upload-trigger {
     width: 100%;
     height: 100%;
 }
+
 .n-upload-dragger {
     height: 100%;
 }
+
 .n-upload.n-upload--dragger-inside {
     height: 100%;
 }
+
 /*upload component filelist style */
 .n-upload-file-info__thumbnail {
     margin-bottom: 7px;
 }
+
 .n-upload-file-list {
     width: 98%;
     margin-left: 10px;

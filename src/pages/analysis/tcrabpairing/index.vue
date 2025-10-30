@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col w-full">
         <el-scrollbar class="w-full" ref="scrollbarRef" v-load="loading">
-            <div class="flex flex-col outer-container">
+            <div class="flex flex-col outer-container min-h-screen bg-gray-100">
                 <div class="font-600 ml-20 mt-16 flex flex-row border-b-2 w-9/10 pb-5">
                     <div class="text-4xl text-[#253959]">TCR Alpha-Beta Chain Pairing</div>
                     <el-button
@@ -113,21 +113,6 @@
                         </div>
                         <div v-for="(inputGroup, index) in inputBlocks" :key="index" class="w-190">
                             <hr class="mb-5" />
-                            <el-form-item label="Name" label-width="100px" class="is-required">
-                                <n-input-group>
-                                    <n-input
-                                        round
-                                        placeholder="Name"
-                                        type="textarea"
-                                        clearable
-                                        :rows="1"
-                                        v-model:value="inputGroup.name"
-                                    ></n-input>
-                                    <n-input-group-label @click="deleteInputBlock(index)">
-                                        Delete this entry
-                                    </n-input-group-label>
-                                </n-input-group>
-                            </el-form-item>
                             <el-form-item label="Select" label-width="100px" class="is-required">
                                 <n-input-group class="w-full">
                                     <n-dropdown
@@ -153,9 +138,9 @@
                                             {{ inputGroup.element || 'Select Gene Element' }}
                                         </n-button>
                                     </n-dropdown>
-                                    <n-input-group-label @click="importFromDB(index)">
+                                    <!-- <n-input-group-label @click="importFromDB(index)">
                                         Import data from DB
-                                    </n-input-group-label>
+                                    </n-input-group-label> -->
                                 </n-input-group>
                             </el-form-item>
                             <el-form-item label="Input" label-width="100px" class="is-required">
@@ -171,6 +156,9 @@
                                             maxRows: 3,
                                         }"
                                     ></n-input>
+                                    <n-input-group-label @click="deleteInputBlock(index)">
+                                        Delete this entry
+                                    </n-input-group-label>
                                 </n-input-group>
                             </el-form-item>
                         </div>
@@ -225,7 +213,7 @@ import { useUserIdGenerator } from '@/utils/userIdGenerator'
 import { encrypt } from '@/utils/crypto'
 import { windowErrorMessage, windowSuccessMessage } from '@/utils/windowFunctions'
 import { tcrabpairingChainRefOptions, tcrabpairingGeneElementRefOptions } from '@/utils/selectionoptions'
-const inputBlocks = ref([{ name: '', chain: '', element: '', seq: '' }]) // Initialize with one input block
+const inputBlocks = ref([{ chain: '', element: '', seq: '' }]) // Initialize with one input block
 const inputBlocktoPass = ref({ chain: '', element: '', seq: '' })
 
 const fileList = ref<UploadFileInfo[]>([])
@@ -250,36 +238,33 @@ const handleInputGeneElement = (key: string, option: any, index: number) => {
 }
 
 const addInputBlock = () => {
-    inputBlocks.value.push({ name: '', chain: '', element: '', seq: '' }) // Add a new input block
+    inputBlocks.value.push({ chain: '', element: '', seq: '' }) // Add a new input block
 }
-const importFromDB = (index: number) => {
-    console.log('=====================================', index, inputBlocks.value[index].chain)
-    if (inputBlocks.value[index].chain === '') {
-        windowErrorMessage('Please select chain first')
-        return
-    }
-    if (inputBlocks.value[index].element === '') {
-        windowErrorMessage('Please select gene element first')
-        return
-    }
-    importID.value = index
-    passchain.value = inputBlocks.value[index].chain
-    passelement.value = inputBlocks.value[index].element
-    selectionDialogVisible.value = true
-}
+// const importFromDB = (index: number) => {
+//     if (inputBlocks.value[index].chain === '') {
+//         windowErrorMessage('Please select chain first')
+//         return
+//     }
+//     if (inputBlocks.value[index].element === '') {
+//         windowErrorMessage('Please select gene element first')
+//         return
+//     }
+//     importID.value = index
+//     passchain.value = inputBlocks.value[index].chain
+//     passelement.value = inputBlocks.value[index].element
+//     selectionDialogVisible.value = true
+// }
 const deleteInputBlock = (index: number) => {
     inputBlocks.value.splice(index, 1)
 }
 const fillSequence = () => {
     inputBlocks.value.length = 0
     inputBlocks.value.push({
-        name: 'seq1',
         chain: 'Alpha',
         element: 'V Gene',
         seq: 'TRAV1-1',
     })
     inputBlocks.value.push({
-        name: 'seq1',
         chain: 'Beta',
         element: 'CDR3',
         seq: 'CAVNTGGFKTIF',
@@ -292,7 +277,6 @@ const handleSelectionDialogVisible = (value: any) => {
 const handleInputBlocktoPass = (value: any) => {
     inputBlocktoPass.value = value
     inputBlocks.value[importID.value].seq = inputBlocktoPass.value.seq
-    console.log('------------>', inputBlocktoPass.value)
 }
 
 const handleFileListChange = (data: UploadFileInfo[]) => {
@@ -334,10 +318,6 @@ const godemo = () => {
 
 const checkPasteInput = () => {
     // error code: 0 for true, 1 for requiring input, 2 for requiring letters
-    const isOnlyLettersAndDigits = (str: string) => {
-        const regex = /^[A-Za-z0-9]+$/
-        return regex.test(str)
-    }
 
     if (inputBlocks.value.length === 0) {
         return 1
@@ -345,13 +325,9 @@ const checkPasteInput = () => {
     for (let i = 0; i < inputBlocks.value.length; i += 1) {
         const block = inputBlocks.value[i]
         if (
-            block.name.length === 0 ||
             block.seq.length === 0
         ) {
             return 1
-        }
-        if (!isOnlyLettersAndDigits(block.name)) {
-            return 2
         }
         if (block.chain === '') {
             return 3
@@ -386,9 +362,6 @@ const submit = async () => {
             switch (paster_input_code) {
                 case 1:
                     windowErrorMessage('Please input sequence')
-                    break
-                case 2:
-                    windowErrorMessage('Only letters and digits are allowed in the name')
                     break
                 case 3:
                     windowErrorMessage('Please select chain for all input blocks')
@@ -471,7 +444,7 @@ const gosubmithelper = () => {
     display: flex;
     flex-direction: column;
     padding: 20px;
-    background-color: #f9f9f9;
     border-radius: 8px;
+    // Remove background-color since we're using Tailwind's bg-gray-100
 }
 </style>

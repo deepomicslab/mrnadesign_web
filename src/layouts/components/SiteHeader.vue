@@ -238,6 +238,7 @@ const menuOptions: MenuOption[] = [
     { label: 'Download', key: '/download', icon: renderIcon(DownloadIcon) },
     { label: 'Tutorial', key: '/tutorial', icon: renderIcon(tutorialIcon) },
     { label: 'Contact us', key: '/contact', icon: renderIcon(UserIcon) },
+    { label: 'User Management', key: '/login', icon: renderIcon(UserIcon) },
 ]
 
 const router = useRouter()

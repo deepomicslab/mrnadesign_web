@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col w-full">
         <el-scrollbar class="w-full" ref="scrollbarRef" v-load="loading">
-            <div class="flex flex-col outer-container">
+            <div class="flex flex-col outer-container min-h-screen bg-gray-100">
                 <div class="font-600 ml-20 mt-16 flex flex-row border-b-2 w-9/10 pb-5">
                     <div class="text-4xl text-[#253959]">Linear Design (CDS only)</div>
                     <el-button
@@ -535,7 +535,7 @@ const gosubmithelper = () => {
     display: flex;
     flex-direction: column;
     padding: 20px;
-    background-color: #f9f9f9;
     border-radius: 8px;
+    // Remove background-color since we're using Tailwind's bg-gray-100
 }
 </style>

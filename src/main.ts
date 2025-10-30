@@ -19,18 +19,6 @@ const router = createRouter({
 })
 app.use(router)
 
-// import { basicSetup } from 'codemirror'
-// import VueCodemirror from 'vue-codemirror'
-// app.use(VueCodemirror, {
-//     // optional default global options
-//     autofocus: true,
-//     disabled: false,
-//     indentWithTab: true,
-//     tabSize: 5,
-//     placeholder: 'Code goes here...',
-//     extensions: [basicSetup],
-//     // ...
-// })
 // Pinia
 import { createPinia } from 'pinia'
 import piniaPluginPersist from 'pinia-plugin-persist'
@@ -47,14 +35,10 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 app.use(ElementPlus)
 
-// import GSignInButton from 'vue-google-signin-button'
-// app.use(GSignInButton)
-
 // WindiCSS
 import 'virtual:windi.css'
 
 // NProgress
-// index.html 中通过 #nprogress .bar 修改进度条颜色
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 NProgress.configure({
@@ -63,10 +47,34 @@ NProgress.configure({
     speed: 500, // 动画速度
     minimum: 0.3, // 最低百分比
 })
-router.beforeEach((to, from, next) => {
+
+router.beforeEach(async (to, from, next) => {
     NProgress.start()
-    next()
+
+    try {
+        // Auth guard logic - FIXED
+        const { useAuthStore } = await import('./store/auth')
+        const authStore = useAuthStore()
+
+        authStore.initializeAuth()
+
+        const requiresAuth = to.path.includes('/database/transcripthub/')
+
+        // REMOVED: No auto-redirect from login page for authenticated users
+        // This allows authenticated users to access the User Management page (/login)
+
+        if (requiresAuth && !authStore.isAuthenticated) {
+            next(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
+            return
+        }
+
+        next()
+    } catch (error) {
+        console.error('Router guard error:', error)
+        next()
+    }
 })
+
 router.afterEach(() => {
     NProgress.done()
 })

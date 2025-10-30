@@ -31,9 +31,7 @@
                 mode="horizontal"
                 @select="change_flist_entry"
             >
-                <el-menu-item v-for="t in flist" :key="t" :index="t">
-                    {{ t }}
-                </el-menu-item>
+                <el-menu-item v-for="t in flist" :key="t" :index="t">seq_id {{ t }}</el-menu-item>
             </el-menu>
         </div>
         <div v-loading="loading" class="mb-20">
@@ -423,15 +421,15 @@ const inputparamcolumns = ref<DataTableColumns<RowData>>([
         },
         width: columnWidth.short,
     },
-    {
-        title: 'name',
-        key: 'name',
-        align: 'center',
-        ellipsis: {
-            tooltip: true,
-        },
-        width: columnWidth.short,
-    },
+    // {
+    //     title: 'name',
+    //     key: 'name',
+    //     align: 'center',
+    //     ellipsis: {
+    //         tooltip: true,
+    //     },
+    //     width: columnWidth.short,
+    // },
     {
         title: 'chain',
         key: 'chain',
